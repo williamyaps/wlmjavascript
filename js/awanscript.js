@@ -38,7 +38,7 @@ function main_init() {
     geometry = new THREE.Geometry();
 
     // loading texture
-    var texture = THREE.ImageUtils.loadTexture('images/clouds.png');
+    var texture = THREE.ImageUtils.loadTexture('https://williamyaps.github.io/wlmjavascript/img/clouds.png');
     texture.magFilter = THREE.LinearMipMapLinearFilter;
     texture.minFilter = THREE.LinearMipMapLinearFilter;
 
