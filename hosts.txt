@@ -1,0 +1,94 @@
+# Copyright (c) 1993-2009 Microsoft Corp.
+#
+# This is a sample HOSTS file used by Microsoft TCP/IP for Windows.
+#
+# This file contains the mappings of IP addresses to host names. Each
+# entry should be kept on an individual line. The IP address should
+# be placed in the first column followed by the corresponding host name.
+# The IP address and the host name should be separated by at least one
+# space.
+#
+# Additionally, comments (such as these) may be inserted on individual
+# lines or following the machine name denoted by a '#' symbol.
+#
+# For example:
+#
+#      102.54.94.97     rhino.acme.com          # source server
+#       38.25.63.10     x.acme.com              # x client host
+# localhost name resolution is handled within DNS itself.
+#	127.0.0.1       localhost
+#	::1             localhost
+
+127.0.0.1	cfs.u-ad.info
+127.0.0.1	cfs1.uzone.id
+0.0.0.0		118.97.116.27
+127.0.0.1	i.mobavatar.com
+127.0.0.1	mobavatar.com
+127.0.0.1	internet-positif.org 
+127.0.0.l	internetpositif.uzone.id
+127.0.0.1	getfireshot.com
+127.0.0.1	histats.com
+127.0.0.1	www.telkom.co.id
+127.0.0.1	telkom.co.id
+127.0.0.1	syndication.exoclick.com
+127.0.0.1	exoclick.com
+127.0.0.1	cdn.adplxmd.com
+0.0.0.0		buenosearch.com
+0.0.0.0		www.buenosearch.com
+127.0.0.1	cfs.uzone.id
+127.0.0.1	u-ad.info
+127.0.0.1	eclkmpsa.com
+127.0.0.1	data.cytochemistryrecitativewrasse.com
+127.0.0.1	tagila.adk2x.comimp
+127.0.0.1	www.adnetworkperformance.com
+127.0.0.1	adnetworkperformance.com
+127.0.0.1	www.bersama365.com
+127.0.0.1	www.jdhoki.com
+127.0.0.1	www.bukainternet.com
+127.0.0.1	www.jdhoki.com
+127.0.0.1	www.sayatogel.com
+127.0.0.1	www.gemapoker.com
+127.0.0.1	www.onclickpredictiv.com
+127.0.0.1	yie4zooseif.info
+127.0.0.1	engine.spotscenered.info
+127.0.0.1	ads.adxpansion.com
+127.0.0.1	api-public.addthis.com
+127.0.0.1	addthis.com
+127.0.0.1	m.addthis.com
+127.0.0.1	s7.addthis.com
+127.0.0.1	main.exoclick.com
+127.0.0.1	a.tribalfusion.com
+0.0.0.0		asiabandarkiu.com
+0.0.0.0		www.asiabandarkiu.com
+0.0.0.0		bandarqiu.com
+0.0.0.0		www.bandarqiu.com
+0.0.0.0		egame.pkvn.mobi
+0.0.0.0		pkvn.mobi
+0.0.0.0		www.pokerstars.net
+0.0.0.0		m.pokerstars.net
+0.0.0.0		m.asiabandarkiu.com
+0.0.0.0		m.bandarqiu.com
+0.0.0.0		m.pokerstars.net
+0.0.0.0		m.egame.pkvn.mobi
+0.0.0.0		m.pkvn.mobi
+127.0.0.1	ads.stickyadstv.com
+0.0.0.0		[*.]pkvn.mobi
+0.0.0.0		[*.]uzone.id
+127.0.0.1	104.28.28.98
+
+127.0.0.1	104.28.29.98
+58.64.192.142	play.tudou.com
+127.0.0.1	match.adsrvr.org
+127.0.0.1	links.services.disqus.com
+127.0.0.1	www.madadsmedia.com
+127.0.0.1	go.adversal.com
+127.0.0.1	h-98reale.com
+127.0.1.1	go.pub2srv.com
+127.0.0.1	deloton.com
+127.0.0.1	bigpicturepop.com
+127.0.0.1	Onclickads.net
+127.0.0.1	cfs2.uadexchange.com
+127.0.0.1	p02.notifa.info
+127.0.0.1	adservice.google.co.id
+127.0.0.1	pagead2.googlesyndication.com
+127.0.0.1	cdnjs.cloudflare.com
