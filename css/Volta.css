@@ -1,0 +1,279 @@
+/******************************************************************************
+Project          :  Engineering Calculator VOLTA
+Module           :  Style Sheet CSS3
+******************************************************************************
+Author           :  William Yap
+Copyright        :  https://williamyaps.github.io
+Date Created     :  01/20/2019
+Last Modified    :  23/09/2019
+******************************************************************************
+DISCLAIMER: This Application is provide on AS IS basis without any warranty
+******************************************************************************
+TERMS OF USE     :  This module is copyrighted. You can use it provided that
+                 :  you keep the original copyright note.
+******************************************************************************/
+
+/* MAIN DIV W/ALL CONTENTS */
+.oscMain {
+    width:100%;
+    margin:0;
+    max-width:1080px;
+    min-width:320px;
+ 	padding:3px 10px;
+ 	/* make rounded corners */
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    /* add gradient */
+    background-color: #9a9a9a;
+    background: -webkit-gradient(linear, left top, left bottom, from(#404040), to(#707070));
+    background: -moz-linear-gradient(top, #404040, #707070);
+}
+
+div.oscCaption, div.oscModel {
+    margin:0;
+    height:2em; 
+    line-height:2em; 
+    vertical-align:middle;
+}
+
+div.oscCaption {
+    float:right;
+    font-weight:400;
+    color: #dadada;
+    font-size: 0.8em; 
+}
+
+div.oscModel {
+    float:left;
+    font-size: 0.8em; 
+    padding: 0em 1em;
+    text-align:center;
+    background-color: #303030;
+    font-weight:600;
+    color: yellow;
+    /* make rounded corners */
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.div-left-button{text-align:left;}
+
+/* CONTROLS' WIDTH */
+div#keyPad { width: 100%; }
+
+/* KEYS AND CONTROLS*/
+div#keyPad button, .oscExtControl, .oscStackControl {width:13%;}
+
+/* EXTENDER CONTROL */
+.oscExtControl{float:right;}
+.oscExtControl, .oscStackControl
+{
+    height:34px;
+    line-height:34px;
+    vertical-align:middle;
+    text-align:center;
+    background-color: olive;
+    color: #dadada;
+    font-size: 20px;
+    font-weight:400;
+    cursor: pointer;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+
+div#keyPad button#keyPad_btnReserved1 {width:27%}
+
+div#keyPad button#keyPad_btnEnter {border: solid 2px #a1a121; color:Yellow; width: 27%; }
+
+div#keyPad input#keyPad_UserInput { width: 85%; font-size: 1.4em;}
+div#keyPad input#keyPad_Mem { width: 85%; font-size: 1.2em;}
+
+button#keyPad_btnE48,
+button#keyPad_btnE96,
+button#keyPad_btnE192,
+button#keyPad_btnCe { float:right; }
+
+.oscStackRegister { width: 100%;}
+
+.keyPad_btnNumeric, 
+.keyPad_btnConst, 
+.keyPad_btnCommand,
+.keyPad_btnPrefix { margin-right:1px;}
+
+.keyPad_btnBinaryOp, 
+.keyPad_btnUnaryOp, 
+.keyPad_btnAdRight { float:right; }
+
+/* stack register content */
+.oscStackRegister
+{
+    width: 100%;
+    margin-top:5px;
+    height:30px;
+    line-height:30px;
+    vertical-align:middle;
+    font-size: 22px;
+    font-weight:normal;
+    text-align:center;
+    color:#eaeaea;
+    background-color:Olive;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    filter:alpha(opacity=90);
+	-moz-opacity:0.9;
+	opacity: 0.9;
+	z-index:20;
+	cursor: pointer;
+} 
+
+/* extended functions area */
+.voltExtPanel, .voltESeries
+{
+    margin:0px;  
+    padding: 5px; 
+    display:block; 
+    background-color:#404040; 
+    border: solid 1px Olive;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+
+/* CONTROLS: KEYS, INPUT/MEM TEXT BOXES */
+div#keyPad input, div#keyPad button 
+{
+    margin: 0px;
+    padding: 0px;
+    height: 30pt;
+    line-height:30pt;
+    vertical-align:middle;
+    border: 1px solid #808080;
+    font-family: Arial, Tahoma, Verdana, Calibri;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+div#keyPad button 
+{
+    text-align: center;
+    font-size: 11pt;
+    cursor: pointer;
+    color: #efefef;
+    font-weight:500;
+    /* add gradient */
+    background:#404040;
+    background: -moz-linear-gradient(top, #707070, #505050 50%, #303030 50%, #202020);
+    background: -webkit-gradient(linear, left top, left bottom, from(#707070),
+    color-stop(0.5, #505050), color-stop(0.5, #303030), to(#202020));
+}
+div#keyPad button:active {	border: solid 2px #707070; }
+div#keyPad button:hover  {
+    background: #606060;
+    background: -moz-linear-gradient(top, #606060, #404040 50%, #303030 50%, #101010);
+    background: -webkit-gradient(linear, left top, left bottom, from(#606060),
+    color-stop(0.5, #404040), color-stop(0.5, #303030), to(#101010));
+}
+
+/* INPUT/MEM TEXT BOXES*/
+div#keyPad input 
+{
+    float:left;
+    text-align: left;
+    text-indent:1em;
+    color: yellow;
+    /* add gradient */
+    background: #303030;
+    background: -webkit-gradient(linear, center top, center bottom, from(#101010), to(#505050));
+    background: -moz-linear-gradient(top, #101010, #505050);
+}
+
+/* MEM BOX */
+div#keyPad input#keyPad_Mem 
+{
+    color: #eaeaea;
+    cursor: pointer;
+    /* add stop gradient */
+    background: -moz-linear-gradient(top, #404040, #303030 50%, #202020 50%, #101010);
+    background: -webkit-gradient(linear, left top, left bottom, from(#404040),
+    color-stop(0.5, #303030), color-stop(0.5, #202020), to(#101010));
+}
+	
+/* MEM OP KEYS*/
+div#keyPad .keyPad_btnMemOp {border:2px solid #c4b5eb; color:#adcde5;  float:right;}
+
+/* ENTER BUTTON: */
+div#keyPad button#keyPad_btnEnter { color:Yellow; float:right; font-size: 1.5em;}
+
+div#keyPad button#keyPad_btnBack {font-size: 1em;}
+
+.div-left-button button#keyPad_btnBack,
+.div-left-button button#keyPad_btnClr,
+.div-left-button button#keyPad_btnAllClr  
+{border:2px solid red; color:yellow;}
+	
+/* SPECIAL FORMATTING FOR SUPER-SCRIPT KEYS */
+div#keyPad button#keyPad_btnSquare,
+div#keyPad button#keyPad_btnCube,
+div#keyPad button#keyPad_btnExp,
+div#keyPad keyPad_btnYpowX
+{ font-size: 1em; }
+
+/* E-SERIES BUTTON */
+div#keyPad .keyPad_btnESeries, 
+div#keyPad .keyPad_btnESeries:hover
+{
+    font-size:12pt;
+    font-weight:600;
+    color:#202020;
+    border:none;
+    background: #dadada;
+    background: -moz-linear-gradient(top, #f0f0f0, #bababa 10%, #cacaca 46%, #909090 48%, #dadada 52%, #cacaca 54%, #cacaca 90%, #ababab);
+    background: -webkit-gradient(linear, center top, center bottom, from(#f0f0f0), color-stop(0.1, #bababa ), color-stop(0.46, #cacaca), color-stop(0.48, #909090), color-stop(0.52, #dadada ), color-stop(0.54, #cacaca), color-stop(0.90, #cacaca), to(#ababab));
+}
+div#keyPad .keyPad_btnESeries:hover,
+div#keyPad .keyPad_btnESeries:active   {font-size:1.1em; font-weight:700;}
+
+/* TABLE E-SERIES */
+.tabESeries {
+    width:100%; 
+    text-align:center; 
+    color:#dfdfdf; 
+    font-size:1em;
+    border-collapse:collapse;
+}
+
+/* odd rows style */
+.tabESeries tr:nth-child(odd) {background-color: #454545;}
+
+/* Table hover style */
+.tabESeries tr:hover {
+    background-color: #dadada;
+    color: #000;
+}
+
+/* CLEAR BOTH */
+.clear {clear:both;}
+
+.oscSpacer2, .oscSpacer3, .oscSpacer5  {clear:both; width:100%;}
+.oscSpacer2 {height:2px;}
+.oscSpacer3 {height:3px;}
+.oscSpacer5 {height:5px;}
+
+.oscVSpacer2, .oscVSpacer3, .oscVSpacer5  {float:right; height:10px;}
+.oscVSpacer2 {width:2px; }
+.oscVSpacer3 {width:3px; }
+.oscVSpacer5 {width:5px; }
+
+.oscMade,
+.oscCopyright 
+{
+    margin:3px 5px 0px 5px;     
+    font-size: 0.8em;
+    color: #e0e0e0;
+}
+.oscMade { float:right;}
+.oscCopyright { float:left;}
