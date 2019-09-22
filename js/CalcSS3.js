@@ -282,7 +282,7 @@
 			key = keyBoard[keyText];
 
 		if (event.target === helpButton) {
-			window.location = 'http://dematte.at/calculator#usage';
+			window.location = '';
 		}
 		if (event.target === smallerButton) {
 			toggleCalc(true);
