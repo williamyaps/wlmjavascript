@@ -77,7 +77,43 @@ _iub.csConfiguration = {"cookiePolicyInOtherWindow":true,"lang":"en","siteId":15
 <!-- end cookie consent -->
 </head>
 <body>
-<div class="container container-sm">
+<section id="top-section">
+		<div class="top-bg">
+			 <header class="header">
+  <nav class="navbar">
+    <div class="container container-sm">
+      
+      <!--/.nav-collapse -->
+    </div>
+  </nav>
+</header>
+
+<!-- Google API -->
+<script src="https://apis.google.com/js/platform.js?onload=initG" async="" defer=""></script>
+<script>
+var delete_cookie = function(name) {
+  document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+};
+
+function initG() {
+  gapi.load('auth2', function() {
+		params = {client_id: '934318811994-dt6agl7khlp5qhu08eo4iii0lc9bv8um.apps.googleusercontent.com'};
+		gapi.auth2.init(params)
+	  });
+}
+
+
+$( "#signOutButton" ).click(function() {
+	
+    var auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut().then(function () {
+      console.log('User signed out.');
+    });
+	
+  delete_cookie('usid');
+  window.location.href = "./";
+});
+</script>				<div class="container container-sm">
 					<div class="col-md-4 col-sm-4">
 						<div class="company-decr">
 							<h1 class="section-descr">Video &amp; Audio Recording Clients + Infrastructure </h1>
@@ -90,6 +126,9 @@ _iub.csConfiguration = {"cookiePolicyInOtherWindow":true,"lang":"en","siteId":15
 						</div>
 					</div>
 				</div>
+			</div>
+			
+	</section>
 
 <div>
 	<h1>Media Recorder API Demo</h1>
