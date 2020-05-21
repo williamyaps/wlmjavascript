@@ -82,8 +82,8 @@ p#data {
 video {
   background: #222;
   margin: 10px auto;
-  width: 480px;
-  height: 320px;
+  width: 320px;
+  height: 240px;
 }
 
 #controls {
