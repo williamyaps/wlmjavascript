@@ -4,7 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<base target="_blank">
-	<title>Media Recorder API Demo - addpipe.com</title>
+	<title>Media Recorder API Demo - William Yap</title>
 	<!-- Latest compiled and minified Bootstrap CSS -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 	<link rel="stylesheet" href="record/main.css" />
@@ -77,8 +77,8 @@ _iub.csConfiguration = {"cookiePolicyInOtherWindow":true,"lang":"en","siteId":15
 <body>
 <div>
 	<h1>Media Recorder API Demo</h1>
-	<p><small>Made by the <a href="https://williamyaps.github.io/">Pipe Recording Platform</a></small></p>
-	<p>The demo below uses the <strong>Media​Stream Recording API</strong> and <strong>getUserMedia()</strong> to record a 320x240 video file. For more info check out our article: <a title="Media Recorder API in Action on Chrome and Firefox" target="_blank" href="https://williamyaps.github.io/recorder.html">Media Recorder API in Action on Chrome and Firefox</a>.</h2>
+	<p><small>Made by the <a href="https://williamyaps.github.io/wlmjavascript/recorder.html">William Yap Recording Platform</a></small></p>
+	<p>The demo below uses the <strong>Media​Stream Recording API</strong> and <strong>getUserMedia()</strong> to record a 320x240 video file. For more info check out our article: <a title="Media Recorder API in Action on Chrome and Firefox" target="_blank" href="https://williamyaps.github.io/wlmjavascript/recorder.html">Media Recorder API in Action on Chrome and Firefox</a>.</h2>
 	<div>
 		<video controls autoplay></video><br>
 		<div id="controls">
@@ -120,15 +120,24 @@ _iub.csConfiguration = {"cookiePolicyInOtherWindow":true,"lang":"en","siteId":15
 <ul>
 	<li>William Yap recorder</li>	
 </ul>
-<script class="_iub_cs_activate-inline" type="text/plain">
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-	ga('create', 'UA-133914-18', 'auto');
-	ga('set', 'anonymizeIp', true);
-	ga('send', 'pageview');
-</script>
 </body>
+<p>The <strong>video container</strong> used by both Chrome and Firefox is:</p>
+<ul>
+<li>.webm</li>
+<li>File size is smaller, save your storage</li>
+<li>No need install apps, direct run via website</li>
+</ul>
+
+<p>The <strong>video codecs</strong> available are:</p>
+<ul>
+<li>VP8 on Firefox and Chrome 47+</li>
+<li>VP8/VP9 on Chrome 49+</li>
+<li>VP8/VP9/H.264 on Chrome 52+</li>
+</ul>
+
+<p>The <strong>audio codec</strong> used is:</p>
+<ul>
+<li>Vorbis @ 44100 Hz on Firefox 30+</li>
+<li>Opus Audio @ 48000 Hz on Chrome 49+</li>
+</ul>
 </html>
