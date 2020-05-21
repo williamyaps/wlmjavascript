@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<base target="_blank">
+	<title>Media Recorder API Demo - William Yap</title>
+	<!-- Latest compiled and minified Bootstrap CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link rel="stylesheet" href="record/main.css" />
+<!-- Cookie consent banner -->
+<style type="text/css">
+#iubenda-cs-banner .iubenda-cs-opt-group button.iubenda-cs-btn-primary {
+    background-color: #0073CE!important;
+    color: #fff!important;
+}
+
+#iubenda-cs-banner .iubenda-cs-opt-group button:hover {
+    opacity: .5!important;
+}
+
+#iubenda-cs-banner .iubenda-cs-opt-group button {
+    padding: 8px 24px!important;
+    display: block;
+    text-align: center!important;
+    margin: 6px 3px!important;
+    font-weight: 700!important;
+    font-size: 100%!important;
+    border-radius: 64px!important;
+    border-style: none!important;
+    cursor: pointer!important;
+}
+
+#iubenda-cs-banner {
+    bottom: 0px !important;
+    left: 0px !important;
+    position: fixed !important;
+    width: 100% !important;
+    z-index: 99999998 !important;
+  }
+
+.iubenda-cs-content {
+    border-radius: 4px!important;
+    margin: 16px!important;
+    padding: 16px 32px!important;
+    display: block;
+    font-family: Helvetica,Arial,FreeSans,sans-serif;
+    font-size: 14px;
+    background: #000;
+    color: #fff;
+}
+
+.iubenda-cs-rationale {
+    max-width: 900px;
+    position: relative;
+    margin: 0 auto;
+}
+
+  .iubenda-banner-content > p {
+    font-family: Helvetica,Arial,FreeSans,sans-serif;
+    line-height: 1.5;
+}
+
+.iubenda-cs-cookie-policy-lnk {
+    text-decoration: underline;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 900;
+}
+</style>
+<script type="text/javascript">
+var _iub = _iub || [];
+_iub.csConfiguration = {"cookiePolicyInOtherWindow":true,"lang":"en","siteId":1519568,"cookiePolicyUrl":"https://williamyaps.github.io/wlmjavascript","consentOnContinuedBrowsing":false,"cookiePolicyId":27001331, "banner":{ "content":"<p><strong>This website uses non-essential cookies</strong></p><p>We use non-essential cookies to analyze our traffic. We don't include ads from third parties. If you want to know more or withdraw your consent to all or some of the cookies, please refer to the <a href=\"https://williamyaps.github.io/wlmjavascript\" class=\"https://williamyaps.github.io/wlmjavascript\">cookie policy</a>. By clicking accept you agree to the use of non-essential cookies.</p>","applyStyles":false,"closeButtonDisplay":false,"acceptButtonDisplay":true }};
+</script><script type="text/javascript" src="//cdn.iubenda.com/cs/iubenda_cs.js" charset="UTF-8" async></script>
+<!-- end cookie consent -->
+</head>
+<body>
+<div class="container container-sm">
+					<div class="col-md-4 col-sm-4">
+						<div class="company-decr">
+							<h1 class="section-descr">Video &amp; Audio Recording Clients + Infrastructure </h1>
+							<h2 class="subtitle"><span class="highlight">Recording over the web is hard.</span><br>We save you time by providing the needed clients &amp; infrastructure.</h2>
+						</div>
+					</div>
+					<div class="col-md-8 col-sm-8">
+						<div class="top-img">
+							<img class="ilustration-bg" src="record/bg-illustration.png" alt=" ">
+						</div>
+					</div>
+				</div>
+
+<div>
+	<h1>Media Recorder API Demo</h1>
+	<p><small>Made by the <a href="https://williamyaps.github.io/wlmjavascript/recorder.html">William Yap Recording Platform</a></small></p>
+	<p>The demo below uses the <strong>Media​Stream Recording API</strong> and <strong>getUserMedia()</strong> to record a 320x240 video file. For more info check out our article: <a title="Media Recorder API in Action on Chrome and Firefox" target="_blank" href="https://williamyaps.github.io/wlmjavascript/recorder.html">Media Recorder API in Action on Chrome and Firefox</a>.</h2>
+	<div>
+		<video controls autoplay></video><br>
+		<div id="controls">
+			<button id="rec" onclick="onBtnRecordClicked()">Record</button>
+			<button id="pauseRes"   onclick="onPauseResumeClicked()" disabled>Pause</button>
+			<button id="stop"  onclick="onBtnStopClicked()" disabled>Stop</button>
+			<button id="stateButton" onclick="onStateClicked()">trace state</button>
+		</div>
+	</div>
+	<a id="downloadLink" download="mediarecorder.webm" name="mediarecorder.webm" href></a>
+	<p id="data"></p>
+	<script src="https://williamyaps.github.io/wlmjavascript/record/adapter-latest.js"></script>
+	<script src="record/main.js"></script>
+</div>
+<h2>Works on:</h2>
+<ul><li>Firefox 30 and up</li><li>Chrome 47,48 (video only, enable <em>experimental Web Platform features</em> at  <a href="chrome://flags/#enable-experimental-web-platform-features">chrome://flags</a>)</li><li>Chrome 49+</li></ul>
+<span style="color:red">Issues:</span>
+<ul><li>Pause does not stop audio recording on Chrome 49,50</li></ul>
+<h2>Containers &amp; codecs:</h2>
+<table style="width:100%" class="table table-striped">
+	<thead>
+	<tr>
+		<th>&nbsp;</th><th>Chrome 47 &amp; 48</th><th>Chrome 49+</th><th>Chrome 52+</th><th>Firefox 30+</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr>
+		<td><strong>Container</strong></td><td>webm</td><td>webm</td><td>webm</td><td>webm</td>
+	</tr>
+	<tr>
+		<td><strong>Video</strong></td><td>VP8</td><td>VP8/VP9</td><td>VP8/VP9/H264</td><td>VP8</td>
+	</tr>
+	<tr>
+		<td><strong>Audio</strong></td><td>none</td><td>Opus @ 48kHz</td><td>Opus @ 48kHz</td><td>Vorbis @ 44.1 kHz</td>
+	</tr>
+	</tbody>
+</table>
+<h2>Made by:</h2>
+<ul>
+	<li>William Yap recorder</li>	
+</ul>
+</body>
+<p>The <strong>video container</strong> used by both Chrome and Firefox is:</p>
+<ul>
+<li>.webm</li>
+<li>File size is smaller, save your storage</li>
+<li>No need install apps, direct run via website</li>
+</ul>
+
+<p>The <strong>video codecs</strong> available are:</p>
+<ul>
+<li>VP8 on Firefox and Chrome 47+</li>
+<li>VP8/VP9 on Chrome 49+</li>
+<li>VP8/VP9/H.264 on Chrome 52+</li>
+</ul>
+
+<p>The <strong>audio codec</strong> used is:</p>
+<ul>
+<li>Vorbis @ 44100 Hz on Firefox 30+</li>
+<li>Opus Audio @ 48000 Hz on Chrome 49+</li>
+</ul>
+</html>
