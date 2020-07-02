@@ -1,12 +1,28 @@
 <HTML>
+<body>
 <video id=example-video width=960 height=540 class="video-js vjs-default-skin" controls>
   <source
      src="https://iqiyi.cdn9-okzy.com/20200629/11842_34ee4328/index.m3u8" type="application/x-mpegURL">
 </video>
+ <link href="//williamyaps.github.io/wlmjavascript/js/video.js" rel="stylesheet">
 <script src="//williamyaps.github.io/wlmjavascript/js/videojs-contrib-hls.js"></script>
 <script src="//williamyaps.github.io/wlmjavascript/js/videojs-contrib-hls.min.js"></script>
 <script>
-var player = videojs('example-video');
-player.play();
-</script>
+      (function(window, videojs) {
+        var player = window.player = videojs('example-video');
+
+        // hook up the video switcher
+        var loadUrl = document.getElementById('load-url');
+        var url = document.getElementById('url');
+        loadUrl.addEventListener('submit', function(event) {
+          event.preventDefault();
+          player.src({
+            src: url.value,
+            type: 'application/x-mpegURL'
+          });
+          return false;
+        });
+      }(window, window.videojs));
+    </script>
+</body>
 </HTML>
