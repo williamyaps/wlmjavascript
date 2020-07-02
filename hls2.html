@@ -16,6 +16,105 @@
 </video>
 </div>
 
+<b>Episode 2:
+</b>
+
+<div id="episode" class="player_wrapper">
+<video class="video-js vjs-default-skin" controls="" id="example-video2">
+  <source src="https://iqiyi.cdn9-okzy.com/20200629/11843_68342ea6/index.m3u8" type="application/x-mpegURL"></source>
+</video>
+</div>
+
+<b>Episode 3:
+</b>
+
+<div id="episode" class="player_wrapper">
+<video class="video-js vjs-default-skin" controls="" id="example-video3">
+  <source src="https://iqiyi.cdn9-okzy.com/20200629/11844_b4812330/index.m3u8" type="application/x-mpegURL"></source>
+</video>
+</div>
+
+<b>Episode 4:
+</b>
+
+<div id="episode" class="player_wrapper">
+<video class="video-js vjs-default-skin" controls="" id="example-video4">
+  <source src="https://iqiyi.cdn9-okzy.com/20200629/11845_4280126b/index.m3u8" type="application/x-mpegURL"></source>
+</video>
+</div>
+
+<b>Episode 5:
+</b>
+
+<div id="episode" class="player_wrapper">
+<video class="video-js vjs-default-skin" controls="" id="example-video5">
+  <source src="https://iqiyi.cdn9-okzy.com/20200629/11846_f1911b8c/index.m3u8" type="application/x-mpegURL"></source>
+</video>
+</div>
+
+<b>Episode 6:
+</b>
+
+<div id="episode" class="player_wrapper">
+<video class="video-js vjs-default-skin" controls="" id="example-video6">
+  <source src="https://iqiyi.cdn9-okzy.com/20200629/11847_42c92c5c/index.m3u8" type="application/x-mpegURL"></source>
+</video>
+</div>
+
+<b>Episode 7:
+</b>
+
+<div id="episode" class="player_wrapper">
+<video class="video-js vjs-default-skin" controls="" id="example-video7">
+  <source src="https://iqiyi.cdn9-okzy.com/20200629/11848_c2a406aa/index.m3u8" type="application/x-mpegURL"></source>
+</video>
+</div>
+
+<b>Episode 8:
+</b>
+
+<div id="episode" class="player_wrapper">
+<video class="video-js vjs-default-skin" controls="" id="example-video8">
+  <source src="https://iqiyi.cdn9-okzy.com/20200629/11849_4ef8c691/index.m3u8" type="application/x-mpegURL"></source>
+</video>
+</div>
+
+<b>Episode 9:
+</b>
+
+<div id="episode" class="player_wrapper">
+<video class="video-js vjs-default-skin" controls="" id="example-video9">
+  <source src="https://iqiyi.cdn9-okzy.com/20200630/11869_44101453/index.m3u8" type="application/x-mpegURL"></source>
+</video>
+</div>
+
+<b>Episode 10:
+</b>
+
+<div id="episode" class="player_wrapper">
+<video class="video-js vjs-default-skin" controls="" id="example-video10">
+  <source src="https://iqiyi.cdn9-okzy.com/20200630/11870_cd543f2e/index.m3u8" type="application/x-mpegURL"></source>
+</video>
+</div>
+
+<b>Episode 11:
+</b>
+
+<div id="episode" class="player_wrapper">
+<video class="video-js vjs-default-skin" controls="" id="example-video11">
+  <source src="https://iqiyi.cdn9-okzy.com/20200701/11905_e951d946/index.m3u8" type="application/x-mpegURL"></source>
+</video>
+</div>
+
+<b>Episode 12:
+</b>
+
+<div id="episode" class="player_wrapper">
+<video class="video-js vjs-default-skin" controls="" id="example-video12">
+  <source src="https://iqiyi.cdn9-okzy.com/20200701/11906_711812ec/index.m3u8" type="application/x-mpegURL"></source>
+</video>
+</div>
+
 <link href="https://williamyaps.github.io/wlmjavascript/css/video-js.css" rel="stylesheet"></link>
 <script src="https://unpkg.com/video.js/dist/video.js"></script>
 <script src="https://unpkg.com/videojs-flash/dist/videojs-flash.js"></script>
@@ -23,6 +122,204 @@
 <script>
       (function(window, videojs) {
         var player = window.player = videojs('example-video');
+
+        // hook up the video switcher
+        var loadUrl = document.getElementById('load-url');
+        var url = document.getElementById('url');
+        loadUrl.addEventListener('submit', function(event) {
+          event.preventDefault();
+          player.src({
+            src: url.value,
+            type: 'application/x-mpegURL'
+          });
+          return false;
+        });
+      }(window, window.videojs));
+    </script>
+	
+	<script>
+      (function(window, videojs) {
+        var player = window.player = videojs('example-video2');
+
+        // hook up the video switcher
+        var loadUrl = document.getElementById('load-url');
+        var url = document.getElementById('url');
+        loadUrl.addEventListener('submit', function(event) {
+          event.preventDefault();
+          player.src({
+            src: url.value,
+            type: 'application/x-mpegURL'
+          });
+          return false;
+        });
+      }(window, window.videojs));
+    </script>
+	
+	<script>
+      (function(window, videojs) {
+        var player = window.player = videojs('example-video3');
+
+        // hook up the video switcher
+        var loadUrl = document.getElementById('load-url');
+        var url = document.getElementById('url');
+        loadUrl.addEventListener('submit', function(event) {
+          event.preventDefault();
+          player.src({
+            src: url.value,
+            type: 'application/x-mpegURL'
+          });
+          return false;
+        });
+      }(window, window.videojs));
+    </script>
+	
+	<script>
+      (function(window, videojs) {
+        var player = window.player = videojs('example-video4');
+
+        // hook up the video switcher
+        var loadUrl = document.getElementById('load-url');
+        var url = document.getElementById('url');
+        loadUrl.addEventListener('submit', function(event) {
+          event.preventDefault();
+          player.src({
+            src: url.value,
+            type: 'application/x-mpegURL'
+          });
+          return false;
+        });
+      }(window, window.videojs));
+    </script>
+	
+	<script>
+      (function(window, videojs) {
+        var player = window.player = videojs('example-video5');
+
+        // hook up the video switcher
+        var loadUrl = document.getElementById('load-url');
+        var url = document.getElementById('url');
+        loadUrl.addEventListener('submit', function(event) {
+          event.preventDefault();
+          player.src({
+            src: url.value,
+            type: 'application/x-mpegURL'
+          });
+          return false;
+        });
+      }(window, window.videojs));
+    </script>
+	
+	<script>
+      (function(window, videojs) {
+        var player = window.player = videojs('example-video6');
+
+        // hook up the video switcher
+        var loadUrl = document.getElementById('load-url');
+        var url = document.getElementById('url');
+        loadUrl.addEventListener('submit', function(event) {
+          event.preventDefault();
+          player.src({
+            src: url.value,
+            type: 'application/x-mpegURL'
+          });
+          return false;
+        });
+      }(window, window.videojs));
+    </script>
+	
+	<script>
+      (function(window, videojs) {
+        var player = window.player = videojs('example-video7');
+
+        // hook up the video switcher
+        var loadUrl = document.getElementById('load-url');
+        var url = document.getElementById('url');
+        loadUrl.addEventListener('submit', function(event) {
+          event.preventDefault();
+          player.src({
+            src: url.value,
+            type: 'application/x-mpegURL'
+          });
+          return false;
+        });
+      }(window, window.videojs));
+    </script>
+	
+	<script>
+      (function(window, videojs) {
+        var player = window.player = videojs('example-video8');
+
+        // hook up the video switcher
+        var loadUrl = document.getElementById('load-url');
+        var url = document.getElementById('url');
+        loadUrl.addEventListener('submit', function(event) {
+          event.preventDefault();
+          player.src({
+            src: url.value,
+            type: 'application/x-mpegURL'
+          });
+          return false;
+        });
+      }(window, window.videojs));
+    </script>
+	
+	<script>
+      (function(window, videojs) {
+        var player = window.player = videojs('example-video9');
+
+        // hook up the video switcher
+        var loadUrl = document.getElementById('load-url');
+        var url = document.getElementById('url');
+        loadUrl.addEventListener('submit', function(event) {
+          event.preventDefault();
+          player.src({
+            src: url.value,
+            type: 'application/x-mpegURL'
+          });
+          return false;
+        });
+      }(window, window.videojs));
+    </script>
+	
+	<script>
+      (function(window, videojs) {
+        var player = window.player = videojs('example-video10');
+
+        // hook up the video switcher
+        var loadUrl = document.getElementById('load-url');
+        var url = document.getElementById('url');
+        loadUrl.addEventListener('submit', function(event) {
+          event.preventDefault();
+          player.src({
+            src: url.value,
+            type: 'application/x-mpegURL'
+          });
+          return false;
+        });
+      }(window, window.videojs));
+    </script>
+	
+	<script>
+      (function(window, videojs) {
+        var player = window.player = videojs('example-video11');
+
+        // hook up the video switcher
+        var loadUrl = document.getElementById('load-url');
+        var url = document.getElementById('url');
+        loadUrl.addEventListener('submit', function(event) {
+          event.preventDefault();
+          player.src({
+            src: url.value,
+            type: 'application/x-mpegURL'
+          });
+          return false;
+        });
+      }(window, window.videojs));
+    </script>
+	
+	<script>
+      (function(window, videojs) {
+        var player = window.player = videojs('example-video12');
 
         // hook up the video switcher
         var loadUrl = document.getElementById('load-url');
