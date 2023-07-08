@@ -1,3 +1,6 @@
 URI uri = new URI("https://www.baeldung.com/domain");
 String host = uri.getHost();
 assertEquals("www.baeldung.com", host);
+
+String domainName = host.startsWith("www.") ? host.substring(4) : host;
+assertEquals("baeldung.com", domainName);
