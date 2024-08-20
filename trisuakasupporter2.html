@@ -8,7 +8,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.birds.min.js"></script>
     <script>
-      window.addEventListener("DOMContentLoaded", () => {
+	    window.addEventListener("DOMContentLoaded", () => {
         VANTA.BIRDS({
           el: "#vanta",
           mouseControls: true,
@@ -36,6 +36,11 @@
     </script>
   </head>
   <body>
+  <audio controls autoplay>
+  <source src="https://williamyaps.github.io/wlmjavascript/trisuakasupporter_files/abjremix.mp3" type="audio/ogg">
+  <source src="https://williamyaps.github.io/wlmjavascript/trisuakasupporter_files/abjremix.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
     <div id="vanta"><canvas class="vanta-canvas" width="1366" height="657" style="position: absolute; z-index: 0; top: 0px; left: 0px; width: 1366px; height: 657px;"></canvas></div>
     <main class="animated" style="opacity: 1; filter: blur(0px);">
       <header>
@@ -123,10 +128,6 @@
         </li>
       </ul>
     </main>
-  <audio controls autoplay>
-  <source src="https://williamyaps.github.io/wlmjavascript/trisuakasupporter_files/abjremix.mp3" type="audio/ogg">
-  <source src="https://williamyaps.github.io/wlmjavascript/trisuakasupporter_files/abjremix.mp3" type="audio/mpeg">
-  Your browser does not support the audio element.
-</audio>
+  
 
 </body></html>
