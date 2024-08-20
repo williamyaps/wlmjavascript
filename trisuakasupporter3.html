@@ -3,12 +3,21 @@
     
     <title>Tri Suaka</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="./trisuakasupporter_files/index3.css">
+    <link rel="stylesheet" href="./trisuakasupporter_files/index2.css">
     <link rel="preload" href="./images/b500.gif">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.birds.min.js"></script>
+	<script>
+var source = "https://williamyaps.github.io/wlmjavascript/trisuakasupporter_files/abjremix.mp3";
+var audio = new Audio(); // use the constructor in JavaScript, just easier that way
+audio.addEventListener("load", function() {
+  audio.play();
+}, true);
+audio.src = source;
+audio.autoplay = true; // add this
+</script>
     <script>
-      window.addEventListener("DOMContentLoaded", () => {
+	    window.addEventListener("DOMContentLoaded", () => {
         VANTA.BIRDS({
           el: "#vanta",
           mouseControls: true,
@@ -34,8 +43,9 @@
         }, 1000);
       });
     </script>
+	
   </head>
-  <body>
+  <body>  
     <div id="vanta"><canvas class="vanta-canvas" width="1366" height="657" style="position: absolute; z-index: 0; top: 0px; left: 0px; width: 1366px; height: 657px;"></canvas></div>
     <main class="animated" style="opacity: 1; filter: blur(0px);">
       <header>
@@ -123,6 +133,7 @@
         </li>
       </ul>
     </main>
-  
+
+
 
 </body></html>
