@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tabel Perbandingan Adblock (Berwarna)</title>
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#60a5fa;
+      --green:#16a34a; --blue:#2563eb; --orange:#f97316; --red:#ef4444; --purple:#7c3aed; --teal:#0ea5a4; --gray:#475569;
+      --glass: rgba(255,255,255,0.03);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#071027 0%, #071427 100%);color:#e6eef6}
+    .wrap{max-width:980px;margin:36px auto;padding:24px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 6px 30px rgba(2,6,23,0.7)}
+    h1{font-size:20px;margin:0 0 8px}
+    p.lead{margin:0 0 18px;color:var(--muted)}
+    table{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden}
+    thead th{padding:14px 12px;text-align:left;font-size:13px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-bottom:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+    tbody td{padding:12px;font-size:14px;border-bottom:1px dashed rgba(255,255,255,0.03)}
+    tbody tr:last-child td{border-bottom:0}
+    .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;color:#fff}
+    .b-complete{background:linear-gradient(90deg,var(--green), #22c55e)}
+    .b-balanced{background:linear-gradient(90deg,var(--blue), #60a5fa)}
+    .b-aggressive{background:linear-gradient(90deg,var(--orange), #fb923c)}
+    .b-security{background:linear-gradient(90deg,var(--red), #f87171)}
+    .b-mobile{background:linear-gradient(90deg,var(--purple), #c084fc)}
+    .b-hybrid{background:linear-gradient(90deg,var(--teal), #34d399)}
+    .b-simple{background:linear-gradient(90deg,var(--gray), #94a3b8)}
+
+    /* responsive */
+    @media (max-width:820px){
+      table, thead, tbody, th, td, tr{display:block}
+      thead{display:none}
+      tr{margin-bottom:14px;border-radius:8px;background:var(--glass);padding:10px}
+      td{border:0;padding:8px}
+      td.meta{font-size:12px;color:var(--muted)}
+      td.label{font-weight:600}
+    }
+
+    /* footer legend */
+    .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+    .legend .item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.02);font-size:13px}
+    .copy-btn{margin-left:auto;background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 10px;border-radius:8px;color:var(--muted);cursor:pointer}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Perbandingan Blocklist / Adblock (Ringkas)</h1>
+    <p class="lead">Tabel ini merangkum fokus utama, estimasi jumlah domain, dan karakteristik tiap list.
+    </p>
+
+    <div style="overflow:auto;border-radius:10px">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:48px">No</th>
+            <th>Nama List</th>
+            <th style="width:160px">Jumlah Domain (±)</th>
+            <th>Fokus Utama</th>
+            <th style="width:220px">Karakteristik</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><strong>OISD – Full</strong></td>
+            <td>200k+</td>
+            <td>Ads, Phishing, Malware, Spyware, Ransomware, Crypto, Tracking</td>
+            <td><span class="badge b-balanced">Seimbang, curated</span> minim false positive</td>
+          </tr>
+
+          <tr>
+            <td>2</td>
+            <td><strong>StevenBlack Unified</strong></td>
+            <td>70k–100k</td>
+            <td>Ads, Malware, opsi Social/Gambling/Porn</td>
+            <td><span class="badge b-simple">Modular & sederhana</span></td>
+          </tr>
+
+          <tr>
+            <td>3</td>
+            <td><strong>1Hosts – Xtra</strong></td>
+            <td>350k–400k</td>
+            <td>Ads, Trackers, Malware, Telemetry</td>
+            <td><span class="badge b-aggressive">Lebih agresif</span> heavy blocking</td>
+          </tr>
+
+          <tr>
+            <td>4</td>
+            <td><strong>Hagezi – Ultimate</strong></td>
+            <td>1 juta+</td>
+            <td>Ads, Trackers, Malware, Phishing, Telemetry, Crypto, Scam</td>
+            <td><span class="badge b-complete">Super lengkap</span> risiko false positive</td>
+          </tr>
+
+          <tr>
+            <td>5</td>
+            <td><strong>Hagezi – TIF</strong></td>
+            <td>50k–300k (dinamis)</td>
+            <td>Threat Intel: botnet C2, ransomware infra, APT, phishing</td>
+            <td><span class="badge b-security">Security hardcore</span> reaktif terhadap ancaman</td>
+          </tr>
+
+          <tr>
+            <td>6</td>
+            <td><strong>GoodbyeAds</strong></td>
+            <td>120k–150k</td>
+            <td>Ads & Telemetry khusus Android/iOS</td>
+            <td><span class="badge b-mobile">Fokus mobile</span> cocok untuk app blocking</td>
+          </tr>
+
+          <tr>
+            <td>7</td>
+            <td><strong>AdGuard Filter</strong></td>
+            <td>Filter rules (bukan host)</td>
+            <td>Ads, Trackers, Malware, Scam, Annoyances (cookie, popups)</td>
+            <td><span class="badge b-hybrid">Hybrid</span> content + cosmetic filtering</td>
+          </tr>
+
+          <tr>
+            <td>8</td>
+            <td><strong>hBlock</strong></td>
+            <td>100k–150k</td>
+            <td>Ads, Trackers, Malware, Phishing, Crypto mining</td>
+            <td><span class="badge b-simple">Ringan & stabil</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display:flex;align-items:center;margin-top:14px">
+      <div class="legend">
+        <div class="item"><span class="badge b-complete"> </span> Hagezi Ultimate — Paling lengkap</div>
+        <div class="item"><span class="badge b-balanced"> </span> OISD Full — Seimbang</div>
+        <div class="item"><span class="badge b-aggressive"> </span> 1Hosts — Agresif</div>
+        <div class="item"><span class="badge b-security"> </span> Hagezi TIF — Threat Intel</div>
+        <div class="item"><span class="badge b-mobile"> </span> GoodbyeAds — Mobile</div>
+        <div class="item"><span class="badge b-hybrid"> </span> AdGuard — Content Filter</div>
+      </div>
+
+      <button class="copy-btn" onclick="copyHtml()">Copy HTML ke clipboard</button>	  
+    </div>
+	
+	<h1 id="-revisi-jawaban-saya-setelah-melihat-tabelmu">🏆 Kesimpulan saya William Yap</h1>
+	<h2 id="-pemenang-hagezi-s-dns-ultimate">👑 Pemenang: Hagezi’s DNS - Ultimate</h2>
+	<p><strong>Jumlah domain:</strong> 1 juta+<br><strong>Fokus:</strong> Ads, Trackers, Malware, Phishing, Telemetry, Crypto, Scam<br><strong>Karakteristik:</strong> <span class="badge b-complete">Super lengkap</span> — risiko false positive tinggi<br><strong>Verdict:</strong> ✔️ <strong>Paling lengkap secara komprehensif</strong> — ini adalah &quot;everything-in-one&quot; untuk privasi ekstrem.</p>
+	<h2 id="-runner-up-1hosts-xtra">🥈 Runner-up: 1Hosts - Xtra</h2>
+	<p><strong>Jumlah domain:</strong> 350k–400k<br><strong>Fokus:</strong> Ads, Trackers, Malware, Telemetry<br><strong>Karakteristik:</strong> <span class="badge b-aggressive">Lebih agresif</span> — cocok untuk uBlock Origin<br><strong>Verdict:</strong> ✔️ <strong>Terbaik untuk pengguna browser modern yang ingin blokir tanpa kompromi.</strong></p>
+	<h2 id="-honorable-mention-stevenblack-unified">🥉 Honorable Mention: StevenBlack Unified</h2>
+	<p><strong>Jumlah domain:</strong> 70k–100k <em>(perhatikan: angka ini jauh lebih rendah dari yang saya sebutkan sebelumnya — terima kasih atas koreksi!)</em><br><strong>Fokus:</strong> Ads, Malware, opsi Social/Gambling/Porn<br><strong>Karakteristik:</strong> <span class="badge b-simple">Modular &amp; sederhana</span><br><strong>Verdict:</strong> ✔️ <strong>Cocok untuk Pi-hole / hosts file — tapi tidak se-lengkap Hagezi.</strong></p>
+	<h2 id="-specialized-layer-hagezi-tif">🔐 Specialized Layer: Hagezi – TIF</h2>
+	<p><strong>Jumlah domain:</strong> 50k–300k (dinamis)<br><strong>Fokus:</strong> Threat Intel — C2 servers, ransomware, APT, botnet<br><strong>Karakteristik:</strong> <span class="badge b-security">Security hardcore</span><br><strong>Verdict:</strong> ✔️ <strong>Bukan pengganti adblock — ini pelapis keamanan tingkat tinggi. Gunakan bersama Ultimate.</strong></p>
+	<h2 id="-mobile-specialist-goodbyeads">📱 Mobile Specialist: GoodbyeAds</h2>
+	<p><strong>Jumlah domain:</strong> 120k–150k<br><strong>Fokus:</strong> Ads &amp; Telemetry Android/iOS<br><strong>Karakteristik:</strong> <span class="badge b-mobile">Fokus mobile</span><br><strong>Verdict:</strong> ✔️ <strong>Ideal untuk pengguna smartphone yang ingin bersih dari iklan app dan sistem.</strong></p>
+	<h2 id="-hybrid-powerhouse-adguard-filter">🧩 Hybrid Powerhouse: AdGuard Filter</h2>
+	<p><strong>Jenis:</strong> Rule-based (bukan host list)<br><strong>Fokus:</strong> Ads, Trackers, Annoyances (cookie banners, popups, paywalls)<br><strong>Karakteristik:</strong> <span class="badge b-hybrid">Hybrid</span> — content + cosmetic filtering<br><strong>Verdict:</strong> ✔️ <strong>Terbaik untuk browser jika kamu ingin iklan hilang dan situs tidak membentur anti-adblock.</strong></p>
+	<h2 id="-balanced-choice-oisd-full">⚖️ Balanced Choice: OISD – Full</h2>
+	<p><strong>Jumlah domain:</strong> 200k+<br><strong>Fokus:</strong> Ads, Phishing, Malware, Tracking, Crypto, Ransomware<br><strong>Karakteristik:</strong> <span class="badge b-balanced">Seimbang, curated</span><br><strong>Verdict:</strong> ✔️ <strong>Pilihan aman untuk pemula sampai advance — minim false positive.</strong></p>
+	<h2 id="-lightweight-stable-hblock">🌿 Lightweight &amp; Stable: hBlock</h2>
+	<p><strong>Jumlah domain:</strong> 100k–150k<br><strong>Fokus:</strong> Ads, Trackers, Malware, Phishing, Crypto mining<br><strong>Karakteristik:</strong> <span class="badge b-simple">Ringan &amp; stabil</span><br><strong>Verdict:</strong> ✔️ <strong>Untuk yang ingin efektif tanpa overkill — ideal untuk Raspberry Pi atau perangkat lemah.</strong></p>
+
+    <script>
+      function copyHtml(){
+        const html = `<!doctype html>\n<html lang=\"id\">\n${document.documentElement.innerHTML}\n</html>`;
+        navigator.clipboard.writeText(html).then(()=>{
+          alert('HTML tabel disalin ke clipboard. Silakan paste di editor.');
+        }).catch(()=>{
+          alert('Gagal menyalin — browser mungkin membatasi akses clipboard.');
+        });
+      }
+    </script>
+  </div
+ 
+
+</body>
+</html>
