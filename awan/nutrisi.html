@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nutrisi untuk Tulang</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --secondary: #8b5cf6;
+      --accent: #10b981;
+      --dark-bg: #0f172a;
+      --dark-card: #1e293b;
+      --dark-text: #f1f5f9;
+      --light-bg: #f8fafc;
+      --light-card: #ffffff;
+      --light-text: #0f172a;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--dark-bg);
+      color: var(--dark-text);
+      line-height: 1.6;
+      transition: all 0.3s ease;
+    }
+
+    body.light {
+      background: var(--light-bg);
+      color: var(--light-text);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px 0;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.8;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: var(--secondary);
+      color: white;
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      color: white;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .card {
+      background: var(--dark-card);
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: var(--shadow);
+      margin-bottom: 30px;
+      transition: all 0.3s ease;
+    }
+
+    .light .card {
+      background: var(--light-card);
+    }
+
+    h2 {
+      margin-bottom: 15px;
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h2 i {
+      font-size: 1.5rem;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 400px;
+      margin: 20px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .light th, .light td {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    th {
+      background: rgba(59, 130, 246, 0.2);
+      font-weight: 600;
+    }
+
+    .light th {
+      background: rgba(59, 130, 246, 0.1);
+    }
+
+    tr {
+      transition: all 0.2s ease;
+    }
+
+    tr:hover {
+      background: rgba(59, 130, 246, 0.1);
+      cursor: pointer;
+      transform: translateX(5px);
+    }
+
+    .highlighted {
+      background: rgba(250, 204, 21, 0.2) !important;
+      box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.5);
+    }
+
+    .nutrient-info {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(59, 130, 246, 0.1);
+      border-radius: 8px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .nutrient-info.active {
+      display: block;
+    }
+
+    .info-title {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .info-content {
+      opacity: 0.9;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      opacity: 0.7;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .chart-container {
+        height: 300px;
+      }
+      
+      th, td {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body class="dark">
+  <div class="container">
+    <header>
+      <h1>Nutrisi untuk Tulang</h1>
+      <p class="subtitle">Visualisasi interaktif pentingnya nutrisi pada kesehatan tulang</p>
+    </header>
+
+    <div class="controls">
+      <button id="toggleTheme" class="btn-primary">
+        <i>🌙</i> Toggle Theme
+      </button>
+      <button id="toggleType" class="btn-secondary">
+        <i>📊</i> Toggle Chart Type
+      </button>
+      <button id="downloadChart" class="btn-accent">
+        <i>📥</i> Download Chart
+      </button>
+      <button id="resetHighlight" class="btn-primary">
+        <i>🔄</i> Reset Highlight
+      </button>
+    </div>
+
+    <div class="card">
+      <h2><i>📈</i> Signifikansi Nutrisi (0-100)</h2>
+      <div class="chart-container">
+        <canvas id="boneChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><i>🥗</i> Tabel Nutrisi</h2>
+      <table id="nutriTable">
+        <thead>
+          <tr>
+            <th>Nutrisi</th>
+            <th>Fungsi untuk Tulang</th>
+            <th>Sumber Makanan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-nutrient="kalsium">
+            <td><strong>Kalsium</strong></td>
+            <td>Mineral utama pembentuk struktur tulang</td>
+            <td>Susu, keju, yogurt, ikan teri, sayuran hijau</td>
+          </tr>
+          <tr data-nutrient="vitamin-d">
+            <td><strong>Vitamin D</strong></td>
+            <td>Membantu penyerapan kalsium</td>
+            <td>Sinar matahari, salmon, tuna, telur</td>
+          </tr>
+          <tr data-nutrient="magnesium">
+            <td><strong>Magnesium</strong></td>
+            <td>Mengaktifkan vitamin D, menjaga kepadatan tulang</td>
+            <td>Kacang, biji-bijian, alpukat, pisang</td>
+          </tr>
+          <tr data-nutrient="fosfor">
+            <td><strong>Fosfor</strong></td>
+            <td>Pasangan kalsium dalam struktur tulang (kalsium fosfat)</td>
+            <td>Daging, ikan, kacang-kacangan</td>
+          </tr>
+          <tr data-nutrient="vitamin-c">
+            <td><strong>Vitamin C</strong></td>
+            <td>Membantu produksi kolagen (jaringan penopang tulang)</td>
+            <td>Jeruk, jambu biji, paprika, stroberi, kiwi</td>
+          </tr>
+          <tr data-nutrient="vitamin-k">
+            <td><strong>Vitamin K</strong></td>
+            <td>Membantu mineralisasi tulang & mengikat kalsium</td>
+            <td>Sayuran hijau, brokoli, bayam</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div id="nutrientInfo" class="nutrient-info">
+        <div class="info-title">Informasi Detail</div>
+        <div class="info-content">Klik pada nutrisi di tabel atau grafik untuk melihat informasi lebih lanjut.</div>
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2025 Visualisasi Nutrisi Tulang | By: William Yap</p>
+    </footer>
+  </div>
+
+  <script>
+    // Data nutrisi dengan informasi lebih detail
+    const nutrientData = {
+      "kalsium": {
+        name: "Kalsium",
+        importance: 100,
+        supportive: 90,
+        description: "Kalsium adalah mineral paling melimpah dalam tubuh, dengan 99% disimpan dalam tulang dan gigi. Ini penting untuk perkembangan, pertumbuhan, dan pemeliharaan tulang.",
+        dailyNeed: "1000-1200 mg/hari untuk orang dewasa",
+        deficiency: "Dapat menyebabkan osteoporosis dan peningkatan risiko patah tulang"
+      },
+      "vitamin-d": {
+        name: "Vitamin D",
+        importance: 95,
+        supportive: 92,
+        description: "Vitamin D membantu tubuh menyerap kalsium dan fosfor dari makanan. Tanpa vitamin D yang cukup, tubuh hanya dapat menyerap 10-15% kalsium dari makanan.",
+        dailyNeed: "600-800 IU/hari untuk orang dewasa",
+        deficiency: "Dapat menyebabkan rakitis pada anak-anak dan osteomalacia pada orang dewasa"
+      },
+      "magnesium": {
+        name: "Magnesium",
+        importance: 85,
+        supportive: 78,
+        description: "Sekitar 60% magnesium dalam tubuh ditemukan di tulang. Ini membantu mengatur transportasi kalsium dan penting untuk konversi vitamin D menjadi bentuk aktifnya.",
+        dailyNeed: "310-420 mg/hari untuk orang dewasa",
+        deficiency: "Dapat mengganggu metabolisme kalsium dan vitamin D"
+      },
+      "fosfor": {
+        name: "Fosfor",
+        importance: 80,
+        supportive: 76,
+        description: "Fosfor membentuk sekitar 50% dari massa tulang, biasanya dalam bentuk kalsium fosfat. Ini bekerja sama dengan kalsium untuk membentuk struktur tulang yang kuat.",
+        dailyNeed: "700 mg/hari untuk orang dewasa",
+        deficiency: "Jarang terjadi tetapi dapat menyebabkan tulang lemah dan nyeri tulang"
+      },
+      "vitamin-c": {
+        name: "Vitamin C",
+        importance: 70,
+        supportive: 85,
+        description: "Vitamin C diperlukan untuk produksi kolagen, protein yang membentuk jaringan ikat dalam tulang. Ini juga antioksidan yang melindungi sel-sel tulang dari kerusakan.",
+        dailyNeed: "75-90 mg/hari untuk orang dewasa",
+        deficiency: "Dapat menyebabkan produksi kolagen yang tidak memadai, melemahkan struktur tulang"
+      },
+      "vitamin-k": {
+        name: "Vitamin K",
+        importance: 75,
+        supportive: 88,
+        description: "Vitamin K mengaktifkan protein yang mengikat kalsium ke matriks tulang. Ini membantu mineralisasi tulang dan mencegah kalsium menumpuk di tempat yang salah seperti arteri.",
+        dailyNeed: "90-120 mcg/hari untuk orang dewasa",
+        deficiency: "Dapat mengurangi mineralisasi tulang dan meningkatkan risiko patah tulang"
+      }
+    };
+
+    // Inisialisasi chart
+    const ctx = document.getElementById('boneChart').getContext('2d');
+    
+    // Warna untuk tema gelap dan terang
+    const darkColors = {
+      importance: 'rgba(59, 130, 246, 0.7)',
+      supportive: 'rgba(139, 92, 246, 0.7)',
+      grid: 'rgba(255, 255, 255, 0.1)',
+      text: '#f1f5f9'
+    };
+    
+    const lightColors = {
+      importance: 'rgba(59, 130, 246, 0.7)',
+      supportive: 'rgba(139, 92, 246, 0.7)',
+      grid: 'rgba(0, 0, 0, 0.1)',
+      text: '#0f172a'
+    };
+    
+    let currentColors = darkColors;
+
+    const data = {
+      labels: Object.keys(nutrientData).map(key => nutrientData[key].name),
+      datasets: [
+        {
+          label: "Tingkat Penting",
+          data: Object.keys(nutrientData).map(key => nutrientData[key].importance),
+          backgroundColor: currentColors.importance,
+          borderColor: currentColors.importance.replace('0.7', '1'),
+          borderWidth: 2,
+          pointBackgroundColor: '#ffffff',
+          pointBorderColor: currentColors.importance.replace('0.7', '1'),
+          pointBorderWidth: 2,
+          pointRadius: 5,
+          pointHoverRadius: 7
+        },
+        {
+          label: "Dukungan Sinergis",
+          data: Object.keys(nutrientData).map(key => nutrientData[key].supportive),
+          backgroundColor: currentColors.supportive,
+          borderColor: currentColors.supportive.replace('0.7', '1'),
+          borderWidth: 2,
+          pointBackgroundColor: '#ffffff',
+          pointBorderColor: currentColors.supportive.replace('0.7', '1'),
+          pointBorderWidth: 2,
+          pointRadius: 5,
+          pointHoverRadius: 7
+        }
+      ]
+    };
+
+    let chartType = 'radar';
+    const chart = new Chart(ctx, {
+      type: chartType,
+      data: data,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              color: currentColors.text,
+              font: {
+                size: 14
+              }
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            titleColor: '#ffffff',
+            bodyColor: '#ffffff',
+            borderColor: currentColors.importance,
+            borderWidth: 1
+          }
+        },
+        scales: chartType === 'radar' ? {
+          r: {
+            beginAtZero: true,
+            max: 100,
+            grid: {
+              color: currentColors.grid
+            },
+            angleLines: {
+              color: currentColors.grid
+            },
+            pointLabels: {
+              color: currentColors.text,
+              font: {
+                size: 12
+              }
+            },
+            ticks: {
+              color: currentColors.text,
+              backdropColor: 'transparent'
+            }
+          }
+        } : {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            grid: {
+              color: currentColors.grid
+            },
+            ticks: {
+              color: currentColors.text
+            }
+          },
+          x: {
+            grid: {
+              color: currentColors.grid
+            },
+            ticks: {
+              color: currentColors.text
+            }
+          }
+        }
+      }
+    });
+
+    // Fungsi untuk memperbarui warna chart berdasarkan tema
+    function updateChartColors() {
+      const isDark = document.body.classList.contains('dark');
+      currentColors = isDark ? darkColors : lightColors;
+      
+      chart.data.datasets[0].backgroundColor = currentColors.importance;
+      chart.data.datasets[0].borderColor = currentColors.importance.replace('0.7', '1');
+      chart.data.datasets[0].pointBorderColor = currentColors.importance.replace('0.7', '1');
+      
+      chart.data.datasets[1].backgroundColor = currentColors.supportive;
+      chart.data.datasets[1].borderColor = currentColors.supportive.replace('0.7', '1');
+      chart.data.datasets[1].pointBorderColor = currentColors.supportive.replace('0.7', '1');
+      
+      if (chartType === 'radar') {
+        chart.options.scales.r.grid.color = currentColors.grid;
+        chart.options.scales.r.angleLines.color = currentColors.grid;
+        chart.options.scales.r.pointLabels.color = currentColors.text;
+        chart.options.scales.r.ticks.color = currentColors.text;
+      } else {
+        chart.options.scales.y.grid.color = currentColors.grid;
+        chart.options.scales.y.ticks.color = currentColors.text;
+        chart.options.scales.x.grid.color = currentColors.grid;
+        chart.options.scales.x.ticks.color = currentColors.text;
+      }
+      
+      chart.options.plugins.legend.labels.color = currentColors.text;
+      chart.update();
+    }
+
+    // Toggle chart type
+    document.getElementById('toggleType').onclick = () => {
+      chartType = chartType === 'bar' ? 'radar' : 'bar';
+      chart.config.type = chartType;
+      
+      // Perbarui opsi skala berdasarkan jenis chart
+      if (chartType === 'radar') {
+        chart.options.scales = {
+          r: {
+            beginAtZero: true,
+            max: 100,
+            grid: {
+              color: currentColors.grid
+            },
+            angleLines: {
+              color: currentColors.grid
+            },
+            pointLabels: {
+              color: currentColors.text,
+              font: {
+                size: 12
+              }
+            },
+            ticks: {
+              color: currentColors.text,
+              backdropColor: 'transparent'
+            }
+          }
+        };
+      } else {
+        chart.options.scales = {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            grid: {
+              color: currentColors.grid
+            },
+            ticks: {
+              color: currentColors.text
+            }
+          },
+          x: {
+            grid: {
+              color: currentColors.grid
+            },
+            ticks: {
+              color: currentColors.text
+            }
+          }
+        };
+      }
+      
+      chart.update();
+      updateChartColors();
+    };
+
+    // Download chart
+    document.getElementById('downloadChart').onclick = () => {
+      const a = document.createElement('a');
+      a.href = chart.toBase64Image();
+      a.download = 'nutrisi_tulang.png';
+      a.click();
+    };
+
+    // Reset highlight
+    document.getElementById('resetHighlight').onclick = () => {
+      document.querySelectorAll('#nutriTable tr').forEach(tr => {
+        tr.classList.remove('highlighted');
+      });
+      document.getElementById('nutrientInfo').classList.remove('active');
+      chart.setActiveElements([]);
+      chart.update();
+    };
+
+    // Highlight sync (klik chart → highlight tabel)
+    document.getElementById('boneChart').onclick = evt => {
+      const points = chart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+      if (points.length) {
+        const index = points[0].index;
+        highlightNutrient(index);
+      }
+    };
+
+    // Klik tabel → highlight chart
+    document.querySelectorAll('#nutriTable tbody tr').forEach((tr, idx) => {
+      tr.addEventListener('click', () => {
+        highlightNutrient(idx);
+      });
+    });
+
+    function highlightNutrient(index) {
+      // Reset semua highlight
+      document.querySelectorAll('#nutriTable tr').forEach(tr => {
+        tr.classList.remove('highlighted');
+      });
+      
+      // Highlight baris yang dipilih
+      const rows = document.querySelectorAll('#nutriTable tbody tr');
+      rows[index].classList.add('highlighted');
+      
+      // Tampilkan informasi nutrisi
+      const nutrientKeys = Object.keys(nutrientData);
+      const nutrientKey = nutrientKeys[index];
+      const nutrient = nutrientData[nutrientKey];
+      
+      const infoDiv = document.getElementById('nutrientInfo');
+      infoDiv.innerHTML = `
+        <div class="info-title">${nutrient.name}</div>
+        <div class="info-content">
+          <p><strong>Deskripsi:</strong> ${nutrient.description}</p>
+          <p><strong>Kebutuhan Harian:</strong> ${nutrient.dailyNeed}</p>
+          <p><strong>Dampak Kekurangan:</strong> ${nutrient.deficiency}</p>
+        </div>
+      `;
+      infoDiv.classList.add('active');
+      
+      // Highlight chart
+      chart.setActiveElements([{ datasetIndex: 0, index: index }]);
+      chart.update();
+    }
+
+    // Toggle tema
+    document.getElementById('toggleTheme').onclick = () => {
+      const isDark = document.body.classList.contains('dark');
+      document.body.classList.toggle('dark');
+      document.body.classList.toggle('light');
+      updateChartColors();
+    };
+  </script>
+</body>
+</html>
