@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Tanggal dan Hari</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f2f6fc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      padding: 25px 35px;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .tanggal {
+      font-size: 22px;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    input[type="date"] {
+      font-size: 18px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .hari {
+      margin-top: 15px;
+      font-size: 20px;
+      color: #0077cc;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="tanggal" id="tanggalHariIni"></div>
+    <input type="date" id="kalender">
+    <div class="hari" id="hariTerpilih"></div>
+  </div>
+
+  <script>
+    const tanggalDiv = document.getElementById('tanggalHariIni');
+    const kalenderInput = document.getElementById('kalender');
+    const hariDiv = document.getElementById('hariTerpilih');
+
+    function formatTanggal(date) {
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      return date.toLocaleDateString('id-ID', options);
+    }
+
+    function getHari(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('id-ID', { weekday: 'long' });
+    }
+
+    // Tampilkan tanggal hari ini
+    const today = new Date();
+    tanggalDiv.textContent = `Hari ini: ${formatTanggal(today)}`;
+
+    // Set kalender ke hari ini
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    kalenderInput.value = `${yyyy}-${mm}-${dd}`;
+    hariDiv.textContent = `Hari: ${getHari(kalenderInput.value)}`;
+
+    // Update hari saat tanggal dipilih
+    kalenderInput.addEventListener('change', () => {
+      const hari = getHari(kalenderInput.value);
+      hariDiv.textContent = `Hari: ${hari}`;
+    });
+  </script>
+</body>
+</html>
