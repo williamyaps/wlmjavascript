@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Tanggal Hari Ini</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .tanggal-container {
+      background: #ffffff;
+      padding: 20px 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .tanggal {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    input[type="date"] {
+      font-size: 18px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="tanggal-container">
+    <div class="tanggal" id="tanggalHariIni"></div>
+    <input type="date" id="kalender">
+  </div>
+
+  <script>
+    const today = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const tanggalFormatted = today.toLocaleDateString('id-ID', options);
+
+    document.getElementById('tanggalHariIni').textContent = `Hari ini: ${tanggalFormatted}`;
+    
+    // Set nilai default kalender ke hari ini
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    document.getElementById('kalender').value = `${yyyy}-${mm}-${dd}`;
+  </script>
+</body>
+</html>
