@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalender Interaktif</title>
+  <style>
+    :root {
+      --primary-color: #007bff;
+      --secondary-color: #6c757d;
+      --background-light: #e9ecef;
+      --card-bg: #ffffff;
+      --text-color: #343a40;
+      --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--background-light);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: var(--text-color);
+      transition: background-color 0.5s ease;
+    }
+    .card {
+      background-color: var(--card-bg);
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+      width: 90%;
+      max-width: 450px;
+      animation: fadeIn 1s ease-out;
+    }
+    .card h1 {
+      font-size: 2.2rem;
+      color: var(--primary-color);
+      margin-bottom: 10px;
+    }
+    .card p.subheading {
+      color: var(--secondary-color);
+      margin-bottom: 25px;
+    }
+    .display-box {
+      background-color: var(--background-light);
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 25px;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+    .tanggal-display {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    .hari-display {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: var(--secondary-color);
+    }
+    input[type="date"] {
+      padding: 10px 15px;
+      border: 2px solid var(--secondary-color);
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: border-color 0.3s ease;
+    }
+    input[type="date"]:hover {
+      border-color: var(--primary-color);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 600px) {
+      .card {
+        padding: 30px 20px;
+      }
+      .card h1 {
+        font-size: 1.8rem;
+      }
+      .tanggal-display {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Kalender Hari Ini</h1>
+  <p class="subheading">Pilih tanggal untuk melihat nama hari.</p>
+  
+  <div class="display-box">
+    <div class="tanggal-display" id="displayTanggal"></div>
+    <div class="hari-display" id="displayHari"></div>
+  </div>
+  
+  <input type="date" id="inputTanggal">
+</div>
+
+<script>
+  const inputTanggal = document.getElementById('inputTanggal');
+  const displayTanggal = document.getElementById('displayTanggal');
+  const displayHari = document.getElementById('displayHari');
+
+  const namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const namaBulan = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+  ];
+
+  function perbaruiTampilan() {
+    const tanggal = new Date(inputTanggal.value);
+    
+    const hari = namaHari[tanggal.getDay()];
+    const tanggalTampil = tanggal.getDate();
+    const bulan = namaBulan[tanggal.getMonth()];
+    const tahun = tanggal.getFullYear();
+
+    displayTanggal.textContent = `${tanggalTampil} ${bulan} ${tahun}`;
+    displayHari.textContent = `Hari: ${hari}`;
+  }
+
+  // Atur tanggal awal saat halaman dimuat
+  const hariIni = new Date();
+  const yyyy = hariIni.getFullYear();
+  const mm = String(hariIni.getMonth() + 1).padStart(2, '0');
+  const dd = String(hariIni.getDate()).padStart(2, '0');
+  
+  inputTanggal.value = `${yyyy}-${mm}-${dd}`;
+  perbaruiTampilan();
+
+  // Tambahkan event listener untuk perubahan tanggal
+  inputTanggal.addEventListener('change', perbaruiTampilan);
+</script>
+
+</body>
+</html>
