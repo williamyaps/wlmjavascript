@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrisi Tulang</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            line-height: 1.6;
+            margin: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #1a73e8;
+            border-bottom: 2px solid #1a73e8;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        /* Styling for the bar chart */
+        .chart-container {
+            margin-top: 40px;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            height: 200px;
+            border-bottom: 1px solid #ccc;
+            padding-top: 20px;
+        }
+
+        .bar {
+            width: 15%;
+            margin: 0 2.5%;
+            background-color: #3498db;
+            position: relative;
+            animation: grow 1s ease-out forwards;
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #555;
+            white-space: nowrap;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Custom bar heights for demonstration */
+        .bar.kalsium { height: 90%; background-color: #4CAF50; }
+        .bar.vitamin-d { height: 80%; background-color: #FFC107; }
+        .bar.fosfor { height: 75%; background-color: #FF5722; }
+        .bar.magnesium { height: 70%; background-color: #9C27B0; }
+        .bar.vitamin-k { height: 65%; background-color: #00BCD4; }
+        .bar.protein { height: 85%; background-color: #E91E63; }
+
+        @keyframes grow {
+            from { height: 0; }
+            to { height: var(--bar-height); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Tabel Nutrisi Penting untuk Tulang</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Nutrisi</th>
+                <th>Fungsi Utama</th>
+                <th>Sumber Makanan</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Kalsium</td>
+                <td>Komponen utama tulang dan gigi.</td>
+                <td>Susu, keju, bayam, tahu.</td>
+            </tr>
+            <tr>
+                <td>Vitamin D</td>
+                <td>Membantu penyerapan kalsium.</td>
+                <td>Sinar matahari, ikan berlemak, telur.</td>
+            </tr>
+            <tr>
+                <td>Fosfor</td>
+                <td>Bekerja sama dengan kalsium.</td>
+                <td>Daging, ikan, telur, susu.</td>
+            </tr>
+            <tr>
+                <td>Magnesium</td>
+                <td>Berperan dalam pembentukan tulang.</td>
+                <td>Sayuran hijau, kacang-kacangan.</td>
+            </tr>
+            <tr>
+                <td>Vitamin K</td>
+                <td>Meningkatkan kepadatan mineral tulang.</td>
+                <td>Sayuran berdaun hijau, brokoli.</td>
+            </tr>
+            <tr>
+                <td>Protein</td>
+                <td>Fondasi untuk mineral tulang.</td>
+                <td>Daging tanpa lemak, ikan, telur.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Grafik Perbandingan Kebutuhan Nutrisi Tulang</h2>
+    <div class="chart-container">
+        <div class="bar-chart">
+            <div class="bar kalsium" style="--bar-height: 90%;">
+                <span class="bar-value">90%</span>
+                <span class="bar-label">Kalsium</span>
+            </div>
+            <div class="bar vitamin-d" style="--bar-height: 80%;">
+                <span class="bar-value">80%</span>
+                <span class="bar-label">Vit. D</span>
+            </div>
+            <div class="bar fosfor" style="--bar-height: 75%;">
+                <span class="bar-value">75%</span>
+                <span class="bar-label">Fosfor</span>
+            </div>
+            <div class="bar magnesium" style="--bar-height: 70%;">
+                <span class="bar-value">70%</span>
+                <span class="bar-label">Magnesium</span>
+            </div>
+            <div class="bar vitamin-k" style="--bar-height: 65%;">
+                <span class="bar-value">65%</span>
+                <span class="bar-label">Vit. K</span>
+            </div>
+            <div class="bar protein" style="--bar-height: 85%;">
+                <span class="bar-value">85%</span>
+                <span class="bar-label">Protein</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
