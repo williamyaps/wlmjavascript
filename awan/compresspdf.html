@@ -1,41 +1,344 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kompresi PDF</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .upload-area {
+      border: 2px dashed #3498db;
+      border-radius: 8px;
+      padding: 40px 20px;
+      text-align: center;
+      margin-bottom: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .upload-area:hover {
+      background-color: #f8f9fa;
+      border-color: #2980b9;
+    }
+    .upload-area p {
+      margin: 0;
+      color: #7f8c8d;
+    }
+    .upload-area i {
+      font-size: 48px;
+      color: #3498db;
+      margin-bottom: 10px;
+    }
+    #fileInput {
+      display: none;
+    }
+    .options {
+      margin: 20px 0;
+    }
+    .option-group {
+      margin-bottom: 15px;
+    }
+    .option-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+    .option-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    button:disabled {
+      background-color: #95a5a6;
+      cursor: not-allowed;
+    }
+    .file-info {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      display: none;
+    }
+    .progress {
+      margin-top: 15px;
+      display: none;
+    }
+    .progress-bar {
+      height: 10px;
+      background-color: #ecf0f1;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background-color: #2ecc71;
+      width: 0%;
+      transition: width 0.3s;
+    }
+    .status {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #7f8c8d;
+    }
+    .success {
+      color: #27ae60;
+    }
+    .error {
+      color: #e74c3c;
+    }
+  </style>
 </head>
 <body>
-  <h2>Kompresi PDF Sederhana</h2>
-  <input type="file" id="pdfInput" accept="application/pdf" />
-  <button onclick="compressPDF()">Kompres PDF</button>
+  <div class="container">
+    <h1>Kompresi PDF by: William Yap, S. Com</h1>
+    
+    <div class="upload-area" id="uploadArea">
+      <i>📄</i>
+      <p>Klik atau seret file PDF ke sini</p>
+      <input type="file" id="fileInput" accept="application/pdf">
+    </div>
+    
+    <div class="file-info" id="fileInfo">
+      <strong>File terpilih:</strong> <span id="fileName"></span> (<span id="fileSize"></span>)
+    </div>
+    
+    <div class="options">
+      <div class="option-group">
+        <label for="dpiSelect">Kualitas Kompresi (DPI):</label>
+        <select id="dpiSelect">
+          <option value="150">150 DPI (Kualitas Baik)</option>
+          <option value="72">72 DPI (Kualitas Sedang)</option>
+          <option value="60">60 DPI (Kualitas Rendah)</option>
+        </select>
+      </div>
+    </div>
+    
+    <button id="compressBtn" onclick="compressPDF()" disabled>Kompres PDF by William Yap</button>
+    
+    <div class="progress" id="progressContainer">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="status" id="progressStatus">Mengompresi PDF by: William Yap...</div>
+    </div>
+  </div>
 
+  <!-- Library yang diperlukan -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
   <script>
+    // Inisialisasi PDF.js
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js';
+    
+    // Variabel global untuk menyimpan file
+    let selectedFile = null;
+    
+    // Setup event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      const fileInput = document.getElementById('fileInput');
+      const uploadArea = document.getElementById('uploadArea');
+      const compressBtn = document.getElementById('compressBtn');
+      
+      // Event untuk klik pada area upload
+      uploadArea.addEventListener('click', function() {
+        fileInput.click();
+      });
+      
+      // Event untuk drag & drop
+      uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#2980b9';
+        uploadArea.style.backgroundColor = '#f8f9fa';
+      });
+      
+      uploadArea.addEventListener('dragleave', function() {
+        uploadArea.style.borderColor = '#3498db';
+        uploadArea.style.backgroundColor = '';
+      });
+      
+      uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#3498db';
+        uploadArea.style.backgroundColor = '';
+        
+        if (e.dataTransfer.files.length) {
+          handleFileSelection(e.dataTransfer.files[0]);
+        }
+      });
+      
+      // Event untuk perubahan file input
+      fileInput.addEventListener('change', function() {
+        if (this.files.length) {
+          handleFileSelection(this.files[0]);
+        }
+      });
+    });
+    
+    // Fungsi untuk menangani pemilihan file
+    function handleFileSelection(file) {
+      if (file.type !== 'application/pdf') {
+        alert('Silakan pilih file PDF yang valid.');
+        return;
+      }
+      
+      selectedFile = file;
+      
+      // Tampilkan info file
+      const fileInfo = document.getElementById('fileInfo');
+      const fileName = document.getElementById('fileName');
+      const fileSize = document.getElementById('fileSize');
+      
+      fileName.textContent = file.name;
+      fileSize.textContent = formatFileSize(file.size);
+      fileInfo.style.display = 'block';
+      
+      // Aktifkan tombol kompresi
+      document.getElementById('compressBtn').disabled = false;
+    }
+    
+    // Fungsi untuk memformat ukuran file
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Fungsi utama untuk kompresi PDF
     async function compressPDF() {
-      const input = document.getElementById('pdfInput');
-      if (!input.files.length) {
+      if (!selectedFile) {
         alert('Silakan pilih file PDF terlebih dahulu.');
         return;
       }
-
-      const file = input.files[0];
-      const arrayBuffer = await file.arrayBuffer();
-      const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
-
-      // Kompresi sederhana: hapus metadata
-      pdfDoc.setTitle('');
-      pdfDoc.setAuthor('');
-      pdfDoc.setSubject('');
-      pdfDoc.setKeywords([]);
-      pdfDoc.setProducer('');
-      pdfDoc.setCreator('');
-      pdfDoc.setCreationDate(null);
-      pdfDoc.setModificationDate(null);
-
-      const compressedPdfBytes = await pdfDoc.save();
-      const blob = new Blob([compressedPdfBytes], { type: 'application/pdf' });
-      saveAs(blob, 'compressed.pdf');
+      
+      const dpiSelect = document.getElementById('dpiSelect');
+      const targetDPI = parseInt(dpiSelect.value);
+      
+      // Tampilkan progress bar
+      const progressContainer = document.getElementById('progressContainer');
+      const progressFill = document.getElementById('progressFill');
+      const progressStatus = document.getElementById('progressStatus');
+      
+      progressContainer.style.display = 'block';
+      progressFill.style.width = '10%';
+      progressStatus.textContent = 'Membaca file PDF...';
+      
+      try {
+        // Baca file PDF
+        const arrayBuffer = await selectedFile.arrayBuffer();
+        progressFill.style.width = '30%';
+        progressStatus.textContent = 'Memproses halaman...';
+        
+        // Load PDF menggunakan pdf.js untuk mendapatkan gambar halaman
+        const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+        const numPages = pdf.numPages;
+        
+        // Buat PDF baru menggunakan pdf-lib
+        const pdfDoc = await PDFLib.PDFDocument.create();
+        
+        // Proses setiap halaman
+        for (let i = 1; i <= numPages; i++) {
+          progressFill.style.width = `${30 + (i / numPages) * 50}%`;
+          progressStatus.textContent = `Memproses halaman ${i} dari ${numPages}...`;
+          
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale: 1.0 });
+          
+          // Buat canvas untuk merender halaman
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          
+          // Sesuaikan ukuran canvas berdasarkan DPI target
+          const scale = targetDPI / 72; // 72 DPI adalah standar
+          canvas.width = Math.floor(viewport.width * scale);
+          canvas.height = Math.floor(viewport.height * scale);
+          
+          // Render halaman ke canvas
+          const renderContext = {
+            canvasContext: context,
+            viewport: page.getViewport({ scale: scale })
+          };
+          
+          await page.render(renderContext).promise;
+          
+          // Konversi canvas ke gambar dan tambahkan ke PDF baru
+          const imageData = canvas.toDataURL('image/jpeg', 0.7); // Kualitas JPEG 70%
+          const jpgImage = await pdfDoc.embedJpg(imageData);
+          
+          // Buat halaman baru dengan ukuran yang sesuai
+          const newPage = pdfDoc.addPage([viewport.width, viewport.height]);
+          newPage.drawImage(jpgImage, {
+            x: 0,
+            y: 0,
+            width: viewport.width,
+            height: viewport.height,
+          });
+        }
+        
+        progressFill.style.width = '90%';
+        progressStatus.textContent = 'Menyimpan PDF...';
+        
+        // Hapus metadata untuk kompresi tambahan
+        pdfDoc.setTitle('');
+        pdfDoc.setAuthor('');
+        pdfDoc.setSubject('');
+        pdfDoc.setKeywords([]);
+        pdfDoc.setProducer('');
+        pdfDoc.setCreator('');
+        
+        // Simpan PDF
+        const compressedPdfBytes = await pdfDoc.save();
+        
+        // Buat blob dan simpan file
+        const blob = new Blob([compressedPdfBytes], { type: 'application/pdf' });
+        const originalName = selectedFile.name.replace('.pdf', '');
+        saveAs(blob, `${originalName}_compressed_${targetDPI}dpi.pdf`);
+        
+        progressFill.style.width = '100%';
+        progressStatus.textContent = 'Kompresi selesai!';
+        progressStatus.className = 'status success';
+        
+      } catch (error) {
+        console.error('Error saat mengompresi PDF:', error);
+        progressStatus.textContent = 'Terjadi kesalahan saat mengompresi PDF.';
+        progressStatus.className = 'status error';
+      }
     }
   </script>
 </body>
