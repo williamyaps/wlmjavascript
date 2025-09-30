@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kompresi PDF + Preview by William Yap</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 30px auto; padding: 20px; text-align: center; }
+    #drop-area { border: 2px dashed #666; padding: 40px; margin: 20px 0; cursor: pointer; background: #f9f9f9; transition: background 0.3s; }
+    #drop-area:hover, #drop-area.dragover { background: #e9e9e9; }
+    button { padding: 8px 16px; margin: 5px; font-size: 14px; cursor: pointer; border-radius: 6px; }
+    .active { background: #4CAF50; color: white; }
+    #status { margin-top: 15px; color: #d32f2f; font-weight: bold; }
+    .group { margin: 15px 0; }
+    #preview { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+    .thumb { border: 1px solid #ccc; border-radius: 8px; overflow: hidden; background: #fefefe; padding: 5px; }
+    .thumb img { width: 100%; height: auto; display: block; }
+    .thumb p { font-size: 13px; margin: 5px 0 0; }
+  </style>
+</head>
+<body>
+  <h1 style="color:#0033cc;">Kompresi PDF (Render ke Gambar + Preview)</h1>
+  <h2 style="color:hsl(240, 100%, 50%);">by: Wiliam Yap</h2>
+
+  <div id="drop-area">Klik atau seret file PDF ke sini</div>
+  <div>File terpilih: (<span id="filename">-</span>)</div>
+
+  <div class="group">
+    <h3>Kualitas Kompresi (DPI):</h3>
+    <button class="dpi-btn" data-dpi="300">300 DPI</button>
+    <button class="dpi-btn active" data-dpi="150">150 DPI</button>
+    <button class="dpi-btn" data-dpi="100">100 DPI</button>
+    <button class="dpi-btn" data-dpi="72">72 DPI</button>
+    <button class="dpi-btn" data-dpi="60">60 DPI</button>
+    <button class="dpi-btn" data-dpi="40">40 DPI</button>
+  </div>
+
+  <div class="group">
+    <h3>Kualitas JPEG:</h3>
+    <button class="jpg-btn active" data-quality="0.9">High (0.9)</button>
+    <button class="jpg-btn" data-quality="0.75">Medium (0.75)</button>
+    <button class="jpg-btn" data-quality="0.5">Low (0.5)</button>
+  </div>
+
+  <div class="group">
+    <button id="preview-btn" disabled>Lihat Preview 📸</button>
+    <button id="compress-btn" disabled>Unduh PDF Terkompres 📥</button>
+  </div>
+
+  <div id="status"></div>
+  <div id="preview"></div>
+
+  <!-- pdf.js -->
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js"></script>
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    let selectedFile = null;
+    let selectedDPI = 150;
+    let jpegQuality = 0.9;
+    const { jsPDF } = window.jspdf;
+    let previewImages = [];
+
+    const dropArea = document.getElementById('drop-area');
+    const filenameSpan = document.getElementById('filename');
+    const compressBtn = document.getElementById('compress-btn');
+    const previewBtn = document.getElementById('preview-btn');
+    const statusDiv = document.getElementById('status');
+    const previewDiv = document.getElementById('preview');
+
+    // DPI selection
+    document.querySelectorAll('.dpi-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.dpi-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedDPI = parseInt(btn.dataset.dpi);
+      });
+    });
+
+    // JPEG quality selection
+    document.querySelectorAll('.jpg-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.jpg-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        jpegQuality = parseFloat(btn.dataset.quality);
+      });
+    });
+
+    // File input
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.pdf';
+    fileInput.style.display = 'none';
+    fileInput.onchange = e => { if (e.target.files[0]) handleFile(e.target.files[0]); };
+    document.body.appendChild(fileInput);
+
+    dropArea.addEventListener('click', () => fileInput.click());
+    dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('dragover'); });
+    dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
+    dropArea.addEventListener('drop', e => {
+      e.preventDefault();
+      dropArea.classList.remove('dragover');
+      if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+
+    function handleFile(file) {
+      if (!file.name.toLowerCase().endsWith('.pdf')) {
+        statusDiv.textContent = '❌ Pilih file PDF!';
+        return;
+      }
+      selectedFile = file;
+      filenameSpan.textContent = file.name;
+      compressBtn.disabled = false;
+      previewBtn.disabled = false;
+      statusDiv.textContent = '';
+      previewDiv.innerHTML = '';
+      previewImages = [];
+    }
+
+    async function generatePreview() {
+      if (!selectedFile) return;
+      statusDiv.textContent = '⏳ Membuat preview...';
+
+      previewDiv.innerHTML = '';
+      previewImages = [];
+
+      const arrayBuf = await selectedFile.arrayBuffer();
+      const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuf }).promise;
+      const totalPages = pdfDoc.numPages;
+
+      for (let i = 1; i <= totalPages; i++) {
+        const page = await pdfDoc.getPage(i);
+        const viewport = page.getViewport({ scale: selectedDPI / 72 });
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        await page.render({ canvasContext: ctx, viewport }).promise;
+        const imgData = canvas.toDataURL('image/jpeg', jpegQuality);
+
+        previewImages.push({ data: imgData, width: viewport.width, height: viewport.height });
+
+        const thumb = document.createElement('div');
+        thumb.className = 'thumb';
+        thumb.innerHTML = `<img src="${imgData}" alt="Halaman ${i}"><p>Halaman ${i}</p>`;
+        previewDiv.appendChild(thumb);
+      }
+
+      statusDiv.textContent = '✅ Preview selesai. Jika sudah cocok, klik "Unduh PDF Terkompres".';
+    }
+
+    async function compressPDF() {
+      if (previewImages.length === 0) {
+        statusDiv.textContent = '⚠️ Buat preview dulu sebelum unduh.';
+        return;
+      }
+      statusDiv.textContent = '⏳ Membuat PDF...';
+
+      const outPdf = new jsPDF({ unit: 'pt', compress: true });
+      outPdf.deletePage(1);
+
+      for (let i = 0; i < previewImages.length; i++) {
+        const page = previewImages[i];
+        outPdf.addPage([page.width, page.height]);
+        outPdf.addImage(page.data, 'JPEG', 0, 0, page.width, page.height);
+      }
+
+      outPdf.save(selectedFile.name.replace('.pdf', `_compressed_${selectedDPI}dpi_q${jpegQuality}.pdf`));
+      statusDiv.textContent = '✅ Selesai! File telah diunduh.';
+    }
+
+    previewBtn.onclick = generatePreview;
+    compressBtn.onclick = compressPDF;
+  </script>
+</body>
+</html>
