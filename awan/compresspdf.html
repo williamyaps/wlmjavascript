@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Kompresi PDF</title>
+</head>
+<body>
+  <h2>Kompresi PDF Sederhana</h2>
+  <input type="file" id="pdfInput" accept="application/pdf" />
+  <button onclick="compressPDF()">Kompres PDF</button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+  <script>
+    async function compressPDF() {
+      const input = document.getElementById('pdfInput');
+      if (!input.files.length) {
+        alert('Silakan pilih file PDF terlebih dahulu.');
+        return;
+      }
+
+      const file = input.files[0];
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+
+      // Kompresi sederhana: hapus metadata
+      pdfDoc.setTitle('');
+      pdfDoc.setAuthor('');
+      pdfDoc.setSubject('');
+      pdfDoc.setKeywords([]);
+      pdfDoc.setProducer('');
+      pdfDoc.setCreator('');
+      pdfDoc.setCreationDate(null);
+      pdfDoc.setModificationDate(null);
+
+      const compressedPdfBytes = await pdfDoc.save();
+      const blob = new Blob([compressedPdfBytes], { type: 'application/pdf' });
+      saveAs(blob, 'compressed.pdf');
+    }
+  </script>
+</body>
+</html>
