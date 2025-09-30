@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Kompres PDF lokal di browser — tanpa upload, aman, gratis." />
+  <meta name="author" content="William Yap, S.Com" />
+  <title>Kompres PDF Online - Lokal & Aman</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 20px;
+      text-align: center;
+    }
+    #drop-area {
+      border: 2px dashed #666;
+      padding: 40px;
+      margin: 20px 0;
+      cursor: pointer;
+      background: #f9f9f9;
+      transition: background 0.3s;
+    }
+    #drop-area:hover, #drop-area.dragover {
+      background: #e9e9e9;
+    }
+    button {
+      padding: 8px 16px;
+      margin: 5px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .active {
+      background: #4CAF50;
+      color: white;
+    }
+    #status {
+      margin-top: 15px;
+      color: #d32f2f;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Kompresi PDF by: William Yap, S. Com</h1>
+  
+  <div id="drop-area">Klik atau seret file PDF ke sini</div>
+  <div>File terpilih: (<span id="filename">-</span>)</div>
+
+  <h3>Kualitas Kompresi (DPI):</h3>
+  <button class="dpi-btn active" data-dpi="150">150 DPI (Kualitas Baik)</button>
+  <button class="dpi-btn" data-dpi="100">100 DPI (Kualitas Menengah)</button>
+  <button class="dpi-btn" data-dpi="72">72 DPI (Kualitas Sedang)</button>
+  <button class="dpi-btn" data-dpi="60">60 DPI (Kualitas Rendah)</button>
+
+  <br><br>
+  <button id="compress-btn" disabled>Kompres PDF</button>
+  <div id="status"></div>
+
+  <!-- Load PDF.js dan jsPDF -->
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    // Konfigurasi worker PDF.js
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+
+    let selectedFile = null;
+    let selectedDPI = 150;
+    const { jsPDF } = window.jspdf;
+
+    const dropArea = document.getElementById('drop-area');
+    const filenameSpan = document.getElementById('filename');
+    const compressBtn = document.getElementById('compress-btn');
+    const statusDiv = document.getElementById('status');
+
+    // Pilih DPI
+    document.querySelectorAll('.dpi-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.dpi-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedDPI = parseInt(btn.dataset.dpi);
+      });
+    });
+
+    // Buat input file tersembunyi
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.pdf';
+    fileInput.style.display = 'none';
+    fileInput.onchange = e => {
+      if (e.target.files[0]) {
+        handleFile(e.target.files[0]);
+      }
+    };
+    document.body.appendChild(fileInput);
+
+    // Klik area → buka file picker
+    dropArea.addEventListener('click', () => fileInput.click());
+
+    // Drag & drop
+    dropArea.addEventListener('dragover', e => {
+      e.preventDefault();
+      dropArea.classList.add('dragover');
+    });
+    dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
+    dropArea.addEventListener('drop', e => {
+      e.preventDefault();
+      dropArea.classList.remove('dragover');
+      if (e.dataTransfer.files.length) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    function handleFile(file) {
+      if (!file.name.toLowerCase().endsWith('.pdf')) {
+        statusDiv.textContent = '❌ Pilih file PDF!';
+        return;
+      }
+      selectedFile = file;
+      filenameSpan.textContent = file.name;
+      compressBtn.disabled = false;
+      statusDiv.textContent = '';
+    }
+
+    // Fungsi kompresi utama
+    async function compressPDF() {
+      if (!selectedFile) return;
+      statusDiv.textContent = '⏳ Memproses...';
+
+      try {
+        const arrayBuf = await selectedFile.arrayBuffer();
+        const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuf }).promise;
+        const totalPages = pdfDoc.numPages;
+
+        const pdfOut = new jsPDF();
+        pdfOut.deletePage(1); // hapus halaman default
+
+        for (let i = 1; i <= totalPages; i++) {
+          const page = await pdfDoc.getPage(i);
+          const viewport = page.getViewport({ scale: 1 });
+          
+          // Hitung ukuran canvas berdasarkan DPI
+          const scale = selectedDPI / 72;
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = Math.floor(viewport.width * scale);
+          canvas.height = Math.floor(viewport.height * scale);
+
+          const renderCtx = {
+            canvasContext: ctx,
+            viewport: page.getViewport({ scale })
+          };
+          await page.render(renderCtx).promise;
+
+          // Tambah halaman ke PDF output
+          const img = canvas.toDataURL('image/jpeg', 0.85);
+          pdfOut.addPage([viewport.width, viewport.height]);
+          pdfOut.addImage(img, 'JPEG', 0, 0, viewport.width, viewport.height);
+        }
+
+        // Simpan
+        pdfOut.save(selectedFile.name.replace('.pdf', '_compressed.pdf'));
+        statusDiv.textContent = '✅ Selesai! File telah diunduh.';
+      } catch (err) {
+        console.error(err);
+        statusDiv.textContent = '❌ Error: ' + (err.message || 'Gagal memproses PDF');
+      }
+    }
+
+    compressBtn.onclick = compressPDF;
+  </script>
+</body>
+</html>
