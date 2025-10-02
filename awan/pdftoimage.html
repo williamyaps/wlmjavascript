@@ -184,48 +184,41 @@
       pageImages = [];
     }
 
-    function applyWatermark(canvas, ctx) {
-      if (watermarkType === "none" && watermarkImage) {
-        // Apply image watermark
-        const watermarkWidth = width * 0.6; // 60% of canvas width
-        const watermarkHeight = (watermarkImage.height / watermarkImage.width) * watermarkWidth;
-        const x = (width - watermarkWidth) / 2;
-        const y = (height - watermarkHeight) / 2;
-        
-        ctx.globalAlpha = 0.5; // Light opacity
-        ctx.drawImage(watermarkImage, x, y, watermarkWidth, watermarkHeight);
-        ctx.globalAlpha = 1.0; // Reset alpha
-      } 
-      
-      if (watermarkType === "image" && watermarkImage) {
-        // Apply image watermark
-        const watermarkWidth = width * 0.5; // 50% of canvas width
-        const watermarkHeight = (watermarkImage.height / watermarkImage.width) * watermarkWidth;
-        const x = (width - watermarkWidth) / 2;
-        const y = (height - watermarkHeight) / 2;
-        
-        ctx.globalAlpha = 0.4; // Light opacity
-        ctx.drawImage(watermarkImage, x, y, watermarkWidth, watermarkHeight);
-        ctx.globalAlpha = 1.0; // Reset alpha
-      } 
-      else if (watermarkType === "text") {
-        // Apply text watermark
-        ctx.globalAlpha = 0.35; // Light opacity
-        ctx.font = `bold ${Math.max(width / 20, 20)}px Arial`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        
-        // Colorful text effect
-        const gradient = ctx.createLinearGradient(0, 0, width, height);
-        gradient.addColorStop(0, "#ff6b6b");
-        gradient.addColorStop(0.5, "#4ecdc4");
-        gradient.addColorStop(1, "#45b7d1");
-        ctx.fillStyle = gradient;
-        
-        ctx.fillText("convert by: William Yap", width / 2, height / 2);
-        ctx.globalAlpha = 1.0; // Reset alpha
-      }
-    }
+	function applyWatermark(canvas, ctx) {
+	  const width = canvas.width;
+	  const height = canvas.height;
+
+	  let type = watermarkType || "image";
+
+	  if ((type === "none" || type === "image") && watermarkImage) {
+		const scale = type === "none" ? 0.6 : 0.5;
+		const alpha = type === "none" ? 0.5 : 0.4;
+
+		const watermarkWidth = width * scale;
+		const watermarkHeight = (watermarkImage.height / watermarkImage.width) * watermarkWidth;
+		const x = (width - watermarkWidth) / 2;
+		const y = (height - watermarkHeight) / 2;
+
+		ctx.globalAlpha = alpha;
+		ctx.drawImage(watermarkImage, x, y, watermarkWidth, watermarkHeight);
+		ctx.globalAlpha = 1.0;
+	  } else if (type === "text") {
+		ctx.globalAlpha = 0.35;
+		ctx.font = `bold ${Math.max(width / 20, 20)}px Arial`;
+		ctx.textAlign = "center";
+		ctx.textBaseline = "middle";
+
+		const gradient = ctx.createLinearGradient(0, 0, width, height);
+		gradient.addColorStop(0, "#ff6b6b");
+		gradient.addColorStop(0.5, "#4ecdc4");
+		gradient.addColorStop(1, "#45b7d1");
+		ctx.fillStyle = gradient;
+
+		ctx.fillText("convert by: William Yap®", width / 2, height / 2);
+		ctx.globalAlpha = 1.0;
+	  }
+	}
+
 
     async function generatePreview() {
       if (!selectedFile) return;
