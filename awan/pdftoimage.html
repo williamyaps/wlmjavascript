@@ -18,6 +18,10 @@
     select { padding: 8px 12px; font-size: 14px; border-radius: 6px; border: 1px solid #d1d5db; }
     h1 { color: #4338ca; }
     h2 { color: #7c3aed; margin-top: -10px; }
+    .watermark-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 10px; }
+    .watermark-option { display: flex; align-items: center; gap: 5px; }
+    .watermark-option input[type="radio"] { margin: 0; }
+    .watermark-option label { cursor: pointer; }
   </style>
 </head>
 <body>
@@ -55,6 +59,24 @@
   </div>
 
   <div class="group">
+    <h3>Watermark:</h3>
+    <div class="watermark-options"> <!--
+      <div class="watermark-option">
+        <input type="radio" id="watermark-none" name="watermark" value="none" checked>
+        <label for="watermark-none">Tidak ada watermark</label>
+      </div> -->
+      <div class="watermark-option">
+        <input type="radio" id="watermark-image" name="watermark" value="image">
+        <label for="watermark-image">Gambar</label>
+      </div>
+      <div class="watermark-option">
+        <input type="radio" id="watermark-text" name="watermark" value="text">
+        <label for="watermark-text">Text</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="group">
     <button id="preview-btn" disabled>Lihat Preview 📸</button>
     <button id="download-btn" disabled>Unduh Semua 📥</button>
   </div>
@@ -77,6 +99,8 @@
     let selectedQualityLabel = "ultra";
     let selectedFormat = "png";
     let pageImages = [];
+    let watermarkType = "none";
+    let watermarkImage = null;
 
     const dropArea = document.getElementById('drop-area');
     const filenameSpan = document.getElementById('filename');
@@ -112,6 +136,21 @@
       jpgQualityGroup.style.display = selectedFormat === "jpg" ? "block" : "none";
     });
 
+    // Watermark selection
+    document.querySelectorAll('input[name="watermark"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        watermarkType = radio.value;
+      });
+    });
+
+    // Preload watermark image
+    const watermarkImg = new Image();
+    watermarkImg.crossOrigin = "anonymous";
+    watermarkImg.src = "https://wlmyaps.github.io/pdf/image/watermark.png";
+    watermarkImg.onload = () => {
+      watermarkImage = watermarkImg;
+    };
+
     // File input
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
@@ -145,6 +184,49 @@
       pageImages = [];
     }
 
+    function applyWatermark(canvas, ctx) {
+      if (watermarkType === "none" && watermarkImage) {
+        // Apply image watermark
+        const watermarkWidth = width * 0.6; // 60% of canvas width
+        const watermarkHeight = (watermarkImage.height / watermarkImage.width) * watermarkWidth;
+        const x = (width - watermarkWidth) / 2;
+        const y = (height - watermarkHeight) / 2;
+        
+        ctx.globalAlpha = 0.5; // Light opacity
+        ctx.drawImage(watermarkImage, x, y, watermarkWidth, watermarkHeight);
+        ctx.globalAlpha = 1.0; // Reset alpha
+      } 
+      
+      if (watermarkType === "image" && watermarkImage) {
+        // Apply image watermark
+        const watermarkWidth = width * 0.5; // 50% of canvas width
+        const watermarkHeight = (watermarkImage.height / watermarkImage.width) * watermarkWidth;
+        const x = (width - watermarkWidth) / 2;
+        const y = (height - watermarkHeight) / 2;
+        
+        ctx.globalAlpha = 0.4; // Light opacity
+        ctx.drawImage(watermarkImage, x, y, watermarkWidth, watermarkHeight);
+        ctx.globalAlpha = 1.0; // Reset alpha
+      } 
+      else if (watermarkType === "text") {
+        // Apply text watermark
+        ctx.globalAlpha = 0.35; // Light opacity
+        ctx.font = `bold ${Math.max(width / 20, 20)}px Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        
+        // Colorful text effect
+        const gradient = ctx.createLinearGradient(0, 0, width, height);
+        gradient.addColorStop(0, "#ff6b6b");
+        gradient.addColorStop(0.5, "#4ecdc4");
+        gradient.addColorStop(1, "#45b7d1");
+        ctx.fillStyle = gradient;
+        
+        ctx.fillText("convert by: William Yap", width / 2, height / 2);
+        ctx.globalAlpha = 1.0; // Reset alpha
+      }
+    }
+
     async function generatePreview() {
       if (!selectedFile) return;
       statusDiv.textContent = '⏳ Merender halaman...';
@@ -165,6 +247,9 @@
           canvas.height = viewport.height;
 
           await page.render({ canvasContext: ctx, viewport }).promise;
+          
+          // Apply watermark after rendering the PDF page
+          applyWatermark(canvas, ctx);
 
           let dataUrl;
           if (selectedFormat === "jpg") {
