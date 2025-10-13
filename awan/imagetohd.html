@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Remacri 4x — In-Browser AI Upscaler (Pixelcut-like UI)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b1020;
+    --card: #0f1724;
+    --muted: #94a3b8;
+    --accent: #06b6d4;
+    --accent-2: #7c3aed;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,#071028 0%,#071a2a 100%);color:#e6eef8}
+  .wrap{max-width:1200px;margin:28px auto;padding:22px}
+  header{display:flex;align-items:center;gap:18px;margin-bottom:18px}
+  .brand{font-weight:700;font-size:20px;color:var(--accent-2)}
+  .subtitle{color:var(--muted);font-size:13px}
+  .layout{display:grid;grid-template-columns:360px 1fr;gap:18px}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:16px;box-shadow:0 8px 40px rgba(2,6,23,0.6)}
+  #left .card{position:sticky;top:24px}
+  #drop{height:150px;border:2px dashed rgba(255,255,255,0.06);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-direction:column;cursor:pointer}
+  #drop:hover{background:rgba(255,255,255,0.01)}
+  .small{font-size:12px;color:var(--muted)}
+  .controls{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+  .row{display:flex;gap:8px;align-items:center}
+  .btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px 12px;border-radius:8px;color:inherit;cursor:pointer}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:#041022;font-weight:700}
+  .mode-toggle .btn.active{box-shadow:0 6px 16px rgba(124,58,237,0.14);border-color:rgba(255,255,255,0.08)}
+  select,input[type=number]{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:8px;border-radius:8px;color:inherit}
+  #status{margin-top:8px;min-height:34px}
+  progress{width:100%;height:12px;border-radius:8px;overflow:hidden}
+  #preview-area{padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+  .thumb{background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));padding:10px;border-radius:10px;text-align:center}
+  
+  /* 🔥 PERBAIKAN UTAMA: pastikan gambar/canvas tajam, nggak pecah */
+  .thumb img,
+  .thumb canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+    max-width: 100%;
+    max-height: 400px;
+    height: auto;
+    width: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 6px;
+  }
+  
+  .meta{font-size:13px;color:var(--muted);margin-top:8px}
+  .download-row{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:12px}
+  .footer{font-size:12px;color:var(--muted);margin-top:10px}
+  .hint{font-size:12px;color:#dbeafe;background:rgba(255,255,255,0.02);padding:8px;border-radius:8px}
+  /* cinematic tweak preview overlay */
+  .cinematic { filter: contrast(1.08) saturate(1.05); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="brand">Remacri Upscaler</div>
+      <div class="subtitle">In-browser Remacri 4× — Cinematic Fine Detail (by William Yap)</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <div id="left">
+      <div class="card">
+        <div id="drop">
+          <div style="font-weight:700">Klik / Seret gambar di sini</div>
+          <div class="small" style="margin-top:6px">PNG, JPG, WebP — Foto wajah disarankan</div>
+        </div>
+
+        <div class="controls">
+          <div class="row mode-toggle">
+            <button id="mode-ai" class="btn primary">AI: Remacri (online)</button>
+            <button id="mode-canvas" class="btn" style="margin-left:6px">Canvas (fallback)</button>
+          </div>
+
+          <div class="row">
+            <label class="small">Upscale Factor:</label>
+            <select id="factor">
+              <option value="2">2×</option>
+              <option value="4" selected>4× (recommended)</option>
+              <option value="6">6×</option>
+              <option value="8">8×</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label class="small">Post-Style:</label>
+            <select id="style">
+              <option value="natural">Natural</option>
+              <option value="superdetail">Super Detail</option>
+              <option value="soft">Soft Beauty</option>
+              <option value="cinematic" selected>Cinematic Fine Detail</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <label class="small">Output format:</label>
+            <select id="outfmt">
+              <option value="png">PNG (lossless)</option>
+              <option value="webp" selected>WebP (recommended)</option>
+              <option value="jpg">JPG (quality)</option>
+            </select>
+            <label style="margin-left:8px" class="small">Quality:
+              <input id="quality" type="range" min="0.3" max="1" step="0.05" value="0.9" style="vertical-align:middle;margin-left:6px">
+            </label>
+          </div>
+
+          <div class="row">
+            <label class="small">Model URL (CDN):</label>
+          </div>
+          <div style="margin-top:6px">
+            <input id="model-url" style="width:100%" value="https://huggingface.co/yuvraj108c/ComfyUI-Upscaler-Onnx/resolve/main/4x_foolhardy_Remacri.onnx">
+            <div class="small" style="margin-top:6px">Default: public ONNX Remacri 4x (HuggingFace). Ubah kalau mau pakai host lain.</div>
+          </div>
+
+          <div style="margin-top:12px" class="row">
+            <button id="run-btn" class="btn primary">Run Upscale</button>
+            <button id="clear-btn" class="btn" style="margin-left:6px">Reset</button>
+          </div>
+
+          <div id="status" class="small"></div>
+          <progress id="progress" value="0" max="100" style="display:none"></progress>
+
+          <div class="footer">Note: Model ~70MB, akan diunduh sekali. Jika gagal, gunakan Canvas fallback.</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="right">
+      <div class="card">
+        <div id="preview-area">
+          <div class="thumb">
+            <div style="font-weight:600">Original</div>
+            <div id="orig-wrap"></div>
+            <div class="meta" id="orig-meta">-</div>
+          </div>
+          <div class="thumb">
+            <div style="font-weight:600">Output</div>
+            <div id="out-wrap"></div>
+            <div class="meta" id="out-meta">-</div>
+          </div>
+        </div>
+
+        <div class="download-row">
+          <div class="small" id="size-info"></div>
+          <div style="flex:1"></div>
+          <button id="download-btn" class="btn primary" disabled>Download</button>
+        </div>
+
+        <div style="margin-top:12px" class="hint">
+          Cinematic Fine Detail = light contrast boost + moderate sharpening + subtle filmic tone. Jika mau lebih halus, pilih "Soft Beauty".
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- onnxruntime-web (WASM + WebGL) -->
+<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+
+<script>
+/*
+  Best-effort in-browser ONNX runner for Remacri 4x.
+  Fixed: now displays canvas directly → no quality loss from toDataURL + img scaling.
+*/
+
+const drop = document.getElementById('drop');
+const fi = document.createElement('input'); fi.type='file'; fi.accept='image/*'; fi.style.display='none';
+document.body.appendChild(fi);
+
+const origWrap = document.getElementById('orig-wrap');
+const outWrap = document.getElementById('out-wrap');
+const origMeta = document.getElementById('orig-meta');
+const outMeta = document.getElementById('out-meta');
+const status = document.getElementById('status');
+const progress = document.getElementById('progress');
+const runBtn = document.getElementById('run-btn');
+const clearBtn = document.getElementById('clear-btn');
+const downloadBtn = document.getElementById('download-btn');
+const modelUrlInput = document.getElementById('model-url');
+const factorSelect = document.getElementById('factor');
+const outFmt = document.getElementById('outfmt');
+const qualityRange = document.getElementById('quality');
+const styleSelect = document.getElementById('style');
+
+let currentFile = null;
+let sess = null;
+let lastCanvas = null;
+
+drop.addEventListener('click', ()=> fi.click());
+drop.addEventListener('dragover', e=>{ e.preventDefault(); drop.style.opacity=0.9 });
+drop.addEventListener('dragleave', ()=> drop.style.opacity=1);
+drop.addEventListener('drop', e=>{ e.preventDefault(); if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+
+fi.onchange = e => { if(e.target.files[0]) handleFile(e.target.files[0]); };
+
+clearBtn.addEventListener('click', resetAll);
+runBtn.addEventListener('click', runUpscale);
+downloadBtn.addEventListener('click', downloadResult);
+
+function setStatus(t){ status.textContent = t; }
+function showProgress(v){ progress.style.display = v===null ? 'none' : 'block'; if(v!==null) progress.value = v; }
+
+function resetAll(){
+  currentFile = null; 
+  origWrap.innerHTML = '';
+  outWrap.innerHTML = '';
+  origMeta.textContent = '-';
+  outMeta.textContent = '-';
+  downloadBtn.disabled = true;
+  setStatus('Reset.');
+  lastCanvas = null;
+}
+
+function handleFile(file){
+  currentFile = file;
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    origWrap.innerHTML = '';
+    origWrap.appendChild(img);
+    img.style.maxHeight = '400px';
+    img.style.maxWidth = '100%';
+  };
+  img.src = url;
+  origMeta.textContent = `${file.name} • ${Math.round(file.size/1024)} KB`;
+  outMeta.textContent = '-';
+  downloadBtn.disabled = true;
+  setStatus('File siap. Pilih model & klik Run Upscale.');
+}
+
+function loadImageFromFile(file){
+  return new Promise((res,rej)=>{
+    const img = new Image();
+    img.onload = ()=> res(img);
+    img.onerror = rej;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+function createCanvas(w,h){
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  return c;
+}
+
+async function canvasUpscale(img, targetW, targetH){
+  const tmp = createCanvas(img.width, img.height);
+  const tctx = tmp.getContext('2d');
+  tctx.imageSmoothingEnabled = true; tctx.imageSmoothingQuality = 'high';
+  tctx.drawImage(img,0,0);
+  let curW = img.width, curH = img.height;
+  while(curW < targetW || curH < targetH){
+    const nextW = Math.min(curW*2, targetW);
+    const nextH = Math.min(curH*2, targetH);
+    const nxt = createCanvas(nextW,nextH);
+    const nctx = nxt.getContext('2d');
+    nctx.imageSmoothingEnabled = true; nctx.imageSmoothingQuality = 'high';
+    nctx.drawImage(tmp, 0, 0, nextW, nextH);
+    tmp.width = nextW; tmp.height = nextH;
+    tctx.clearRect(0,0,tmp.width,tmp.height);
+    tctx.drawImage(nxt,0,0);
+    curW = nextW; curH = nextH;
+    await new Promise(r=>setTimeout(r,10));
+  }
+  const out = createCanvas(targetW,targetH);
+  out.getContext('2d').drawImage(tmp, 0,0,targetW,targetH);
+  return out;
+}
+
+function applyCinematic(canvas){
+  const ctx = canvas.getContext('2d');
+  let imgd = ctx.getImageData(0,0,canvas.width,canvas.height);
+  const contrast = 1.06;
+  const factor = (259*(contrast+255))/(255*(259-contrast));
+  for(let i=0;i<imgd.data.length;i+=4){
+    for(let c=0;c<3;c++){
+      const val = imgd.data[i+c];
+      let newv = factor*(val-128)+128;
+      imgd.data[i+c] = Math.max(0, Math.min(255, newv));
+    }
+  }
+  ctx.putImageData(imgd,0,0);
+  const kernel = [0,-1,0,-1,5,-1,0,-1,0];
+  const w=canvas.width,h=canvas.height;
+  const src = ctx.getImageData(0,0,w,h);
+  const out = ctx.createImageData(w,h);
+  for(let y=1;y<h-1;y++){
+    for(let x=1;x<w-1;x++){
+      for(let ch=0;ch<3;ch++){
+        let sum=0;
+        let ki=0;
+        for(let ky=-1;ky<=1;ky++){
+          for(let kx=-1;kx<=1;kx++){
+            const px = ( (y+ky)*w + (x+kx) )*4 + ch;
+            sum += src.data[px] * kernel[ki++];
+          }
+        }
+        const idx = (y*w + x)*4 + ch;
+        out.data[idx] = Math.max(0,Math.min(255,sum));
+      }
+      out.data[(y*w+x)*4+3] = 255;
+    }
+  }
+  ctx.putImageData(out,0,0);
+  return canvas;
+}
+
+function canvasToInputTensor(canvas){
+  const w = canvas.width, h = canvas.height;
+  const ctx = canvas.getContext('2d');
+  const imgd = ctx.getImageData(0,0,w,h).data;
+  const total = w * h;
+  const data = new Float32Array(3 * total);
+  let p = 0;
+  for(let y=0;y<h;y++){
+    for(let x=0;x<w;x++){
+      const i = (y*w + x)*4;
+      data[p] = imgd[i] / 255.0;           // R
+      data[p + total] = imgd[i+1] / 255.0; // G
+      data[p + 2*total] = imgd[i+2] / 255.0; // B
+      p++;
+    }
+  }
+  return {data, shape:[1,3,h,w]};
+}
+
+function tensorToCanvas(output, outW, outH){
+  const canvas = createCanvas(outW, outH);
+  const ctx = canvas.getContext('2d');
+  const imgd = ctx.createImageData(outW, outH);
+  const csize = outW * outH;
+  const r = output.subarray(0, csize);
+  const g = output.subarray(csize, 2*csize);
+  const b = output.subarray(2*csize, 3*csize);
+  let p = 0;
+  for(let i=0;i<csize;i++){
+    imgd.data[p++] = Math.max(0, Math.min(255, Math.round(r[i]*255)));
+    imgd.data[p++] = Math.max(0, Math.min(255, Math.round(g[i]*255)));
+    imgd.data[p++] = Math.max(0, Math.min(255, Math.round(b[i]*255)));
+    imgd.data[p++] = 255;
+  }
+  ctx.putImageData(imgd,0,0);
+  return canvas;
+}
+
+async function loadOnnxSession(url){
+  setStatus('Memuat model ONNX dari CDN — ini bisa memakan waktu (50–120s tergantung koneksi).');
+  showProgress(5);
+  try{
+    const hasWebGL = !!document.createElement('canvas').getContext('webgl');
+    const backendHint = hasWebGL ? 'webgl' : 'wasm';
+    setStatus('Backend: ' + backendHint + ' — memulai download model...');
+    showProgress(20);
+    const session = await ort.InferenceSession.create(url, { executionProviders: [backendHint] });
+    showProgress(100);
+    setStatus('Model berhasil dimuat (ONNX).');
+    return session;
+  }catch(e){
+    console.error(e);
+    showProgress(null);
+    setStatus('Gagal memuat model ONNX: ' + (e.message || e.toString()));
+    throw e;
+  }
+}
+
+async function runOnnxUpscale(img, session, upscaleFactor){
+  const inputCanvas = createCanvas(img.width, img.height);
+  inputCanvas.getContext('2d').drawImage(img,0,0);
+  const {data,shape} = canvasToInputTensor(inputCanvas);
+  setStatus('Menyusun tensor & menjalankan model (ONNX) ...');
+  showProgress(30);
+  const tensor = new ort.Tensor('float32', data, shape);
+  const inputName = session.inputNames[0];
+  const feeds = { [inputName]: tensor };
+  const results = await session.run(feeds);
+  const outName = session.outputNames[0];
+  const outTensor = results[outName];
+  const outShape = outTensor.dims;
+  const hout = outShape[2], wout = outShape[3];
+  const canvas = tensorToCanvas(outTensor.data, wout, hout);
+  return canvas;
+}
+
+async function runUpscale(){
+  if(!currentFile){
+    setStatus('Pilih gambar dulu.');
+    return;
+  }
+  const factor = parseInt(factorSelect.value,10) || 4;
+  const modeAI = document.getElementById('mode-ai').classList.contains('primary');
+  setStatus('Memulai proses — ini bisa lama tergantung koneksi & device...');
+  showProgress(5);
+
+  const img = await loadImageFromFile(currentFile);
+  let targetW = img.width * factor;
+  let targetH = img.height * factor;
+
+  if(modeAI){
+    const modelUrl = modelUrlInput.value.trim();
+    if(!modelUrl){
+      setStatus('Model URL kosong. Masukkan model ONNX URL atau pilih Canvas mode.');
+      return;
+    }
+    try{
+      if(!sess || sess._modelUrl !== modelUrl){
+        sess = await loadOnnxSession(modelUrl);
+        sess._modelUrl = modelUrl;
+      }
+      showProgress(40);
+      const outCanvas = await runOnnxUpscale(img, sess, factor);
+      showProgress(90);
+      if(styleSelect.value === 'cinematic' || styleSelect.value === 'superdetail'){
+        applyCinematic(outCanvas);
+      }
+      // 🔥 TAMPILKAN CANVAS LANGSUNG — NO QUALITY LOSS!
+      outWrap.innerHTML = '';
+      outWrap.appendChild(outCanvas);
+      outCanvas.style.maxHeight = '400px';
+      outCanvas.style.maxWidth = '100%';
+      outMeta.textContent = `${outCanvas.width}×${outCanvas.height}`;
+      lastCanvas = outCanvas;
+      downloadBtn.disabled = false;
+      setStatus('✅ AI Upscale selesai.');
+      showProgress(null);
+      return;
+    }catch(e){
+      console.error('AI failed, fallback to canvas', e);
+      setStatus('⚠️ AI gagal: ' + (e.message || e.toString()) + ' — beralih ke Canvas fallback.');
+      showProgress(null);
+    }
+  }
+
+  // Canvas fallback
+  setStatus('Menjalankan Canvas multi-step upscale (fallback) ...');
+  showProgress(10);
+  const outCanvas = await canvasUpscale(img, targetW, targetH);
+  if(styleSelect.value === 'cinematic' || styleSelect.value === 'superdetail'){
+    applyCinematic(outCanvas);
+  }
+  outWrap.innerHTML = '';
+  outWrap.appendChild(outCanvas);
+  outCanvas.style.maxHeight = '400px';
+  outCanvas.style.maxWidth = '100%';
+  outMeta.textContent = `${outCanvas.width}×${outCanvas.height}`;
+  lastCanvas = outCanvas;
+  downloadBtn.disabled = false;
+  showProgress(null);
+  setStatus('✅ Canvas fallback selesai.');
+}
+
+async function downloadResult(){
+  if(!lastCanvas){ setStatus('Belum ada hasil untuk diunduh'); return; }
+  const fmt = outFmt.value;
+  const q = parseFloat(qualityRange.value);
+  let dataUrl;
+  if(fmt === 'png') dataUrl = lastCanvas.toDataURL('image/png');
+  else {
+    dataUrl = lastCanvas.toDataURL(fmt === 'webp' ? 'image/webp' : 'image/jpeg', q);
+  }
+  const a = document.createElement('a');
+  const base = currentFile.name.replace(/\.[^/.]+$/,'');
+  const suf = `${factorSelect.value}x`;
+  a.href = dataUrl;
+  a.download = `${base}_${suf}.${fmt=== 'jpg' ? 'jpeg' : fmt}`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setStatus('✅ File diunduh.');
+}
+
+document.getElementById('mode-ai').addEventListener('click', ()=>{
+  document.getElementById('mode-ai').classList.add('primary');
+  document.getElementById('mode-canvas').classList.remove('primary');
+});
+document.getElementById('mode-canvas').addEventListener('click', ()=>{
+  document.getElementById('mode-canvas').classList.add('primary');
+  document.getElementById('mode-ai').classList.remove('primary');
+});
+</script>
+</body>
+</html>
