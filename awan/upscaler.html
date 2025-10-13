@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>In-Browser AI Upscaler — Real-ish ESRGAN (by William Yap)</title>
+<style>
+  :root{--accent:#4f46e5;--bg:#f8fafc;--card:#fff;--muted:#6b7280}
+  body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;max-width:980px;margin:28px auto;background:var(--bg);padding:18px;color:#0f172a}
+  h1{color:var(--accent);margin:0 0 6px} h2{color:#6b21a8;margin:0 0 14px;font-weight:600}
+  .card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 6px 20px rgba(2,6,23,0.06);margin-bottom:14px}
+  #drop{border:2px dashed var(--accent);padding:26px;border-radius:12px;cursor:pointer;text-align:center;background:#fff}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .controls button{padding:8px 12px;border-radius:8px;border:1px solid #e6e9ef;background:white;cursor:pointer}
+  .controls button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  label{font-size:13px;color:var(--muted)}
+  #preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:12px}
+  .thumb{border-radius:8px;overflow:hidden;border:1px solid #e6e9ef;padding:10px;background:#fff}
+  .thumb img{display:block;width:100%;height:auto}
+  .hint{font-size:13px;color:#334155}
+  #status{min-height:22px;margin-top:10px;color:#0b5ed7;font-weight:600}
+  progress{width:100%;height:12px;border-radius:8px;overflow:hidden}
+</style>
+</head>
+<body>
+  <h1>AI Image Upscaler (in-browser)</h1>
+  <h2>Real-ish ESRGAN via UpscalerJS — by William Yap</h2>
+
+  <div class="card">
+    <div id="drop">Klik atau seret gambar ke sini (JPG/PNG/WebP)</div>
+    <div style="margin-top:8px"><small>File: <span id="fname">-</span></small></div>
+
+    <div style="margin-top:12px" class="row controls">
+      <div>
+        <strong>Mode:</strong>
+        <button id="btn-canvas" class="active">Canvas (fallback)</button>
+        <button id="btn-ai">AI Upscale (UpscalerJS)</button>
+      </div>
+
+      <div style="margin-left:8px">
+        <strong>Preset:</strong>
+        <select id="preset">
+          <option value="720">720p</option>
+          <option value="1080" selected>1080p</option>
+          <option value="2k">2K</option>
+          <option value="4k">4K</option>
+          <option value="custom">Kustom</option>
+        </select>
+      </div>
+
+      <div id="custom-size" style="display:none">
+        <label>W: <input id="cw" type="number" value="1920" min="1" style="width:92px"></label>
+        <label>H: <input id="ch" type="number" value="1080" min="1" style="width:92px"></label>
+      </div>
+
+      <div style="margin-left:auto">
+        <button id="upscale-btn" disabled>Upscale ⭐</button>
+        <button id="download-btn" disabled>Unduh</button>
+      </div>
+    </div>
+
+    <div style="margin-top:8px">
+      <small class="hint">AI mode memuat model lewat CDN saat pertama pakai — model bisa berat (~puluhan MB). Bila tidak tersedia, gunakan Canvas. UpscalerJS & model default dimuat via CDN.</small>
+    </div>
+
+    <div id="status"></div>
+    <progress id="progress" value="0" max="100" style="display:none"></progress>
+  </div>
+
+  <div id="preview" class="card"></div>
+
+  <!-- ====== LIBRARIES: TensorFlow.js + UpscalerJS (UMD bundles) ====== -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@upscalerjs/default-model@latest/dist/umd/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/upscaler@latest/dist/browser/umd/upscaler.min.js"></script>
+
+  <script>
+  // Simple in-browser AI upscaler using UpscalerJS (DefaultUpscalerJSModel)
+  // Fallback: Canvas multi-step upscale (like earlier)
+  let file = null, origW=0, origH=0, resultDataUrl = null;
+  const drop = document.getElementById('drop');
+  const fname = document.getElementById('fname');
+  const preset = document.getElementById('preset');
+  const customSize = document.getElementById('custom-size');
+  const cw = document.getElementById('cw'); const ch = document.getElementById('ch');
+  const btnAI = document.getElementById('btn-ai'); const btnCanvas = document.getElementById('btn-canvas');
+  const upscaleBtn = document.getElementById('upscale-btn'); const downloadBtn = document.getElementById('download-btn');
+  const status = document.getElementById('status'); const progress = document.getElementById('progress');
+  const preview = document.getElementById('preview');
+
+  // UpscalerJS object (will be created lazily)
+  let upscalerInstance = null;
+
+  // Canvas upscale fallback (multi-step)
+  async function canvasUpscale(imgEl, targetW, targetH){
+    const temp = document.createElement('canvas');
+    const tctx = temp.getContext('2d');
+    temp.width = imgEl.width; temp.height = imgEl.height;
+    tctx.imageSmoothingEnabled = true; tctx.imageSmoothingQuality = 'high';
+    tctx.drawImage(imgEl,0,0);
+    let curW = imgEl.width, curH = imgEl.height;
+    while(curW < targetW || curH < targetH){
+      const nextW = Math.min(curW*2, targetW);
+      const nextH = Math.min(curH*2, targetH);
+      const next = document.createElement('canvas'); next.width = nextW; next.height = nextH;
+      const nctx = next.getContext('2d'); nctx.imageSmoothingEnabled=true; nctx.imageSmoothingQuality='high';
+      nctx.drawImage(temp, 0, 0, nextW, nextH);
+      // copy next into temp (to keep chain)
+      temp.width = nextW; temp.height = nextH;
+      tctx.clearRect(0,0,temp.width,temp.height);
+      tctx.drawImage(next,0,0);
+      curW = nextW; curH = nextH;
+      await new Promise(r=>setTimeout(r,8));
+    }
+    const out = document.createElement('canvas'); out.width = targetW; out.height = targetH;
+    out.getContext('2d').drawImage(temp,0,0,targetW,targetH);
+    return out;
+  }
+
+  // Create UpscalerJS instance (uses DefaultUpscalerJSModel from default-model package)
+  function createUpscaler(){
+    if(window.Upscaler && window.DefaultUpscalerJSModel){
+      // new Upscaler({ model: DefaultUpscalerJSModel })
+      try {
+        upscalerInstance = new Upscaler({ model: DefaultUpscalerJSModel });
+        console.log('UpscalerJS ready');
+        return true;
+      } catch(e){
+        console.error('Upscaler create error', e);
+        return false;
+      }
+    }
+    return false;
+  }
+
+  // Determine target dims from preset
+  function targetFromPreset(origW, origH){
+    const p = preset.value;
+    if(p==='custom'){ return {w: parseInt(cw.value)||origW, h: parseInt(ch.value)||origH}; }
+    let w=1920,h=1080;
+    if(p==='720'){ w=1280; h=720; }
+    if(p==='1080'){ w=1920; h=1080; }
+    if(p==='2k'){ w=2560; h=1440; }
+    if(p==='4k'){ w=3840; h=2160; }
+    // keep orientation (if original portrait, swap)
+    if(origH>origW) return {w:h,h:w};
+    return {w,h};
+  }
+
+  // Main upscale flow
+  async function doUpscale(){
+    if(!file){ status.textContent='⚠️ Pilih file dulu.'; return; }
+    status.textContent = '⏳ Memproses...';
+    preview.innerHTML = ''; resultDataUrl = null; progress.style.display='none';
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    await new Promise(r=> img.onload = r);
+    origW = img.width; origH = img.height;
+    const tgt = targetFromPreset(origW, origH);
+    // maintain aspect by scaling to fit
+    const ratio = origW / origH;
+    let outW = tgt.w, outH = tgt.h;
+    if(outW/outH > ratio){ outW = Math.round(outH * ratio); } else { outH = Math.round(outW / ratio); }
+
+    const usingAI = btnAI.classList.contains('active');
+
+    try {
+      if(usingAI){
+        // create upscaler if not yet
+        if(!upscalerInstance){
+          status.textContent = '📥 Memuat model AI (UpscalerJS) — ini bisa memakan waktu & jaringan...';
+          progress.style.display='block'; progress.value = 10;
+          const ok = createUpscaler();
+          if(!ok){ throw new Error('UpscalerJS tidak tersedia'); }
+          progress.value = 40;
+          // Note: UpscalerJS internally may lazy-load model weights; no explicit load needed here.
+          progress.value = 60;
+        } else {
+          status.textContent = '⚙️ Menjalankan AI upscaler...';
+          progress.style.display='block'; progress.value = 30;
+        }
+
+        // UpscalerJS supports passing an HTMLImageElement; it returns a base64 string or HTMLImageElement depending on usage.
+        // We'll call upscalerInstance.upscale(imageOrUrl, {targetSize}) pattern.
+        const res = await upscalerInstance.upscale(img);
+        // res is usually a data URL (base64 string). If it's an HTMLImageElement, handle accordingly.
+        let dataUrl;
+        if(typeof res === 'string' && res.startsWith('data:')){
+          dataUrl = res;
+        } else if(res instanceof HTMLImageElement){
+          // draw to canvas to resize to desired outW/outH
+          const cv = document.createElement('canvas');
+          cv.width = outW; cv.height = outH;
+          cv.getContext('2d').drawImage(res,0,0,outW,outH);
+          dataUrl = cv.toDataURL('image/png');
+        } else if(res && res.then){ // handle Promise-like (some versions)
+          const awaited = await res;
+          if(typeof awaited === 'string') dataUrl = awaited;
+          else {
+            // try convert tensor or element -> canvas
+            const cv = document.createElement('canvas'); cv.width = outW; cv.height = outH;
+            if(awaited instanceof HTMLImageElement) cv.getContext('2d').drawImage(awaited,0,0,outW,outH);
+            dataUrl = cv.toDataURL('image/png');
+          }
+        } else {
+          // unknown format fallback: try canvas upscale
+          throw new Error('AI output format tidak didukung, fallback ke Canvas');
+        }
+        progress.value = 100;
+        resultDataUrl = dataUrl;
+      } else {
+        // Canvas fallback upscale
+        const outCanvas = await canvasUpscale(img, outW, outH);
+        resultDataUrl = outCanvas.toDataURL('image/png');
+      }
+
+      // show preview (original + result)
+      preview.innerHTML = `
+        <div class="thumb">
+          <h4>Original (${origW}×${origH})</h4>
+          <img src="${URL.createObjectURL(file)}">
+          <p><small>Size: ${(file.size/1024).toFixed(1)} KB</small></p>
+        </div>
+        <div class="thumb">
+          <h4>Output (${outW}×${outH}) ${usingAI?'<small>AI</small>':''}</h4>
+          <img id="resimg" src="${resultDataUrl}">
+          <p><small>Format: PNG • Upscale ≈ ${(outW/origW).toFixed(1)}x</small></p>
+        </div>
+      `;
+      status.textContent = '✅ Selesai — klik Unduh untuk simpan.';
+      downloadBtn.disabled = false;
+      progress.style.display='none';
+    } catch(err){
+      console.error(err);
+      status.textContent = '❌ Gagal (AI mungkin tidak didukung di perangkat ini). Menggunakan Canvas fallback...';
+      progress.style.display='none';
+      // fallback to canvas
+      try {
+        const outCanvas = await canvasUpscale(img, outW, outH);
+        resultDataUrl = outCanvas.toDataURL('image/png');
+        preview.innerHTML = `
+          <div class="thumb">
+            <h4>Original (${origW}×${origH})</h4>
+            <img src="${URL.createObjectURL(file)}">
+            <p><small>Size: ${(file.size/1024).toFixed(1)} KB</small></p>
+          </div>
+          <div class="thumb">
+            <h4>Output (${outW}×${outH}) (Canvas)</h4>
+            <img src="${resultDataUrl}">
+            <p><small>Format: PNG • Upscale ≈ ${(outW/origW).toFixed(1)}x</small></p>
+          </div>
+        `;
+        status.textContent = '✅ Canvas fallback selesai.';
+        downloadBtn.disabled = false;
+      } catch(e2){
+        console.error(e2);
+        status.textContent = '❌ Gagal juga melakukan fallback. ' + (e2.message||e2.toString());
+      }
+    }
+  }
+
+  // file handling
+  const fi = document.createElement('input'); fi.type='file'; fi.accept='image/*'; fi.style.display='none';
+  fi.onchange = e => { if(e.target.files[0]) setFile(e.target.files[0]); };
+  document.body.appendChild(fi);
+
+  drop.addEventListener('click', ()=> fi.click());
+  drop.addEventListener('dragover', e=>{ e.preventDefault(); drop.style.background='#eef2ff' });
+  drop.addEventListener('dragleave', ()=> drop.style.background='');
+  drop.addEventListener('drop', e=>{ e.preventDefault(); drop.style.background=''; if(e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); });
+
+  function setFile(f){
+    file = f; fname.textContent = f.name; status.textContent = '✅ File siap.'; upscaleBtn.disabled=false;
+    downloadBtn.disabled = true; preview.innerHTML = '';
+    resultDataUrl = null;
+    const tmp = new Image(); tmp.src = URL.createObjectURL(f); tmp.onload = ()=> { origW = tmp.width; origH = tmp.height; };
+  }
+
+  preset.addEventListener('change', ()=> { customSize.style.display = preset.value==='custom' ? 'inline-block' : 'none'; });
+
+  btnAI.addEventListener('click', ()=> { btnAI.classList.add('active'); btnCanvas.classList.remove('active'); });
+  btnCanvas.addEventListener('click', ()=> { btnCanvas.classList.add('active'); btnAI.classList.remove('active'); });
+
+  upscaleBtn.addEventListener('click', doUpscale);
+
+  downloadBtn.addEventListener('click', ()=>{
+    if(!resultDataUrl){ status.textContent='⚠️ Belum ada hasil.'; return; }
+    const a = document.createElement('a'); a.href = resultDataUrl;
+    const base = file.name.replace(/\.[^/.]+$/, '');
+    const p = preset.value==='custom' ? `${cw.value}x${ch.value}` : preset.value;
+    a.download = `${base}_${p}.png`; document.body.appendChild(a); a.click(); a.remove();
+    status.textContent = '✅ File diunduh.';
+  });
+
+  // quick check: create upscaler in background (but don't force if not needed)
+  setTimeout(()=> {
+    try { createUpscaler(); console.log('Background upscaler init attempted'); } catch(e){ console.log('background upscaler init failed'); }
+  }, 2000);
+  </script>
+</body>
+</html>
