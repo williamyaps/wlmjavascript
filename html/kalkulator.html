@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Rupiah Final</title>
+<style>
+:root{
+  --bg:#1e1e1e; --text:#fff; --btn:#333; --btn-hover:#444;
+  --operator:#00bcd4; --operator-hover:#0097a7; --equal:#00e676; --equal-hover:#00c853;
+  --function:#607d8b; --function-hover:#546e7a; --clear:#ff5252; --clear-hover:#e53935;
+  --display-bg:#2c2c2c; --display-color:#00e676; --history-bg:#121212; --history-border:#333;
+}
+body.light{
+  --bg:#f7f7f7; --text:#000; --btn:#e0e0e0; --btn-hover:#d0d0d0;
+  --operator:#0288d1; --operator-hover:#0277bd; --equal:#43a047; --equal-hover:#2e7d32;
+  --function:#90a4ae; --function-hover:#78909c; --clear:#e53935; --clear-hover:#c62828;
+  --display-bg:#fafafa; --display-color:#000; --history-bg:#fff; --history-border:#ccc;
+}
+body{
+  background:var(--bg); color:var(--text); font-family:Poppins,sans-serif;
+  display:flex; justify-content:center; align-items:center; height:100vh; margin:0; transition:0.3s;
+}
+.calculator{background:var(--bg); border-radius:15px; box-shadow:0 4px 25px rgba(0,0,0,0.4);
+padding:20px; width:370px; display:flex; flex-direction:column; align-items:center; transition:0.3s;}
+.top-bar{display:flex; justify-content:space-between; width:100%; margin-bottom:10px;}
+.mode-toggle{background:var(--operator); color:var(--text); border:none; padding:8px 15px;
+border-radius:8px; cursor:pointer; transition:0.3s;}
+.mode-toggle:hover{background:var(--operator-hover);}
+.display{width:100%; height:60px; border:none; border-radius:10px; background:var(--display-bg);
+font-size:2rem; text-align:right; padding-right:15px; margin-bottom:20px; color:var(--display-color);}
+.buttons{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; width:100%;}
+button{height:55px; font-size:1rem; border:none; border-radius:10px; background:var(--btn);
+color:var(--text); cursor:pointer; transition:0.2s;}
+button:hover{background:var(--btn-hover); transform:scale(1.05);}
+button.operator{background:var(--operator);}
+button.operator:hover{background:var(--operator-hover);}
+button.equal{background:var(--equal); color:#000; grid-column:span 2;}
+button.equal:hover{background:var(--equal-hover);}
+button.clear{background:var(--clear);}
+button.clear:hover{background:var(--clear-hover);}
+button.function{background:var(--function);}
+button.function:hover{background:var(--function-hover);}
+.history{background:var(--history-bg); border:1px solid var(--history-border);
+border-radius:10px; width:100%; padding:10px 15px; margin-top:20px; overflow-y:auto; max-height:150px;}
+.history h4{text-align:center; margin:5px 0 10px 0;}
+.history-item{font-size:0.9rem; margin-bottom:5px; border-bottom:1px solid var(--history-border);
+padding-bottom:4px; cursor:pointer; transition:0.2s;}
+.history-item:hover{background:var(--btn-hover);}
+.history-item span{display:block; text-align:right; color:var(--operator);}
+@media(max-width:500px){.calculator{width:95%;}}
+</style>
+</head>
+<body>
+<div class="calculator">
+<div class="top-bar">
+<h3>🧮 Kalkulator Tri Suaka</h3>
+<button class="mode-toggle" onclick="toggleMode()">🌙 / ☀️</button>
+</div>
+
+<input type="text" id="display" class="display" oninput="formatInput()" />
+
+<div class="buttons">
+<button class="clear" onclick="clearDisplay()">C</button>
+<button onclick="deleteLast()">⌫</button>
+<button onclick="appendValue('%')">%</button>
+<button class="function" onclick="appendValue('Math.PI')">π</button>
+<button class="operator" onclick="appendValue('/')">÷</button>
+
+<button class="function" onclick="appendValue('Math.sin(')">sin</button>
+<button class="function" onclick="appendValue('Math.cos(')">cos</button>
+<button class="function" onclick="appendValue('Math.tan(')">tan</button>
+<button class="function" onclick="appendValue('Math.log10(')">log</button>
+<button class="operator" onclick="appendValue('*')">×</button>
+
+<button onclick="appendValue('7')">7</button>
+<button onclick="appendValue('8')">8</button>
+<button onclick="appendValue('9')">9</button>
+<button class="function" onclick="appendValue('Math.sqrt(')">√</button>
+<button class="operator" onclick="appendValue('-')">−</button>
+
+<button onclick="appendValue('4')">4</button>
+<button onclick="appendValue('5')">5</button>
+<button onclick="appendValue('6')">6</button>
+<button class="function" onclick="appendValue('**')">xʸ</button>
+<button class="operator" onclick="appendValue('+')">+</button>
+
+<button onclick="appendValue('1')">1</button>
+<button onclick="appendValue('2')">2</button>
+<button onclick="appendValue('3')">3</button>
+<button onclick="appendValue('(')">(</button>
+<button onclick="appendValue(')')">)</button>
+
+<button onclick="appendValue('0')">0</button>
+<button onclick="appendValue('.')">.</button>
+<button class="equal" onclick="calculate()">=</button>
+</div>
+
+<div class="history" id="history">
+<h4>🧾 Riwayat</h4>
+<div id="history-content"></div>
+</div>
+</div>
+
+<script>
+const display = document.getElementById("display");
+const body = document.body;
+const historyContent = document.getElementById("history-content");
+
+function appendValue(val){display.value+=val;}
+function clearDisplay(){display.value="";}
+function deleteLast(){display.value=display.value.slice(0,-1);}
+function toggleMode(){body.classList.toggle("light");}
+
+// Format input real-time
+function formatInput(){
+  let val = display.value.replace(/\./g,''); // hapus titik ribuan dulu
+  if(!isNaN(val) && val!==""){
+    if(val.includes(',')){
+      let parts = val.split(',');
+      parts[0] = Number(parts[0]).toLocaleString('id-ID');
+      display.value = parts.join(',');
+    } else {
+      display.value = Number(val).toLocaleString('id-ID');
+    }
+  }
+}
+
+// Format hasil rupiah/desimal
+function formatResult(num){
+  if(Number.isInteger(Math.round(num*100)/100)){ // bulat atau 2 desimal presisi
+    if(Number.isInteger(num)){
+      return num.toLocaleString('id-ID'); // bulat
+    } else {
+      return num.toLocaleString('id-ID',{minimumFractionDigits:2, maximumFractionDigits:2}); // 2 desimal
+    }
+  } else {
+    return num.toLocaleString('id-ID',{maximumFractionDigits:2});
+  }
+}
+
+function calculate(){
+  try{
+    let exp = display.value.replace(/\./g,''); // hapus titik ribuan
+    // ganti persen: "100000-20%" => "100000-(100000*20/100)"
+    exp = exp.replace(/(\d+(\.\d+)?)(%)/g,"($1*0.01)");
+    let result = eval(exp);
+    display.value = formatResult(result);
+    addToHistory(exp, result);
+  }catch{
+    display.value="Error";
+  }
+}
+
+function addToHistory(exp,res){
+  const item=document.createElement("div");
+  item.classList.add("history-item");
+  item.innerHTML = `${exp}<span>= ${formatResult(res)}</span>`;
+  item.onclick = ()=>display.value=formatResult(res);
+  historyContent.prepend(item);
+}
+</script>
+</body>
+</html>
