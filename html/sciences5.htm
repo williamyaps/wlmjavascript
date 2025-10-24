@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kalkulator Ilmiah Modern</title>
+  <style>
+    :root {
+      --bg-color: #1e1e1e;
+      --text-color: #fff;
+      --btn-bg: #333;
+      --btn-hover: #444;
+      --operator-bg: #00bcd4;
+      --operator-hover: #0097a7;
+      --equal-bg: #00e676;
+      --equal-hover: #00c853;
+      --function-bg: #607d8b;
+      --function-hover: #546e7a;
+      --clear-bg: #ff5252;
+      --clear-hover: #e53935;
+      --display-bg: #2c2c2c;
+      --display-color: #00e676;
+      --history-bg: #121212;
+      --history-border: #333;
+    }
+
+    body.light {
+      --bg-color: #f7f7f7;
+      --text-color: #000;
+      --btn-bg: #e0e0e0;
+      --btn-hover: #d0d0d0;
+      --operator-bg: #0288d1;
+      --operator-hover: #0277bd;
+      --equal-bg: #43a047;
+      --equal-hover: #2e7d32;
+      --function-bg: #90a4ae;
+      --function-hover: #78909c;
+      --clear-bg: #e53935;
+      --clear-hover: #c62828;
+      --display-bg: #fafafa;
+      --display-color: #000;
+      --history-bg: #fff;
+      --history-border: #ccc;
+    }
+
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-family: "Poppins", sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      transition: all 0.3s ease;
+    }
+
+    .calculator {
+      background: var(--bg-color);
+      border-radius: 15px;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
+      padding: 20px;
+      width: 370px;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .mode-toggle {
+      background: var(--operator-bg);
+      color: var(--text-color);
+      border: none;
+      padding: 8px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .mode-toggle:hover {
+      background: var(--operator-hover);
+    }
+
+    .display {
+      width: 100%;
+      height: 60px;
+      border: none;
+      border-radius: 10px;
+      background: var(--display-bg);
+      font-size: 2rem;
+      text-align: right;
+      padding-right: 15px;
+      margin-bottom: 20px;
+      color: var(--display-color);
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      width: 100%;
+    }
+
+    button {
+      height: 55px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      background-color: var(--btn-bg);
+      color: var(--text-color);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background-color: var(--btn-hover);
+      transform: scale(1.05);
+    }
+
+    button.operator {
+      background-color: var(--operator-bg);
+    }
+
+    button.operator:hover {
+      background-color: var(--operator-hover);
+    }
+
+    button.equal {
+      background-color: var(--equal-bg);
+      color: #000;
+      grid-column: span 2;
+    }
+
+    button.equal:hover {
+      background-color: var(--equal-hover);
+    }
+
+    button.clear {
+      background-color: var(--clear-bg);
+    }
+
+    button.clear:hover {
+      background-color: var(--clear-hover);
+    }
+
+    button.function {
+      background-color: var(--function-bg);
+    }
+
+    button.function:hover {
+      background-color: var(--function-hover);
+    }
+
+    /* History Panel (bottom) */
+    .history {
+      background: var(--history-bg);
+      border: 1px solid var(--history-border);
+      border-radius: 10px;
+      width: 100%;
+      padding: 10px 15px;
+      margin-top: 20px;
+      overflow-y: auto;
+      max-height: 150px;
+      transition: all 0.3s ease;
+    }
+
+    .history h4 {
+      text-align: center;
+      margin: 5px 0 10px 0;
+    }
+
+    .history-item {
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+      border-bottom: 1px solid var(--history-border);
+      padding-bottom: 4px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .history-item:hover {
+      background: var(--btn-hover);
+    }
+
+    .history-item span {
+      display: block;
+      text-align: right;
+      color: var(--operator-bg);
+    }
+
+    @media (max-width: 500px) {
+      .calculator {
+        width: 95%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="top-bar">
+      <h3>🧮 Kalkulator Ilmiah</h3>
+      <button class="mode-toggle" onclick="toggleMode()">🌙 / ☀️</button>
+    </div>
+
+    <input type="text" id="display" class="display" disabled />
+
+    <div class="buttons">
+      <button class="clear" onclick="clearDisplay()">C</button>
+      <button onclick="deleteLast()">⌫</button>
+      <button class="function" onclick="appendValue('Math.PI')">π</button>
+      <button class="function" onclick="appendValue('Math.E')">e</button>
+      <button class="operator" onclick="appendValue('/')">÷</button>
+
+      <button class="function" onclick="appendValue('Math.sin(')">sin</button>
+      <button class="function" onclick="appendValue('Math.cos(')">cos</button>
+      <button class="function" onclick="appendValue('Math.tan(')">tan</button>
+      <button class="function" onclick="appendValue('Math.log10(')">log</button>
+      <button class="operator" onclick="appendValue('*')">×</button>
+
+      <button onclick="appendValue('7')">7</button>
+      <button onclick="appendValue('8')">8</button>
+      <button onclick="appendValue('9')">9</button>
+      <button class="function" onclick="appendValue('Math.sqrt(')">√</button>
+      <button class="operator" onclick="appendValue('-')">−</button>
+
+      <button onclick="appendValue('4')">4</button>
+      <button onclick="appendValue('5')">5</button>
+      <button onclick="appendValue('6')">6</button>
+      <button class="function" onclick="appendValue('**')">xʸ</button>
+      <button class="operator" onclick="appendValue('+')">+</button>
+
+      <button onclick="appendValue('1')">1</button>
+      <button onclick="appendValue('2')">2</button>
+      <button onclick="appendValue('3')">3</button>
+      <button onclick="appendValue('(')">(</button>
+      <button onclick="appendValue(')')">)</button>
+
+      <button onclick="appendValue('0')">0</button>
+      <button onclick="appendValue('.')">.</button>
+      <button class="equal" onclick="calculate()">=</button>
+    </div>
+
+    <!-- Riwayat di bawah -->
+    <div class="history" id="history">
+      <h4>🧾 Riwayat</h4>
+      <div id="history-content"></div>
+    </div>
+  </div>
+
+  <script>
+    const display = document.getElementById("display");
+    const body = document.body;
+    const historyContent = document.getElementById("history-content");
+
+    function appendValue(value) {
+      display.value += value;
+    }
+
+    function clearDisplay() {
+      display.value = "";
+    }
+
+    function deleteLast() {
+      display.value = display.value.slice(0, -1);
+    }
+
+    function calculate() {
+      try {
+        let expression = display.value;
+        let result = eval(expression);
+        display.value = result;
+        addToHistory(expression, result);
+      } catch (error) {
+        display.value = "Error";
+      }
+    }
+
+    function addToHistory(expression, result) {
+      const item = document.createElement("div");
+      item.classList.add("history-item");
+      item.innerHTML = `${expression}<span>= ${result}</span>`;
+      item.onclick = () => {
+        display.value = result; // klik hasil → tampil di layar
+      };
+      historyContent.prepend(item);
+    }
+
+    function toggleMode() {
+      body.classList.toggle("light");
+    }
+  </script>
+</body>
+</html>
