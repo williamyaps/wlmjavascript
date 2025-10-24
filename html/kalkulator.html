@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kalkulator Rupiah BRO Ultimate</title>
+<title>Kalkulator BRO Ultimate Scientific</title>
 <style>
 :root{
   --bg:#1e1e1e; --text:#fff; --btn:#333; --btn-hover:#444;
@@ -19,19 +19,27 @@ body.light{
 }
 body{
   background:var(--bg); color:var(--text); font-family:Poppins,sans-serif;
-  display:flex; justify-content:center; align-items:center; height:100vh; margin:0; transition:0.3s;
+  display:flex; justify-content:center; align-items:flex-start; padding-top:20px; transition:0.3s;
 }
-.calculator{background:var(--bg); border-radius:15px; box-shadow:0 4px 25px rgba(0,0,0,0.4);
-padding:20px; width:370px; display:flex; flex-direction:column; align-items:center; transition:0.3s;}
-.top-bar{display:flex; justify-content:space-between; width:100%; margin-bottom:10px;}
+.calculator{
+  background:var(--bg); border-radius:15px; box-shadow:0 4px 25px rgba(0,0,0,0.4);
+  padding:20px; width:380px; display:flex; flex-direction:column; transition:0.3s;
+}
+.top-bar{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
 .mode-toggle{background:var(--operator); color:var(--text); border:none; padding:8px 15px;
 border-radius:8px; cursor:pointer; transition:0.3s;}
 .mode-toggle:hover{background:var(--operator-hover);}
-.display{width:100%; height:60px; border:none; border-radius:10px; background:var(--display-bg);
-font-size:2rem; text-align:right; padding-right:15px; margin-bottom:20px; color:var(--display-color);}
-.buttons{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; width:100%;}
-button{height:55px; font-size:1rem; border:none; border-radius:10px; background:var(--btn);
-color:var(--text); cursor:pointer; transition:0.2s;}
+.display{
+  width:100%; height:70px; border:none; border-radius:10px; background:var(--display-bg);
+  font-size:2rem; text-align:right; padding:10px 15px; margin-bottom:10px; color:var(--display-color);
+  overflow-x:auto;
+}
+.buttons-main{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+.buttons-scientific{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px;}
+button{
+  height:55px; font-size:1rem; border:none; border-radius:10px; background:var(--btn);
+  color:var(--text); cursor:pointer; transition:0.2s;
+}
 button:hover{background:var(--btn-hover); transform:scale(1.05);}
 button.operator{background:var(--operator);}
 button.operator:hover{background:var(--operator-hover);}
@@ -42,7 +50,7 @@ button.clear:hover{background:var(--clear-hover);}
 button.function{background:var(--function);}
 button.function:hover{background:var(--function-hover);}
 .history{background:var(--history-bg); border:1px solid var(--history-border);
-border-radius:10px; width:100%; padding:10px 15px; margin-top:20px; overflow-y:auto; max-height:150px;}
+border-radius:10px; width:100%; padding:10px 15px; margin-top:15px; overflow-y:auto; max-height:150px;}
 .history h4{text-align:center; margin:5px 0 10px 0;}
 .history-item{font-size:0.9rem; margin-bottom:5px; border-bottom:1px solid var(--history-border);
 padding-bottom:4px; cursor:pointer; transition:0.2s;}
@@ -53,42 +61,55 @@ padding-bottom:4px; cursor:pointer; transition:0.2s;}
 </head>
 <body>
 <div class="calculator">
-<div class="top-bar">
-<h3>🧮 Kalkulator Rupiah BRO</h3>
-<button class="mode-toggle" onclick="toggleMode()">🌙 / ☀️</button>
-</div>
+  <div class="top-bar">
+    <h3>🧮 Kalkulator BRO Ultimate</h3>
+    <button class="mode-toggle" onclick="toggleMode()">🌙 / ☀️</button>
+  </div>
 
-<input type="text" id="display" class="display" oninput="formatInput()" />
+  <input type="text" id="display" class="display" oninput="formatInput()" />
 
-<div class="buttons">
-<button class="clear" onclick="clearDisplay()">C</button>
-<button onclick="deleteLast()">⌫</button>
-<button onclick="appendValue('%')">%</button>
-<button class="operator" onclick="appendValue('/')">÷</button>
-<button class="operator" onclick="appendValue('*')">×</button>
+  <div class="buttons-scientific">
+    <button class="function" onclick="appendFunction('Math.sin')">sin</button>
+    <button class="function" onclick="appendFunction('Math.cos')">cos</button>
+    <button class="function" onclick="appendFunction('Math.tan')">tan</button>
+    <button class="function" onclick="appendFunction('Math.sqrt')">√</button>
+    <button class="function" onclick="appendMemory('M+')">M+</button>
+    <button class="function" onclick="appendMemory('MR')">MR</button>
+    <button class="function" onclick="appendValue('^')">^</button>
+    <button class="function" onclick="appendValue('(')">(</button>
+    <button class="function" onclick="appendValue(')')">)</button>
+  </div>
 
-<button onclick="appendValue('7')">7</button>
-<button onclick="appendValue('8')">8</button>
-<button onclick="appendValue('9')">9</button>
-<button class="operator" onclick="appendValue('-')">−</button>
-<button class="operator" onclick="appendValue('+')">+</button>
+  <div class="buttons-main">
+    <button class="clear" onclick="clearDisplay()">C</button>
+    <button onclick="deleteLast()">⌫</button>
+    <button onclick="appendValue('%')">%</button>
+    <button class="operator" onclick="appendValue('/')">÷</button>
 
-<button onclick="appendValue('4')">4</button>
-<button onclick="appendValue('5')">5</button>
-<button onclick="appendValue('6')">6</button>
-<button onclick="appendValue('1')">1</button>
-<button onclick="appendValue('2')">2</button>
+    <button onclick="appendValue('7')">7</button>
+    <button onclick="appendValue('8')">8</button>
+    <button onclick="appendValue('9')">9</button>
+    <button class="operator" onclick="appendValue('*')">×</button>
 
-<button onclick="appendValue('3')">3</button>
-<button onclick="appendValue('0')">0</button>
-<button onclick="appendValue('.')">.</button>
-<button class="equal" onclick="calculate()">=</button>
-</div>
+    <button onclick="appendValue('4')">4</button>
+    <button onclick="appendValue('5')">5</button>
+    <button onclick="appendValue('6')">6</button>
+    <button class="operator" onclick="appendValue('-')">−</button>
 
-<div class="history" id="history">
-<h4>🧾 Riwayat</h4>
-<div id="history-content"></div>
-</div>
+    <button onclick="appendValue('1')">1</button>
+    <button onclick="appendValue('2')">2</button>
+    <button onclick="appendValue('3')">3</button>
+    <button class="operator" onclick="appendValue('+')">+</button>
+
+    <button onclick="appendValue('0')">0</button>
+    <button onclick="appendValue('.')">.</button>
+    <button class="equal" onclick="calculate()">=</button>
+  </div>
+
+  <div class="history" id="history">
+    <h4>🧾 Riwayat</h4>
+    <div id="history-content"></div>
+  </div>
 </div>
 
 <script>
@@ -96,36 +117,38 @@ const display = document.getElementById("display");
 const body = document.body;
 const historyContent = document.getElementById("history-content");
 let historyArr = [];
+let memory = 0;
 
 function appendValue(val){display.value+=val;}
+function appendFunction(func){display.value+=func+'(';}
+function appendMemory(mem){ 
+  if(mem==='M+') memory = parseFloat(display.value.replace(/\./g,''))||0;
+  if(mem==='MR') display.value+=memory;
+}
 function clearDisplay(){display.value="";}
 function deleteLast(){display.value = display.value.slice(0,-1);}
 function toggleMode(){body.classList.toggle("light");}
 
-// Format ribuan real-time
 function formatInput(){
   let val = display.value.replace(/\./g,'');
-  let parts = val.split(/([+\-*/()%])/);
+  let parts = val.split(/([+\-*/%^()])/);
   for(let i=0;i<parts.length;i++){
-    if(parts[i]!=='' && !isNaN(parts[i])){
-      parts[i] = Number(parts[i]).toLocaleString('id-ID');
+    if(parts[i]!==''){
+      if(!isNaN(parts[i])) parts[i] = Number(parts[i]).toLocaleString('id-ID');
     }
   }
   display.value = parts.join('');
 }
 
-// Format hasil akhir
 function formatResult(num){
   num = Math.round(num*100)/100;
   return num % 1 === 0 ? num.toLocaleString('id-ID') : num.toLocaleString('id-ID',{minimumFractionDigits:2, maximumFractionDigits:2});
 }
 
-// Hitung manual, aman persen
 function calculate(){
   try{
-    let expr = display.value.replace(/\./g,''); // hapus titik ribuan
-    // Split angka & operator
-    let tokens = expr.match(/(\d+(\.\d+)?%?|\+|\-|\*|\/|\(|\))/g);
+    let expr = display.value.replace(/\./g,'').replace(/\^/g,'**');
+    let tokens = expr.match(/(\d+(\.\d+)?%?|Math\.[a-z]+\(|\+|\-|\*|\/|\(|\))/g);
     if(!tokens) return;
 
     let stack = [];
@@ -133,7 +156,6 @@ function calculate(){
     tokens.forEach(tok=>{
       if(tok.endsWith('%')){
         let num = parseFloat(tok.replace('%',''));
-        // hitung persen relatif ke lastNumber
         let value = lastNumber * num/100;
         stack.push(value);
         lastNumber = value;
@@ -141,25 +163,22 @@ function calculate(){
         let num = parseFloat(tok);
         stack.push(num);
         lastNumber = num;
-      } else {
-        stack.push(tok);
-      }
+      } else stack.push(tok);
     });
-    // Gabungkan lagi jadi string JS aman
+
     let safeExpr = stack.join('');
     let result = Function('"use strict";return ('+safeExpr+')')();
     display.value = formatResult(result);
-    addToHistory(display.value);
+    addToHistory(safeExpr, display.value);
   } catch(e){
     display.value="Error";
   }
 }
 
-// Riwayat
-function addToHistory(res){
+function addToHistory(exp,res){
   const item = document.createElement("div");
   item.classList.add("history-item");
-  item.innerHTML = `${display.value}<span>= ${res}</span>`;
+  item.innerHTML = `${exp}<span>= ${res}</span>`;
   item.onclick = ()=>display.value = res;
   historyContent.prepend(item);
 }
