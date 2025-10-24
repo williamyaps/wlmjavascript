@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kalkulator Rupiah Ultimate</title>
+<title>Kalkulator Rupiah BRO Ultimate</title>
 <style>
 :root{
   --bg:#1e1e1e; --text:#fff; --btn:#333; --btn-hover:#444;
@@ -54,7 +54,7 @@ padding-bottom:4px; cursor:pointer; transition:0.2s;}
 <body>
 <div class="calculator">
 <div class="top-bar">
-<h3>🧮 Kalkulator Rupiah</h3>
+<h3>🧮 Kalkulator Rupiah BRO</h3>
 <button class="mode-toggle" onclick="toggleMode()">🌙 / ☀️</button>
 </div>
 
@@ -64,33 +64,22 @@ padding-bottom:4px; cursor:pointer; transition:0.2s;}
 <button class="clear" onclick="clearDisplay()">C</button>
 <button onclick="deleteLast()">⌫</button>
 <button onclick="appendValue('%')">%</button>
-<button class="function" onclick="appendValue('Math.PI')">π</button>
 <button class="operator" onclick="appendValue('/')">÷</button>
-
-<button class="function" onclick="appendValue('Math.sin(')">sin</button>
-<button class="function" onclick="appendValue('Math.cos(')">cos</button>
-<button class="function" onclick="appendValue('Math.tan(')">tan</button>
-<button class="function" onclick="appendValue('Math.log10(')">log</button>
 <button class="operator" onclick="appendValue('*')">×</button>
 
 <button onclick="appendValue('7')">7</button>
 <button onclick="appendValue('8')">8</button>
 <button onclick="appendValue('9')">9</button>
-<button class="function" onclick="appendValue('Math.sqrt(')">√</button>
 <button class="operator" onclick="appendValue('-')">−</button>
+<button class="operator" onclick="appendValue('+')">+</button>
 
 <button onclick="appendValue('4')">4</button>
 <button onclick="appendValue('5')">5</button>
 <button onclick="appendValue('6')">6</button>
-<button class="function" onclick="appendValue('**')">xʸ</button>
-<button class="operator" onclick="appendValue('+')">+</button>
-
 <button onclick="appendValue('1')">1</button>
 <button onclick="appendValue('2')">2</button>
-<button onclick="appendValue('3')">3</button>
-<button onclick="appendValue('(')">(</button>
-<button onclick="appendValue(')')">)</button>
 
+<button onclick="appendValue('3')">3</button>
 <button onclick="appendValue('0')">0</button>
 <button onclick="appendValue('.')">.</button>
 <button class="equal" onclick="calculate()">=</button>
@@ -106,7 +95,6 @@ padding-bottom:4px; cursor:pointer; transition:0.2s;}
 const display = document.getElementById("display");
 const body = document.body;
 const historyContent = document.getElementById("history-content");
-
 let historyArr = [];
 
 function appendValue(val){display.value+=val;}
@@ -114,10 +102,10 @@ function clearDisplay(){display.value="";}
 function deleteLast(){display.value = display.value.slice(0,-1);}
 function toggleMode(){body.classList.toggle("light");}
 
-// Format ribuan dan desimal real-time
+// Format ribuan real-time
 function formatInput(){
   let val = display.value.replace(/\./g,'');
-  let parts = val.split(/([+\-*/()])/);
+  let parts = val.split(/([+\-*/()%])/);
   for(let i=0;i<parts.length;i++){
     if(parts[i]!=='' && !isNaN(parts[i])){
       parts[i] = Number(parts[i]).toLocaleString('id-ID');
@@ -132,25 +120,34 @@ function formatResult(num){
   return num % 1 === 0 ? num.toLocaleString('id-ID') : num.toLocaleString('id-ID',{minimumFractionDigits:2, maximumFractionDigits:2});
 }
 
-// Hitung persen relatif terhadap angka sebelumnya
+// Hitung manual, aman persen
 function calculate(){
   try{
-    let exp = display.value.replace(/\./g,'');
-    // regex untuk angka% → (prevNumber * angka / 100)
-    exp = exp.replace(/(\d+(\.\d+)?)%/g, function(match, p1, offset, string){
-      // cari angka sebelum persen
-      let before = string.slice(0, offset).trim();
-      let lastNumberMatch = before.match(/(\d+(\.\d+)?)(\D*)$/);
-      if(lastNumberMatch){
-        let base = parseFloat(lastNumberMatch[1]);
-        let percentValue = base * parseFloat(p1)/100;
-        // ganti 'base+20%' menjadi 'base+percentValue'
-        return percentValue;
+    let expr = display.value.replace(/\./g,''); // hapus titik ribuan
+    // Split angka & operator
+    let tokens = expr.match(/(\d+(\.\d+)?%?|\+|\-|\*|\/|\(|\))/g);
+    if(!tokens) return;
+
+    let stack = [];
+    let lastNumber = 0;
+    tokens.forEach(tok=>{
+      if(tok.endsWith('%')){
+        let num = parseFloat(tok.replace('%',''));
+        // hitung persen relatif ke lastNumber
+        let value = lastNumber * num/100;
+        stack.push(value);
+        lastNumber = value;
+      } else if(!isNaN(tok)){
+        let num = parseFloat(tok);
+        stack.push(num);
+        lastNumber = num;
       } else {
-        return p1*0.01;
+        stack.push(tok);
       }
     });
-    let result = Function('"use strict"; return (' + exp + ')')();
+    // Gabungkan lagi jadi string JS aman
+    let safeExpr = stack.join('');
+    let result = Function('"use strict";return ('+safeExpr+')')();
     display.value = formatResult(result);
     addToHistory(display.value);
   } catch(e){
