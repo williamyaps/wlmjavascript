@@ -1,0 +1,11 @@
+:root{
+  --bg:#1e1e1e; --text:#fff; --btn:#333; 
+  /* semua style yang lo udah punya */
+}
+
+body.light{
+  --bg:#f7f7f7; --text:#000; --btn:#e0e0e0;
+  /* light mode styles */
+}
+
+/* semua CSS dari file sebelumnya */
