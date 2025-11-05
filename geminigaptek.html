@@ -3,17 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator BRO Ultimate</title>
-    <link rel="stylesheet" href="../css/kalkulator2025.css">
+    <title>Calculator BRO Ultimate</title>
+    <style>
+	css
+		:root{
+		  --bg:#1e1e1e; --text:#fff; --btn:#333; 
+		  /* semua style yang lo udah punya */
+		}
+
+		body.light{
+		  --bg:#f7f7f7; --text:#000; --btn:#e0e0e0;
+		  /* light mode styles */
+		}
+
+		/* semua CSS dari file sebelumnya */
+	</style>
 </head>
 <body>
     <div class="calculator">
-        <!-- struktur HTML -->
+        <!-- PASTIKAN STRUCTURE HTML LENGKAP DARI SEBELUMNYA ADA DI SINI -->
+        <div class="top-bar">
+            <h3>🧮 Kalkulator BRO Ultimate</h3>
+            <button class="mode-toggle" onclick="toggleMode()">🌙 / ☀️</button>
+        </div>
+        
+        <input type="text" id="display" class="display" oninput="formatInput()" />
+        
+        <!-- TOMBOL-TOMBOL LAINNYA... -->
     </div>
-    <script src="../js/kalkulator2025.js"></script>
-</body>
+    
+    <script>
+		// semua JavaScript logic dari file sebelumnya
+		const display = document.getElementById("display");
+		const historyContent = document.getElementById("history-content");
+		let historyArr = [];
+		let memory = 0;
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js" 
-        integrity="sha512-..." 
-        crossorigin="anonymous"></script>
+		function appendValue(val){display.value+=val;}
+		function appendFunction(func){display.value+=func+'(';}
+		// ... dan seterusnya
+	</script>
+</body>
 </html>
