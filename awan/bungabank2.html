@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kalkulator Bunga Bank v3.0 (Final)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto+Mono:wght@400;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .input-saldo { width: 100%; max-width: 140px; font-family: 'Roboto Mono', monospace; font-size: 1.125rem; text-align: right; }
+    .bunga-bersih { font-family: 'Roboto Mono', monospace; font-size: 1.125rem; font-weight: 700; color: #16a34a; }
+    .total-final { font-family: 'Roboto Mono', monospace; font-size: 1.75rem; font-weight: 900; text-align: right; }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-4 sm:p-8">
+<div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl p-6 sm:p-10 border-t-8 border-indigo-600">
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-center text-indigo-700 mb-2">💵 Kalkulator Bunga Bank v3.0 (Final)</h1>
+    <p class="text-center text-gray-500 mb-6">Hitung bunga sesuai logika bank digital — transparan & akurat.</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="col-span-1 md:col-span-2 space-y-4">
+            <div class="p-4 bg-gray-50 rounded-lg shadow-inner border border-gray-200">
+                <label for="suku-bunga" class="block text-sm font-semibold text-gray-700 mb-1">Suku Bunga Tahunan (%)</label>
+                <input type="number" id="suku-bunga" value="7" min="0" step="0.01" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-lg font-mono">
+            </div>
+            <div class="p-4 bg-gray-50 rounded-lg shadow-inner border border-gray-200">
+                <label for="nama-bulan" class="block text-sm font-semibold text-gray-700 mb-1">Bulan/Periode (Opsional)</label>
+                <input type="text" id="nama-bulan" placeholder="Misal: November 2025" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-lg">
+            </div>
+        </div>
+
+        <div class="col-span-1 md:col-span-2 flex flex-col justify-end space-y-2">
+            <button onclick="calculateBunga()" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-indigo-700 transition duration-300">
+                1. Hitung Bunga
+            </button>
+            <button onclick="exportToCSV()" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-green-700 transition duration-300">
+                2. Simpan ke CSV
+            </button>
+            <input type="file" id="csv-file-input" accept=".csv" class="hidden" onchange="importFromCSV(event)">
+            <button onclick="document.getElementById('csv-file-input').click()" class="w-full bg-gray-400 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-gray-500 transition duration-300">
+                3. Muat dari CSV
+            </button>
+            <button onclick="fillGaps()" class="w-full bg-amber-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-amber-600 transition duration-300">
+                4. 🧩 Auto-Lengkapi Hari Kosong
+            </button>
+            <button onclick="fillToDays(28)" class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-blue-600 transition duration-300">
+                5. Auto-Lengkapi 28 Hari
+            </button>
+            <button onclick="fillToDays(29)" class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-blue-600 transition duration-300">
+                6. Auto-Lengkapi 29 Hari
+            </button>
+            <button onclick="fillToDays(30)" class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-blue-600 transition duration-300">
+                7. Auto-Lengkapi 30 Hari
+            </button>
+            <button onclick="fillToDays(31)" class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-blue-600 transition duration-300">
+                8. Auto-Lengkapi 31 Hari
+            </button>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto shadow-md rounded-lg mb-6 border border-gray-300">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-200 text-gray-700">
+                <tr>
+                    <th class="p-3 text-left text-sm font-bold tracking-wider w-1/5">Hari Ke-</th>
+                    <th class="p-3 text-right text-sm font-bold tracking-wider w-2/5">Saldo Akhir (Rp)</th>
+                    <th class="p-3 text-right text-sm font-bold tracking-wider w-2/5">Bunga Bersih (Rp)</th>
+                </tr>
+            </thead>
+            <tbody id="input-table-body" class="bg-white divide-y divide-gray-200">
+            </tbody>
+        </table>
+    </div>
+
+    <div id="hasil" class="p-6 bg-green-50 border-l-4 border-green-500 rounded-lg shadow-md">
+        <h3 class="text-xl font-bold text-green-800 mb-2">📊 Hasil Perhitungan Akhir</h3>
+        <p class="text-gray-700">Tekan 'Hitung Bunga' untuk memulai.</p>
+    </div>
+</div>
+
+<script>
+    function parseRupiah(str) {
+        if (typeof str === 'number') return str;
+        if (!str) return 0;
+        return parseInt(String(str).replace(/\D/g, ''), 10) || 0;
+    }
+    function formatRupiah(num) {
+        if (typeof num !== 'number') return '0';
+        return num.toLocaleString('id-ID', { maximumFractionDigits: 0 });
+    }
+    function handleInputFormat(input) {
+        const murni = parseRupiah(input.value);
+        input.value = murni > 0 ? formatRupiah(murni) : '';
+    }
+
+    const tableBody = document.getElementById('input-table-body');
+    for (let i = 1; i <= 31; i++) {
+        const row = tableBody.insertRow();
+        row.innerHTML = `
+            <td class="p-3 font-semibold text-gray-900">${i}</td>
+            <td class="p-3">
+                <input type="text" id="saldo-${i}" class="input-saldo p-2 border rounded-lg bg-white focus:bg-gray-100" 
+                       placeholder="0" value="${i === 1 ? '50.000.000' : ''}"
+                       oninput="handleInputFormat(this)">
+            </td>
+            <td class="p-3 text-right">
+                <span class="bunga-bersih" id="bunga-${i}">0</span>
+            </td>
+        `;
+    }
+
+    function getFilledDays() {
+        const days = [];
+        for (let i = 1; i <= 31; i++) {
+            const saldo = parseRupiah(document.getElementById(`saldo-${i}`).value);
+            if (saldo > 0) days.push({ day: i, saldo });
+        }
+        return days;
+    }
+
+    function hasGaps() {
+        const filled = getFilledDays();
+        if (filled.length < 2) return false;
+        for (let i = 1; i < filled.length; i++) {
+            if (filled[i].day - filled[i-1].day > 1) return true;
+        }
+        return false;
+    }
+
+    function calculateBunga() {
+        if (hasGaps()) {
+            alert("⚠️ Opps! Ada hari kosong di antara data Anda.\n\n"+
+                  "Contoh: Anda isi Hari 1 dan Hari 5, tapi Hari 2–4 kosong.\n\n"+
+                  "💡 Bank tetap hitung bunga untuk tiap hari.\n\n"+
+                  "Silakan:\n"+
+                  "1. Klik 'Auto-Lengkapi Hari Kosong', ATAU\n"+
+                  "2. Isi manual hari kosong.");
+            return;
+        }
+
+        const sukuBunga = parseFloat(document.getElementById('suku-bunga').value) || 0;
+        let totalKotor = 0, totalPajak = 0, lastDay = 0, lastSaldo = 0;
+
+        for (let i = 1; i <= 31; i++) {
+            const saldo = parseRupiah(document.getElementById(`saldo-${i}`).value);
+            const bungaEl = document.getElementById(`bunga-${i}`);
+            if (saldo === 0) {
+                bungaEl.textContent = '0';
+                continue;
+            }
+            lastDay = i;
+            lastSaldo = saldo;
+            const bungaKasar = Math.floor(saldo * sukuBunga / 100 / 365);
+            const pajak = saldo >= 7_500_000 ? Math.floor(bungaKasar * 0.20) : 0;
+            const bungaBersih = bungaKasar - pajak;
+            bungaEl.textContent = formatRupiah(bungaBersih);
+            totalKotor += bungaKasar;
+            totalPajak += pajak;
+        }
+
+        const totalBersih = totalKotor - totalPajak;
+        const estimasiSaldo = lastSaldo + totalBersih;
+
+        document.getElementById('hasil').innerHTML = `
+            <h3 class="text-2xl font-bold text-indigo-700 mb-4">📊 Hasil Perhitungan (Hari ke-${lastDay || '—'})</h3>
+            <div class="grid grid-cols-2 gap-2 text-gray-700">
+                <p class="font-semibold">🟢 Total Bunga Kotor:</p>
+                <p class="total-final text-red-600">Rp ${formatRupiah(totalKotor)}</p>
+                <p class="font-semibold">💸 Total Pajak (20%):</p>
+                <p class="total-final text-red-600">Rp ${formatRupiah(totalPajak)}</p>
+                <div class="col-span-2 border-t pt-2 mt-2"></div>
+                <p class="font-semibold">✅ Total Bunga Bersih:</p>
+                <p class="total-final text-green-700">Rp ${formatRupiah(totalBersih)}</p>
+                <p class="font-semibold">💰 Saldo Terakhir Input:</p>
+                <p class="total-final text-blue-600">Rp ${formatRupiah(lastSaldo)}</p>
+                <div class="col-span-2 border-t pt-2 mt-2"></div>
+                <p class="text-2xl font-bold text-indigo-700">🎯 Estimasi Saldo Saat Ini:</p>
+                <p class="total-final text-indigo-800">Rp ${formatRupiah(estimasiSaldo)}</p>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">
+                ℹ️ Estimasi berdasarkan hari ke-${lastDay}. Cocok untuk pencairan di tengah bulan.
+            </p>
+        `;
+    }
+
+    function fillGaps() {
+        const filled = getFilledDays();
+        if (filled.length === 0) { alert("Isi minimal 1 hari dulu."); return; }
+        let lastSaldo = filled[0].saldo;
+        for (let i = 1; i <= 31; i++) {
+            const saldo = parseRupiah(document.getElementById(`saldo-${i}`).value);
+            if (saldo > 0) lastSaldo = saldo;
+            else document.getElementById(`saldo-${i}`).value = formatRupiah(lastSaldo);
+        }
+        calculateBunga();
+    }
+
+    function fillToDays(N) {
+        const filled = getFilledDays();
+        if (filled.length === 0) { alert("Isi minimal 1 hari dulu."); return; }
+        const lastSaldo = filled[filled.length-1].saldo;
+        for (let i = 1; i <= N; i++) {
+            const saldo = parseRupiah(document.getElementById(`saldo-${i}`).value);
+            if (saldo === 0) document.getElementById(`saldo-${i}`).value = formatRupiah(lastSaldo);
+        }
+        calculateBunga();
+        document.getElementById('hasil').innerHTML += 
+            `<p class="mt-2 text-sm text-blue-600">✅ Diisi sampai hari ke-${N} untuk proyeksi akhir bulan.</p>`;
+    }
+
+    // ✅ FIX: CSV save dengan Blob (work di file://)
+    function exportToCSV() {
+        calculateBunga();
+        const sukuBunga = document.getElementById('suku-bunga').value;
+        const namaBulan = document.getElementById('nama-bulan').value || 'Bulan_X';
+
+        const lines = [
+            "Periode;Suku Bunga (%)",
+            `${namaBulan};${sukuBunga}`,
+            "Hari Ke-;Saldo Akhir (Input);Bunga Bersih (Hasil)"
+        ];
+        for (let i = 1; i <= 31; i++) {
+            const saldo = parseRupiah(document.getElementById(`saldo-${i}`).value);
+            const bunga = parseRupiah(document.getElementById(`bunga-${i}`).textContent);
+            lines.push(`${i};${saldo};${bunga}`);
+        }
+
+        const csvContent = lines.join('\r\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;\uFEFF' });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `log_bunga_${namaBulan.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.csv`;
+        document.body.appendChild(link);
+        link.click();
+
+        setTimeout(() => {
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }, 100);
+    }
+
+    function importFromCSV(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const lines = e.target.result.split(/\r?\n/).filter(l => l.trim());
+            const delimiter = lines.some(l => l.includes(';')) ? ';' : ',';
+            for (let i = 1; i <= 31; i++) document.getElementById(`saldo-${i}`).value = '';
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].toLowerCase().includes("hari ke-")) {
+                    for (let j = i + 1; j < lines.length; j++) {
+                        const data = lines[j].split(delimiter);
+                        if (data.length < 2) continue;
+                        const day = parseInt(data[0]);
+                        if (day >= 1 && day <= 31) {
+                            const saldo = parseRupiah(data[1]);
+                            document.getElementById(`saldo-${day}`).value = saldo > 0 ? formatRupiah(saldo) : '';
+                        }
+                    }
+                    break;
+                }
+            }
+            calculateBunga();
+        };
+        reader.readAsText(file);
+    }
+
+    window.onload = calculateBunga;
+</script>
+</body>
+</html>
