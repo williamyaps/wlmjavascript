@@ -1,216 +1,296 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jam Digital Akurat & Cuaca</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jam Digital, Cuaca, dan Lokasi</title>
     <style>
-        /* CSS untuk Styling */
+        /* Desain dan Skema Warna dari kode modern Anda */
+        :root {
+            --bg: #0f172a;        /* slate-900 */
+            --card: #111827;      /* gray-900 */
+            --text: #e5e7eb;      /* gray-200 */
+            --accent: #22d3ee;    /* cyan-400 */
+            --muted: #9ca3af;     /* gray-400 */
+        }
         body {
-            font-family: Arial, sans-serif;
-            background-color: #000000;
-            color: #ffffff;
+            margin: 0;
+            background: radial-gradient(1200px 500px at 50% -100%, #0ea5e922, transparent 60%), var(--bg);
+            color: var(--text);
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+        .card {
+            width: 100%;
+            max-width: 800px;
+            background: linear-gradient(180deg, #0b1220 0%, var(--card) 100%);
+            border: 1px solid #1f2937;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px #00000055;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
+        }
+        
+        /* Jam Digital sebagai Fokus Utama */
+        #jam-digital {
+            padding: 30px 24px;
             text-align: center;
+            background: rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid #1f2937;
         }
-
-        #jam-utama {
-            font-size: 8em;
-            font-weight: bold;
-            letter-spacing: 5px;
-            color: #4CAF50;
-            text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
-            margin-bottom: 20px;
+        #waktu {
+            font-size: 6.5em;
+            font-weight: 700;
+            color: var(--accent);
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(34, 211, 238, 0.5);
+            line-height: 1.1;
         }
-
-        #info-tambahan {
+        #tanggal-sekarang {
             font-size: 1.5em;
-            margin-bottom: 5px;
-            color: #b0b0b0;
+            color: var(--muted);
+            margin-top: 5px;
         }
 
-        #cuaca-container {
-            display: flex;
-            align-items: center;
+        /* Styling Cuaca dan Info Tambahan */
+        .content { padding: 24px; }
+        .row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
-            margin-top: 15px;
         }
-
-        #suhu-utama {
-            font-size: 4em; /* Suhu lebih besar */
-            font-weight: 600;
-            color: #2196F3;
+        .block {
+            background: #0b1220;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
+            padding: 16px;
         }
-
-        #cuaca-info {
-            text-align: left;
+        .title {
+            font-size: 14px; color: var(--muted); margin-bottom: 8px;
         }
-
-        #lokasi {
-            font-size: 2em;
+        .value {
+            font-size: 28px;
             font-weight: 600;
         }
-
-        #icon-cuaca {
-            width: 100px;
-            height: 100px;
+        .sub {
+            font-size: 13px; color: var(--muted);
         }
-        
-        #error-message {
-            color: red; 
-            margin-top: 10px; 
-            font-size: 0.9em;
+        .footer {
+            padding: 18px 24px;
+            border-top: 1px solid #1f2937;
+            display: flex; justify-content: space-between; align-items: center; gap: 12px;
+            flex-wrap: wrap;
         }
-        
-        @media (max-width: 600px) {
-            #jam-utama {
-                font-size: 4em;
-            }
-            #suhu-utama {
-                font-size: 3em;
-            }
-            #lokasi {
-                font-size: 1.2em;
-            }
-            #cuaca-container {
-                flex-direction: column;
-            }
-            #icon-cuaca {
-                width: 70px;
-                height: 70px;
-            }
+        button {
+            all: unset; background: #0ea5e9; color: #001219;
+            padding: 10px 14px; border-radius: 10px; cursor: pointer;
+            font-weight: 600; transition: background 0.2s;
         }
+        button:hover { background: #22d3ee; color: #062e3a; }
+        .hint { color: var(--muted); font-size: 12px; }
+        .error { color: #fca5a5; }
+        .loading { color: #fde68a; }
+        .accent { color: var(--accent); }
+        .stack { display: grid; gap: 12px; }
     </style>
 </head>
 <body>
-
-    <div id="info-tambahan"></div>
-    <div id="jam-utama"></div>
-
-    <div id="cuaca-container">
-        <img id="icon-cuaca" src="" alt="Icon Cuaca" style="visibility: hidden;">
-        <div id="suhu-utama">--°C</div>
-        <div id="cuaca-info">
-            <div id="lokasi">Memuat...</div>
-            <div id="deskripsi-cuaca" style="font-size: 1.2em;"></div>
+    <main class="card" role="main" aria-live="polite">
+        
+        <div id="jam-digital">
+            <div id="waktu">00:00:00</div>
+            <div id="tanggal-sekarang">Senin, 1 Januari 1970</div>
         </div>
-    </div>
-    
-    <div id="error-message"></div>
+        
+        <div class="content stack">
+            <div id="status" class="hint">Memuat IP Address dan siap untuk lokasi.</div>
+
+            <div class="row">
+                <section class="block" aria-labelledby="ip-title">
+                    <div class="title" id="ip-title">IP Address</div>
+                    <div class="value" id="ip-address-display">—</div>
+                    <div class="sub" id="ip-lokasi-info">Memuat...</div>
+                </section>
+                
+                <section class="block" aria-labelledby="suhu-title">
+                    <div class="title" id="suhu-title">Suhu saat ini</div>
+                    <div class="value" id="suhu">— °C</div>
+                    <div class="sub" id="summary">Klik "Tentukan Lokasi"</div>
+                </section>
+            </div>
+
+            <div class="row">
+                <section class="block" aria-labelledby="lokasi-title">
+                    <div class="title" id="lokasi-title">Lokasi Cuaca</div>
+                    <div class="value" id="lokasi">—</div>
+                    <div class="sub" id="koordinat">Lat: —, Lon: —</div>
+                </section>
+
+                <section class="block" aria-labelledby="angin-title">
+                    <div class="title" id="angin-title">Angin</div>
+                    <div class="value" id="angin">— km/j</div>
+                    <div class="sub" id="arah">Arah: —</div>
+                </section>
+            </div>
+        </div>
+
+        <div class="footer">
+            <button id="btnLokasi" aria-label="Tentukan lokasi">Tentukan Lokasi (Akurat)</button>
+            <div id="info-waktu-lokal" class="hint">Waktu Lokal: <span id="zona">—</span></div>
+        </div>
+    </main>
 
     <script>
-        const jamUtama = document.getElementById('jam-utama');
-        const infoTambahan = document.getElementById('info-tambahan');
-        const suhuUtama = document.getElementById('suhu-utama');
-        const lokasiElement = document.getElementById('lokasi');
-        const iconCuaca = document.getElementById('icon-cuaca');
-        const deskripsiCuaca = document.getElementById('deskripsi-cuaca');
-        const errorMessage = document.getElementById('error-message');
-        
-        // GANTI DENGAN KUNCI API CUACA OPENWEATHERMAP ANDA YANG VALID!
-        const API_KEY_CUACA = 'YOUR_API_KEY'; 
-        
-        const IP_API_URL = 'http://ip-api.com/json/'; 
+        // *** JavaScript untuk Fungsi Dinamis ***
+        const $ = (id) => document.getElementById(id);
+        const btn = $("btnLokasi");
+        const statusEl = $("status");
 
-        // 1. Update Jam dan Tanggal
-        function updateJam() {
+        // URL API
+        const IP_API_URL = 'https://api.ipify.org?format=json'; // Untuk mendapatkan IP
+        const IP_INFO_URL = 'https://ip-api.com/json/'; // Untuk mendapatkan info lokasi IP
+        const WAKTU_EL = $("waktu");
+        const TANGGAL_EL = $("tanggal-sekarang");
+        const ZONA_EL = $("zona");
+        const IP_DISPLAY = $("ip-address-display");
+        const IP_LOKASI_INFO = $("ip-lokasi-info");
+
+        // Fungsi Utilities
+        function updateStatus(text, cls = "hint") {
+            statusEl.textContent = text;
+            statusEl.className = cls;
+        }
+
+        function toCardinal(deg) {
+            const dirs = ["U", "Timur Laut", "T", "Tenggara", "S", "Barat Daya", "B", "Barat Laut"];
+            return dirs[Math.round(deg / 45) % 8];
+        }
+
+        // 1. JAM DIGITAL BERJALAN
+        function updateJamDigital() {
             const now = new Date();
             const jam = String(now.getHours()).padStart(2, '0');
             const menit = String(now.getMinutes()).padStart(2, '0');
             const detik = String(now.getSeconds()).padStart(2, '0');
-            jamUtama.textContent = `${jam}:${menit}:${detik}`;
+            WAKTU_EL.textContent = `${jam}:${menit}:${detik}`;
 
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            infoTambahan.textContent = now.toLocaleDateString('id-ID', options);
+            TANGGAL_EL.textContent = now.toLocaleDateString('id-ID', options);
+            
+            ZONA_EL.textContent = Intl.DateTimeFormat().resolvedOptions().timeZone || "Waktu Lokal";
         }
-        
-        // 2. Mengambil Cuaca dari Koordinat
-        async function fetchCuaca(lat, lon) {
-            try {
-                const urlCuaca = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY_CUACA}&units=metric&lang=id`;
-                
-                const response = await fetch(urlCuaca);
-                if (!response.ok) {
-                     throw new Error('Gagal mengambil data cuaca. Periksa API Key Cuaca.');
-                }
-                const data = await response.json();
+        setInterval(updateJamDigital, 1000);
 
-                const suhu = data.main.temp.toFixed(0); // Suhu dibulatkan ke bilangan bulat
-                const lokasiNama = data.name; 
-                const deskripsi = data.weather[0].description.toUpperCase();
-                const iconCode = data.weather[0].icon;
-
-                suhuUtama.textContent = `${suhu}°C`;
-                lokasiElement.textContent = lokasiNama;
-                deskripsiCuaca.textContent = deskripsi;
-                
-                // Menampilkan icon cuaca
-                iconCuaca.src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
-                iconCuaca.style.visibility = 'visible';
-                
-            } catch (error) {
-                suhuUtama.textContent = "--°C";
-                lokasiElement.textContent = "Gagal Ambil Cuaca.";
-                errorMessage.textContent = `Pesan: ${error.message}`;
-                console.error("Error fetching weather data:", error);
-            }
-        }
-        
-        // 3. Fallback IP Geolocation (Jika Geolocation Browser Gagal/Ditolak)
-        async function fallbackIP() {
-            lokasiElement.textContent = "Memuat (IP Lokasi)...";
+        // 2. AMBIL IP ADDRESS (Perbaikan Stabilitas)
+        async function getIPAddress() {
+            IP_DISPLAY.textContent = "Memuat IP...";
+            IP_LOKASI_INFO.textContent = "Memuat...";
             try {
-                const ipResponse = await fetch(IP_API_URL);
+                // Langkah 1: Ambil alamat IP murni
+                const ipResponse = await fetch(IP_API_URL, { mode: 'cors' });
                 const ipData = await ipResponse.json();
-                
-                if (ipData.status === 'success') {
-                    // Gunakan Lat/Lon dari IP untuk mendapatkan cuaca
-                    await fetchCuaca(ipData.lat, ipData.lon);
-                    lokasiElement.textContent = `${ipData.city || ipData.regionName || 'Lokasi IP'} (${ipData.countryCode})`;
+                const ipAddress = ipData.ip;
+
+                IP_DISPLAY.textContent = ipAddress;
+
+                // Langkah 2: Ambil info lokasi IP
+                const ipInfoResponse = await fetch(IP_INFO_URL + ipAddress, { mode: 'cors' });
+                const ipInfoData = await ipInfoResponse.json();
+
+                if (ipInfoData.status === 'success') {
+                    IP_LOKASI_INFO.textContent = `${ipInfoData.city || ipInfoData.regionName || 'Lokasi Jaringan'}, ${ipInfoData.country}`;
                 } else {
-                    throw new Error("Gagal fallback ke IP Lokasi.");
+                    IP_LOKASI_INFO.textContent = "Gagal info lokasi IP.";
                 }
+
             } catch (e) {
-                lokasiElement.textContent = "Lokasi & Cuaca Gagal Diperoleh.";
-                errorMessage.textContent = `Pesan: ${e.message}`;
+                // Jika gagal, set pesan error tetapi jangan menghentikan skrip
+                IP_DISPLAY.textContent = "Gagal mengambil IP.";
+                IP_LOKASI_INFO.textContent = "Masalah CORS/Jaringan. (Akan tampil di server)";
             }
         }
 
-        // 4. Utama: Coba Geolocation Browser Dulu
-        function getLokasiDanSuhu() {
-            lokasiElement.textContent = "Meminta Izin Lokasi...";
-            iconCuaca.style.visibility = 'hidden';
-
-            if (navigator.geolocation) {
-                // Prioritas 1: Geolocation Browser (Akurat)
-                navigator.geolocation.getCurrentPosition(async (position) => {
-                    errorMessage.textContent = "";
-                    await fetchCuaca(position.coords.latitude, position.coords.longitude);
-                    // Lokasi nama sudah diisi oleh fetchCuaca
-                }, async (error) => {
-                    // Jika ditolak (error.code: 1) atau gagal, coba fallback ke IP
-                    errorMessage.textContent = "Akses lokasi ditolak/gagal. Mencoba Lokasi IP...";
-                    await fallbackIP();
-                });
-            } else {
-                // Jika browser tidak mendukung, coba fallback ke IP
-                fallbackIP();
-            }
+        // 3. AMBIL DATA CUACA (Open-Meteo, Tanpa API Key)
+        async function fetchWeather(lat, lon) {
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m,wind_direction_10m&timezone=auto`;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error("Gagal mengambil data cuaca dari Open-Meteo");
+            const data = await res.json();
+            return {
+                temp: data.current?.temperature_2m,
+                wind: data.current?.wind_speed_10m,
+                dir: data.current?.wind_direction_10m
+            };
         }
 
-        // Jalankan semua fungsi
-        setInterval(updateJam, 1000);
-        getLokasiDanSuhu();
-        // Ulangi pengambilan suhu/lokasi setiap 15 menit (900000 ms)
-        setInterval(getLokasiDanSuhu, 900000); 
+        // 4. AMBIL NAMA LOKASI (Nominatim, Tanpa API Key)
+        async function reverseGeocode(lat, lon) {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
+            const res = await fetch(url, { headers: { "Accept-Language": "id" } });
+            if (!res.ok) throw new Error("Gagal mengambil nama lokasi");
+            const json = await res.json();
+            return json.display_name || json.address?.city || json.address?.road || `Lat ${lat.toFixed(4)}, Lon ${lon.toFixed(4)}`;
+        }
+        
+        // 5. PENANGANAN KLIK LOKASI (Otomatis)
+        async function handleLokasi() {
+            updateStatus("Meminta izin lokasi browser…", "hint loading");
+            
+            // Bersihkan data lama
+            $("lokasi").textContent = "—";
+            $("koordinat").textContent = "Lat: —, Lon: —";
+            $("suhu").textContent = "— °C";
+            $("angin").textContent = "— km/j";
+            $("arah").textContent = "Arah: —";
+            $("summary").textContent = "Memuat...";
 
-        updateJam(); // Panggil sekali saat awal
+            if (!("geolocation" in navigator)) {
+                updateStatus("Perangkat tidak mendukung Geolocation.", "hint error");
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+
+                $("koordinat").textContent = `Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`;
+                
+                try {
+                    updateStatus("Mengambil nama lokasi dan cuaca…", "hint loading");
+                    const [nama, cuaca] = await Promise.all([
+                        reverseGeocode(lat, lon).catch(() => `Lat ${lat.toFixed(4)}, Lon ${lon.toFixed(4)}`),
+                        fetchWeather(lat, lon)
+                    ]);
+
+                    $("lokasi").textContent = nama;
+                    $("suhu").textContent = cuaca.temp != null ? `${cuaca.temp} °C` : "— °C";
+                    $("angin").textContent = cuaca.wind != null ? `${cuaca.wind} km/j` : "— km/j";
+                    $("arah").textContent = cuaca.dir != null ? `Arah: ${toCardinal(cuaca.dir)} (${Math.round(cuaca.dir)}°)` : "Arah: —";
+                    $("summary").textContent = "Data Cuaca dari Open-Meteo";
+                    updateStatus("Berhasil memuat cuaca dari lokasi akurat.", "hint accent");
+                } catch (e) {
+                    updateStatus(`Terjadi kesalahan: ${e.message}`, "hint error");
+                    $("summary").textContent = "Gagal memuat cuaca.";
+                }
+            }, (err) => {
+                const map = { 1: "Izin lokasi ditolak (Gagal memuat cuaca).", 2: "Lokasi tidak tersedia.", 3: "Permintaan lokasi kedaluwarsa." };
+                updateStatus(map[err.code] || "Gagal meminta lokasi. Coba lagi.", "hint error");
+                $("summary").textContent = "Gagal memuat cuaca.";
+            }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+        }
+
+        btn.addEventListener("click", handleLokasi);
+        
+        // Panggil semua fungsi otomatis saat DOM siap.
+        document.addEventListener("DOMContentLoaded", () => {
+            updateJamDigital(); 
+            getIPAddress(); // Panggil IP
+            handleLokasi(); // Panggil Lokasi/Cuaca
+        });
     </script>
-
 </body>
 </html>
