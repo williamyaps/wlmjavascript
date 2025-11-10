@@ -4,16 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Jam Digital dan Cuaca Embed</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=VT323&display=swap" rel="stylesheet">
-
   <style>
     body {
       margin: 0;
-      /* Font Teks Umum: Poppins */
-      font-family: 'Poppins', system-ui, sans-serif;
+      font-family: system-ui, sans-serif;
       background: #0f172a;
       color: #e5e7eb;
       display: grid;
@@ -41,9 +35,6 @@
       font-weight: 600;
       text-align: center;
       margin: 12px 0;
-      /* Font Digital: VT323 */
-      font-family: 'VT323', monospace; 
-      font-size: 4em; 
     }
     .sub {
       font-size: 1em;
@@ -61,7 +52,6 @@
 <body>
   <div class="card">
     <div id="sapaan" class="info"></div>
-    
     <div class="title">Jam Digital</div>
     <div id="jam" class="value">00:00:00</div>
     <div id="tanggal" class="sub">Senin, 1 Januari 1970</div>
@@ -85,7 +75,7 @@
   <script>
     const $ = (id) => document.getElementById(id);
 
-    // 1. Jam digital
+    // 1. Fungsi Jam digital
     function updateJam() {
       const now = new Date();
       $("jam").textContent = now.toLocaleTimeString('id-ID', { hour12: false });
@@ -100,10 +90,10 @@
     const params = new URLSearchParams(location.search);
     const nama = params.get("nama");
     if (nama) {
-      $("sapaan").textContent = `Halo ${nama}, selamat datang di Jam Digital.`;
+      $("sapaan").textContent = `Halo ${nama}, selamat datang di Jam Digital ???`;
     }
 
-    // 3. Cuaca dan lokasi (Geolocation)
+    // 3. Fungsi Cuaca dan lokasi
     function toCardinal(deg) {
       const dirs = ["U", "Timur Laut", "T", "Tenggara", "S", "Barat Daya", "B", "Barat Laut"];
       return dirs[Math.round(deg / 45) % 8];
@@ -138,17 +128,18 @@
         ]);
 
         $("lokasi").textContent = namaLokasi;
-        // Menggunakan \u00B0 untuk derajat Celsius
+        // PERBAIKAN ENCODING: Menggunakan Unicode \u00B0 untuk simbol derajat
         $("suhu").textContent = cuaca.temp != null ? `${cuaca.temp} \u00B0C` : "— \u00B0C";
+        
+        // PERBAIKAN ENCODING: Memastikan arah angin tidak berubah
         $("angin").textContent = cuaca.wind != null ? `Angin: ${cuaca.wind} km/j` : "Angin: — km/j";
         $("arah").textContent = cuaca.dir != null ? `Arah: ${toCardinal(cuaca.dir)} (${Math.round(cuaca.dir)}\u00B0)` : "Arah: —";
         
-        $("ucapan").textContent = "Terima kasih telah menggunakan Jam Digital William.";
+        $("ucapan").textContent = "Terima kasih telah menggunakan Jam Digital William";
       } catch {
         $("lokasi").textContent = "Gagal memuat cuaca.";
       }
     }, () => {
-      // Fungsi ini dijalankan jika izin ditolak atau error.
       $("lokasi").textContent = "Izin lokasi ditolak.";
     });
 
@@ -160,7 +151,7 @@
     window.addEventListener('load', kirimTinggi);
     new ResizeObserver(kirimTinggi).observe(document.body);
     
-    // 5. IP ADDRESS DAN DNS (Fungsi yang mengaktifkan fitur IP/DNS)
+    // 5. PERBAIKAN TOTAL: IP ADDRESS DAN DNS (Menggunakan HTTPS)
     async function getIpAndDns() {
         const ipDisplay = $("ip-address");
         const dnsDisplay = $("dns-info");
@@ -173,6 +164,7 @@
             if (data.ip) {
                 ipDisplay.textContent = data.ip;
                 
+                // PERBAIKAN DNS: Menggunakan data 'org' (ISP/Organisasi) yang lebih akurat
                 const org = data.org || 'Tidak tersedia';
                 dnsDisplay.textContent = `ISP: ${org}`;
 
@@ -182,15 +174,16 @@
             }
 
         } catch (error) {
-            // Pesan ini akan muncul jika ada masalah jaringan/CORS
             console.error("Gagal mengambil data IP/DNS:", error);
             ipDisplay.textContent = 'Error koneksi IP/DNS.';
             dnsDisplay.textContent = 'Error koneksi Hostname/ISP.';
         } finally {
+             // Pastikan ukuran iframe diperbarui setelah data dimuat
              kirimTinggi(); 
         }
     }
     
+    // Panggil fungsi IP Address dan DNS saat pemuatan laman
     getIpAndDns(); 
   </script>
 </body>
