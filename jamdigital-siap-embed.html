@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jam Digital dan Cuaca Embed</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .card {
+      max-width: 720px;
+      width: 100%;
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 20px 40px #00000055;
+    }
+    .title {
+      font-size: 2em;
+      font-weight: 700;
+      color: #22d3ee;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .value {
+      font-size: 3em;
+      font-weight: 600;
+      text-align: center;
+      margin: 12px 0;
+    }
+    .sub {
+      font-size: 1em;
+      color: #9ca3af;
+      text-align: center;
+    }
+    .info {
+      margin-top: 16px;
+      font-size: 14px;
+      color: #22d3ee;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div id="sapaan" class="info"></div>
+    <div class="title">Jam Digital</div>
+    <div id="jam" class="value">00:00:00</div>
+    <div id="tanggal" class="sub">Senin, 1 Januari 1970</div>
+
+    <div class="title" style="margin-top: 24px;">Cuaca Lokasi Anda</div>
+    <div id="lokasi" class="sub">Memuat lokasi…</div>
+    <div id="suhu" class="value">— °C</div>
+    <div id="angin" class="sub">Angin: — km/j</div>
+    <div id="arah" class="sub">Arah: —</div>
+    <div id="ucapan" class="info"></div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    // Jam digital
+    function updateJam() {
+      const now = new Date();
+      $("jam").textContent = now.toLocaleTimeString('id-ID', { hour12: false });
+      $("tanggal").textContent = now.toLocaleDateString('id-ID', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+    }
+    setInterval(updateJam, 1000);
+    updateJam();
+
+    // Sapaan dari parameter URL
+    const params = new URLSearchParams(location.search);
+    const nama = params.get("nama");
+    if (nama) {
+      $("sapaan").textContent = `Halo ${nama}, selamat datang di Jam Digital 🌤️`;
+    }
+
+    // Cuaca dan lokasi
+    function toCardinal(deg) {
+      const dirs = ["U", "Timur Laut", "T", "Tenggara", "S", "Barat Daya", "B", "Barat Laut"];
+      return dirs[Math.round(deg / 45) % 8];
+    }
+
+    async function fetchWeather(lat, lon) {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m,wind_direction_10m&timezone=auto`;
+      const res = await fetch(url);
+      const data = await res.json();
+      return {
+        temp: data.current?.temperature_2m,
+        wind: data.current?.wind_speed_10m,
+        dir: data.current?.wind_direction_10m
+      };
+    }
+
+    async function reverseGeocode(lat, lon) {
+      const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
+      const res = await fetch(url, { headers: { "Accept-Language": "id" } });
+      const json = await res.json();
+      return json.display_name || `Lat ${lat.toFixed(4)}, Lon ${lon.toFixed(4)}`;
+    }
+
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+
+      try {
+        const [namaLokasi, cuaca] = await Promise.all([
+          reverseGeocode(lat, lon).catch(() => `Lat ${lat.toFixed(4)}, Lon ${lon.toFixed(4)}`),
+          fetchWeather(lat, lon)
+        ]);
+
+        $("lokasi").textContent = namaLokasi;
+        $("suhu").textContent = cuaca.temp != null ? `${cuaca.temp} °C` : "— °C";
+        $("angin").textContent = cuaca.wind != null ? `Angin: ${cuaca.wind} km/j` : "Angin: — km/j";
+        $("arah").textContent = cuaca.dir != null ? `Arah: ${toCardinal(cuaca.dir)} (${Math.round(cuaca.dir)}°)` : "Arah: —";
+        $("ucapan").textContent = "Terima kasih telah menggunakan Jam Digital William 🌤️";
+      } catch {
+        $("lokasi").textContent = "Gagal memuat cuaca.";
+      }
+    }, () => {
+      $("lokasi").textContent = "Izin lokasi ditolak.";
+    });
+
+    // Kirim tinggi ke parent iframe
+    function kirimTinggi() {
+      const tinggi = document.documentElement.scrollHeight;
+      parent.postMessage({ type: 'jamdigital:resize', height: tinggi }, '*');
+    }
+    window.addEventListener('load', kirimTinggi);
+    new ResizeObserver(kirimTinggi).observe(document.body);
+  </script>
+</body>
+</html>
