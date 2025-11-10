@@ -7,26 +7,23 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=VT323&display=swap" rel="stylesheet">
 
   <style>
-    /*
-    * IMPLEMENTASI FONT STACK YANG KAMU SARANKAN
-    * Ini memaksa browser mencari font emoji spesifik terlebih dahulu
+    /* * FONT STACK AMAN DAN FONT BARU 
+    * Kita tetap mempertahankan font stack untuk emoji.
     */
-    .emoji-fix {
+    .emoji-stack {
       font-family: 
-        /* Emoji Font Stack (dari saran Anda) */
         "Segoe UI Emoji", "Segoe UI Symbol", "Apple Color Emoji", "Noto Color Emoji",
         /* Font Teks Utama */
-        'Inter', system-ui, -apple-system, BlinkMacSystemFont, 
-        "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; 
+        'Poppins', system-ui, sans-serif; 
     }
 
     body {
       margin: 0;
-      /* Aplikasikan perbaikan font ke body */
-      font-family: 'Inter', system-ui, sans-serif; 
+      /* Font Teks Umum: Poppins */
+      font-family: 'Poppins', system-ui, sans-serif;
       background: #0f172a;
       color: #e5e7eb;
       display: grid;
@@ -41,9 +38,6 @@
       border-radius: 16px;
       padding: 24px;
       box-shadow: 0 20px 40px #00000055;
-      /* Aplikasikan perbaikan font ke card */
-      /* Ini memastikan semua teks di dalam card menggunakan font stack baru */
-      font-family: var(--emoji-fix); /* Gunakan kelas jika perlu, tapi kita akan gunakan kelas di div yang butuh emoji */
     }
     .title {
       font-size: 2em;
@@ -57,7 +51,10 @@
       font-weight: 600;
       text-align: center;
       margin: 12px 0;
-      font-family: 'Space Mono', monospace; 
+      /* Font Digital: VT323 */
+      font-family: 'VT323', monospace; 
+      /* Menaikkan ukuran font value VT323 */
+      font-size: 4em; 
     }
     .sub {
       font-size: 1em;
@@ -74,25 +71,32 @@
 </head>
 <body>
   <div class="card">
-    <div id="sapaan" class="info emoji-fix"></div> <div class="title emoji-fix">Jam Digital ?</div> <div id="jam" class="value">00:00:00</div>
+    <div id="sapaan" class="info emoji-stack"></div>
+    
+    <div class="title emoji-stack">Jam Digital ??</div>
+    <div id="jam" class="value">00:00:00</div>
     <div id="tanggal" class="sub">Senin, 1 Januari 1970</div>
 
-    <div class="title emoji-fix" style="margin-top: 24px;">Cuaca Lokasi Anda ???</div> <div id="lokasi" class="sub">Memuat lokasi…</div>
-    <div id="suhu" class="value">— °C</div>
-    <div id="angin" class="sub">Angin: — km/j</div>
-    <div id="arah" class="sub">Arah: —</div>
+    <div class="title emoji-stack" style="margin-top: 24px;">Cuaca Lokasi Anda ???</div>
+    <div id="lokasi" class="sub">Memuat lokasiâ€¦</div>
+    <div id="suhu" class="value">â€” Â°C</div>
+    <div id="angin" class="sub">Angin: â€” km/j</div>
+    <div id="arah" class="sub">Arah: â€”</div>
     
-    <div class="title emoji-fix" style="margin-top: 24px;">IP Address Anda ???</div> <div id="ip-address" class="value">Memuat...</div>
+    <div class="title emoji-stack" style="margin-top: 24px;">IP Address Anda ????</div>
+    <div id="ip-address" class="value">Memuat...</div>
     <div class="sub" id="ucapan-embed">Terima kasih telah meng-embed widget ini!</div>
 
-    <div class="title emoji-fix" style="margin-top: 24px;">Pemeriksaan ISP (DNS)</div> <div id="dns-info" class="sub">Sedang mengambil Hostname/ISP...</div>
+    <div class="title emoji-stack" style="margin-top: 24px;">Pemeriksaan ISP (DNS)</div>
+    <div id="dns-info" class="sub">Sedang mengambil Hostname/ISP...</div>
 
-    <div id="ucapan" class="info emoji-fix"></div> </div>
+    <div id="ucapan" class="info emoji-stack"></div>
+  </div>
 
   <script>
     const $ = (id) => document.getElementById(id);
 
-    // ... (Fungsi Jam digital, Sapaan, Cuaca, Kirim Tinggi, IP/DNS tetap sama)
+    // 1. Jam digital
     function updateJam() {
       const now = new Date();
       $("jam").textContent = now.toLocaleTimeString('id-ID', { hour12: false });
@@ -103,12 +107,14 @@
     setInterval(updateJam, 1000);
     updateJam();
 
+    // 2. Sapaan dari parameter URL (Tanpa Emoji)
     const params = new URLSearchParams(location.search);
     const nama = params.get("nama");
     if (nama) {
       $("sapaan").textContent = `Halo ${nama}, selamat datang di Jam Digital.`;
     }
 
+    // 3. Cuaca dan lokasi
     function toCardinal(deg) {
       const dirs = ["U", "Timur Laut", "T", "Tenggara", "S", "Barat Daya", "B", "Barat Laut"];
       return dirs[Math.round(deg / 45) % 8];
@@ -143,13 +149,10 @@
         ]);
 
         $("lokasi").textContent = namaLokasi;
-        
-        const suhuText = cuaca.temp != null ? `${cuaca.temp} \u00B0C` : "— \u00B0C"; 
-        $("suhu").textContent = suhuText;
-        
-        $("angin").textContent = cuaca.wind != null ? `Angin: ${cuaca.wind} km/j` : "Angin: — km/j";
-        
-        $("arah").textContent = cuaca.dir != null ? `Arah: ${toCardinal(cuaca.dir)} (${Math.round(cuaca.dir)}\u00B0)` : "Arah: —";
+        // Menggunakan \u00B0 untuk derajat Celsius
+        $("suhu").textContent = cuaca.temp != null ? `${cuaca.temp} \u00B0C` : "â€” \u00B0C";
+        $("angin").textContent = cuaca.wind != null ? `Angin: ${cuaca.wind} km/j` : "Angin: â€” km/j";
+        $("arah").textContent = cuaca.dir != null ? `Arah: ${toCardinal(cuaca.dir)} (${Math.round(cuaca.dir)}\u00B0)` : "Arah: â€”";
         
         $("ucapan").textContent = "Terima kasih telah menggunakan Jam Digital William.";
       } catch {
@@ -159,6 +162,7 @@
       $("lokasi").textContent = "Izin lokasi ditolak.";
     });
 
+    // 4. Kirim tinggi ke parent iframe
     function kirimTinggi() {
       const tinggi = document.documentElement.scrollHeight;
       parent.postMessage({ type: 'jamdigital:resize', height: tinggi }, '*');
@@ -166,6 +170,7 @@
     window.addEventListener('load', kirimTinggi);
     new ResizeObserver(kirimTinggi).observe(document.body);
     
+    // 5. IP ADDRESS DAN DNS (Fungsi yang hilang, sekarang ditambahkan)
     async function getIpAndDns() {
         const ipDisplay = $("ip-address");
         const dnsDisplay = $("dns-info");
