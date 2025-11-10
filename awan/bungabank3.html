@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kalkulator Bunga Bank v3.0 (William Yap, S. Com)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto+Mono:wght@400;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .input-saldo { width: 100%; max-width: 140px; font-family: 'Roboto Mono', monospace; font-size: 1.125rem; text-align: right; }
+    .bunga-bersih { font-family: 'Roboto Mono', monospace; font-size: 1.125rem; font-weight: 700; color: #16a34a; }
+    .total-final { font-family: 'Roboto Mono', monospace; font-size: 1.75rem; font-weight: 900; text-align: right; }
+  </style>
+</head>
+<iframe
+  src="https://williamyaps.github.io/wlmjavascript/jamdigital-siap-embed.html?nama=Brother"
+  title="Jam Digital Brother"
+  style="width: 100%; height: 540px; border: none; border-radius: 12px;"
+  loading="lazy"
+  sandbox="allow-scripts allow-same-origin"
+></iframe>
+<body class="bg-gray-100 min-h-screen p-4 sm:p-8">
+<div class="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl p-6 sm:p-10 border-t-8 border-indigo-600">
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-center text-indigo-700 mb-2">💵 Kalkulator Bunga Bank v3.0 (Final)</h1>
+    <p class="text-center text-gray-500 mb-6">Hitung bunga sesuai logika bank digital — transparan & akurat.</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="col-span-1 md:col-span-2 space-y-4">
+            <div class="p-4 bg-gray-50 rounded-lg shadow-inner border border-gray-200">
+                <label for="suku-bunga" class="block text-sm font-semibold text-gray-700 mb-1">Suku Bunga Tahunan (%)</label>
+                <input type="number" id="suku-bunga" value="7" min="0" step="0.01" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-lg font-mono">
+            </div>
+            <div class="p-4 bg-gray-50 rounded-lg shadow-inner border border-gray-200">
+                <label for="nama-bulan" class="block text-sm font-semibold text-gray-700 mb-1">Bulan/Periode (Opsional)</label>
+                <input type="text" id="nama-bulan" placeholder="Misal: November 2025" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-lg">
+            </div>
+        </div>
+
+        <div class="col-span-1 md:col-span-2 flex flex-col justify-end space-y-2">
+            <button onclick="calculateBunga()" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-indigo-700 transition duration-300">
+                1. Hitung Bunga
+            </button>
+            <button onclick="exportToCSV()" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-green-700 transition duration-300">
+                2. Simpan ke CSV
+            </button>
+            <input type="file" id="csv-file-input" accept=".csv" class="hidden" onchange="importFromCSV(event)">
+            <button onclick="document.getElementById('csv-file-input').click()" class="w-full bg-gray-400 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-gray-500 transition duration-300">
+                3. Muat dari CSV
+            </button>
+            <button onclick="fillGaps()" class="w-full bg-amber-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-amber-600 transition duration-300">
+                4. 🧩 Auto-Lengkapi Hari Kosong
+            </button>
+            <button onclick="fillToDays(28)" class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-blue-600 transition duration-300">
+                5. Auto-Lengkapi 28 Hari
+            </button>
+            <button onclick="fillToDays(29)" class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-blue-600 transition duration-300">
+                6. Auto-Lengkapi 29 Hari
+            </button>
+            <button onclick="fillToDays(30)" class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-blue-600 transition duration-300">
+                7. Auto-Lengkapi 30 Hari
+            </button>
+            <button onclick="fillToDays(31)" class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:bg-blue-600 transition duration-300">
+                8. Auto-Lengkapi 31 Hari
+            </button>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto shadow-md rounded-lg mb-6 border border-gray-300">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-200 text-gray-700">
+                <tr>
+                    <th class="p-3 text-left text-sm font-bold tracking-wider w-1/5">Hari Ke-</th>
+                    <th class="p-3 text-right text-sm font-bold tracking-wider w-2/5">Saldo Akhir (Rp)</th>
+                    <th class="p-3 text-right text-sm font-bold tracking-wider w-2/5">Bunga Bersih (Rp)</th>
+                </tr>
+            </thead>
+            <tbody id="input-table-body" class="bg-white divide-y divide-gray-200">
+            </tbody>
+        </table>
+    </div>
+
+    <div id="hasil" class="p-6 bg-green-50 border-l-4 border-green-500 rounded-lg shadow-md">
+        <h3 class="text-xl font-bold text-green-800 mb-2">📊 Hasil Perhitungan Akhir</h3>
+        <p class="text-gray-700">Tekan 'Hitung Bunga' untuk memulai.</p>
+    </div>
+</div>
+
+<!-- GANTI SCRIPT DENGAN VERSI OBFUSCATED -->
+  <script src="https://williamyaps.github.io/wlmjavascript/js/bungabank2_obf.js"></script>
+</body>
+</body>
+
+</html>
