@@ -728,6 +728,97 @@
                 </p>
             </div>
         </div>
+		
+		<!-- Section Data Nutrisi Lengkap (Toggle Tabel) -->
+<div class="nutrition-section">
+    <h2 class="card-title"><i class="fas fa-table"></i> Data Nutrisi Lengkap</h2>
+    <p>Klik untuk melihat tabel nutrisi lengkap telur ayam vs bebek berdasarkan data USDA.</p>
+    
+    <div style="text-align: center; margin: 20px 0;">
+        <button id="toggleTableBtn" class="start-button" style="padding: 12px 24px; font-size: 16px;">
+            <i class="fas fa-chevron-down"></i> Tampilkan Tabel Lengkap
+        </button>
+    </div>
+    
+    <!-- Tabel yang akan ditoggle -->
+    <div id="nutritionTableContainer" style="display: none; overflow-x: auto; margin-top: 20px;">
+        <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <thead>
+                <tr style="background-color: #4285f4; color: white;">
+                    <th style="padding: 15px; text-align: left;">Zat Gizi</th>
+                    <th style="padding: 15px; text-align: center;">Satuan</th>
+                    <th style="padding: 15px; text-align: center;">Telur Ayam (100g)</th>
+                    <th style="padding: 15px; text-align: center;">Telur Ayam (Per Butir ≈50g)</th>
+                    <th style="padding: 15px; text-align: center;">Telur Bebek (100g)</th>
+                    <th style="padding: 15px; text-align: center;">Telur Bebek (Per Butir ≈70g)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- MAKRONUTRIEN & ENERGI -->
+                <tr style="background-color: #f8f9fa; font-weight: bold;">
+                    <td colspan="6" style="padding: 12px 15px;">MAKRONUTRIEN & ENERGI</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee;">Energi</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">kkal</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">149</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">74.5</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">185</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; color: #d23f31;">129.5</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee;">Protein</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">g</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">12.6</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">6.3</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">12.8</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; color: #0d904f;">9.0</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee;">Total Lemak</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">g</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">9.9</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">5.0</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">13.8</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; color: #d23f31;">9.7</td>
+                </tr>
+                <!-- Baris lainnya (Karbohidrat, Mineral, Vitamin) -->
+                <!-- Contoh baris Kolesterol yang penting -->
+                <tr style="background-color: #f8f9fa; font-weight: bold;">
+                    <td colspan="6" style="padding: 12px 15px;">LAINNYA</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee;">Kolesterol</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">mg</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">372</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">186</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">884</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; color: #d23f31; background-color: #ffebee;">619</td>
+                </tr>
+                <!-- Tambahkan baris lain sesuai tabel di gambar -->
+                <tr>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee;">Kolin</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">mg</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">294</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; color: #0d904f;">147</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">263</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">184</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee;">Vitamin B12</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">μg</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">0.9</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">0.45</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center;">5.4</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; color: #0d904f;">3.78</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="font-size: 14px; color: #5f6368; margin-top: 10px; text-align: center; font-style: italic;">
+            <i class="fas fa-info-circle"></i> Data berdasarkan basis gizi USDA. Warna <span style="color: #0d904f; font-weight: bold;">hijau</span> menandakan nilai unggul, <span style="color: #d23f31; font-weight: bold;">merah</span> menandakan perlu perhatian khusus.
+        </p>
+    </div>
+</div>
         
         <div class="nutrition-section">
             <h2 class="card-title"><i class="fas fa-lightbulb"></i> Kesimpulan Cepat</h2>
@@ -815,6 +906,29 @@
             });
             
             // Fungsi untuk tombol mulai
+			
+			// Fungsi untuk toggle tabel nutrisi lengkap
+const toggleTableBtn = document.getElementById('toggleTableBtn');
+const nutritionTableContainer = document.getElementById('nutritionTableContainer');
+
+if (toggleTableBtn && nutritionTableContainer) {
+    toggleTableBtn.addEventListener('click', function() {
+        const isHidden = nutritionTableContainer.style.display === 'none';
+        
+        if (isHidden) {
+            nutritionTableContainer.style.display = 'block';
+            toggleTableBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Sembunyikan Tabel Lengkap';
+            // Scroll halus ke tabel
+            setTimeout(() => {
+                nutritionTableContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        } else {
+            nutritionTableContainer.style.display = 'none';
+            toggleTableBtn.innerHTML = '<i class="fas fa-chevron-down"></i> Tampilkan Tabel Lengkap';
+        }
+    });
+}
+			
             document.querySelector('.start-button').addEventListener('click', function() {
                 alert('Pertarungan dimulai! Mari kita bandingkan telur ayam dan bebek!');
                 // Scroll ke section perbandingan
