@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telur Ayam vs Bebek - Duel Nutrisi & Rasa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 30px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .gemini-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4285f4;
+        }
+
+        .title-container {
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .main-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #202124;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #5f6368;
+        }
+
+        .chat-icon {
+            font-size: 20px;
+            color: #25D366;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .hero-section {
+            background-color: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 36px;
+            font-weight: 800;
+            color: #202124;
+            margin-bottom: 10px;
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+            color: #5f6368;
+            margin-bottom: 25px;
+        }
+
+        .start-button {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            padding: 12px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .start-button:hover {
+            background-color: #3367d6;
+        }
+
+        .comparison-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .comparison-card {
+            background-color: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #202124;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chicken-icon {
+            color: #FF9800;
+        }
+
+        .duck-icon {
+            color: #8BC34A;
+        }
+
+        .feature-list {
+            list-style-type: none;
+        }
+
+        .feature-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .feature-label {
+            font-weight: 600;
+            color: #5f6368;
+        }
+
+        .feature-value {
+            font-weight: 700;
+            color: #202124;
+        }
+
+        .highlight {
+            color: #4285f4;
+            font-weight: 800;
+        }
+
+        .nutrition-section {
+            background-color: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .nutrition-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-btn {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background-color: #f8f9fa;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .toggle-btn.active {
+            background-color: #4285f4;
+            color: white;
+            border-color: #4285f4;
+        }
+
+        .nutrition-comparison {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+
+        .nutrition-item {
+            flex: 1;
+            padding: 0 15px;
+        }
+
+        .nutrition-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #202124;
+            margin-bottom: 5px;
+        }
+
+        .nutrition-label {
+            font-size: 14px;
+            color: #5f6368;
+        }
+
+        .warning-note {
+            background-color: #FFF3CD;
+            border-left: 4px solid #FFC107;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .menu-section {
+            background-color: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .menu-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #202124;
+            margin-bottom: 20px;
+        }
+
+        .menu-options {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .menu-option {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+            padding: 15px;
+            border-radius: 12px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .menu-option:hover {
+            background-color: #e8f0fe;
+        }
+
+        .menu-option.active {
+            background-color: #e8f0fe;
+            border-color: #4285f4;
+        }
+
+        .option-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #5f6368;
+        }
+
+        .option-title {
+            font-weight: 600;
+            color: #202124;
+        }
+
+        .content-display {
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            min-height: 250px;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        .content-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #202124;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .winner-badge {
+            background-color: #34A853;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .texture-tag, .taste-tag {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+
+        .texture-tag {
+            background-color: #E8F0FE;
+            color: #4285f4;
+        }
+
+        .taste-tag {
+            background-color: #FCE8E6;
+            color: #EA4335;
+        }
+
+        /* Carousel Styles */
+        .carousel-section {
+            background-color: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-top: 20px;
+        }
+
+        .carousel-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #202124;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .carousel-container {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            position: relative;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: 400px;
+            object-fit: contain;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .carousel-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .carousel-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .carousel-btn {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+
+        .carousel-btn:hover {
+            background-color: #3367d6;
+        }
+
+        .carousel-dots {
+            display: flex;
+            gap: 10px;
+        }
+
+        .carousel-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ddd;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .carousel-dot.active {
+            background-color: #4285f4;
+        }
+
+        .carousel-timer {
+            height: 4px;
+            background-color: #4285f4;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-top: 1px solid #ddd;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #5f6368;
+        }
+
+        .footer-links a {
+            color: #5f6368;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .music-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .menu-options {
+                flex-direction: column;
+            }
+            
+            .hero-title {
+                font-size: 28px;
+            }
+            
+            .main-title {
+                font-size: 22px;
+            }
+            
+            .carousel-slide img {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-container">
+            <div class="gemini-logo">William Yap</div>
+            <div class="chat-icon"><i class="fab fa-whatsapp"></i></div>
+        </div>
+        <div class="title-container">
+            <div class="main-title">Ayam vs Bebek</div>
+            <div class="subtitle">Duel nutrisi, rasa, dan kuliner. Mana yang sebenarnya juara di dapur Anda?</div>
+        </div>
+        <div style="width: 100px;"></div>
+    </div>
+
+    <div class="container">
+        <div class="hero-section">
+            <h1 class="hero-title">Ayam vs Bebek</h1>
+            <p class="hero-subtitle">Duel nutrisi, rasa, dan kuliner. Mana yang sebenarnya juara di dapur Anda?</p>
+            <button class="start-button"><i class="fas fa-play"></i> Mulai Pertarungan</button>
+        </div>
+
+        <div class="comparison-section">
+            <div class="comparison-card">
+                <h2 class="card-title"><i class="fas fa-egg chicken-icon"></i> Telur Ayam - Si Serbaguna</h2>
+                <ul class="feature-list">
+                    <li class="feature-item">
+                        <span class="feature-label">Berat Rata-rata</span>
+                        <span class="feature-value">~50 - 60 gram</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-label">Warna Cangkang</span>
+                        <span class="feature-value">Coklat atau Putih</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-label">Kuning Telur</span>
+                        <span class="feature-value">Kuning Sedang</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-label">Rasa Putih Telur</span>
+                        <span class="feature-value">Netral & Ringan</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="comparison-card">
+                <h2 class="card-title"><i class="fas fa-egg duck-icon"></i> Telur Bebek - Si Gurih & Kaya</h2>
+                <ul class="feature-list">
+                    <li class="feature-item">
+                        <span class="feature-label">Berat Rata-rata</span>
+                        <span class="feature-value highlight">~70 - 80 gram (+50% Besar!)</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-label">Warna Cangkang</span>
+                        <span class="feature-value">Biru Kehijauan / Putih</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-label">Kuning Telur</span>
+                        <span class="feature-value highlight">Oranye Kemerahan (Besar)</span>
+                    </li>
+                    <li class="feature-item">
+                        <span class="feature-label">Rasa Putih Telur</span>
+                        <span class="feature-value highlight">Kenyal & Lebih Padat</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="nutrition-section">
+            <h2 class="card-title"><i class="fas fa-chart-bar"></i> Adu Nutrisi</h2>
+            <p>Data mana yang ingin Anda lihat?</p>
+            
+            <div class="nutrition-toggle">
+                <button class="toggle-btn active" id="per100">Per 100 Gram</button>
+                <button class="toggle-btn" id="perButir">Per Butir (Estimasi)</button>
+            </div>
+            
+            <div class="nutrition-comparison">
+                <div class="nutrition-item">
+                    <div class="nutrition-value">143</div>
+                    <div class="nutrition-label">Kalori</div>
+                    <div class="nutrition-label">Telur Ayam</div>
+                </div>
+                <div class="nutrition-item">
+                    <div class="nutrition-value">185</div>
+                    <div class="nutrition-label">Kolesterol (mg)</div>
+                    <div class="nutrition-label">Telur Ayam</div>
+                </div>
+                <div class="nutrition-item">
+                    <div class="nutrition-value">185</div>
+                    <div class="nutrition-label">Kalori</div>
+                    <div class="nutrition-label">Telur Bebek</div>
+                </div>
+                <div class="nutrition-item">
+                    <div class="nutrition-value highlight">619</div>
+                    <div class="nutrition-label">Kolesterol (mg)</div>
+                    <div class="nutrition-label">Telur Bebek</div>
+                </div>
+            </div>
+            
+            <div class="warning-note">
+                <i class="fas fa-exclamation-triangle"></i> Telur bebek mengandung kolesterol jauuuh lebih tinggi (hampir 3x lipat per butir) dibandingkan telur ayam. Hati-hati bagi penderita penyakit jantung!
+            </div>
+            
+            <p style="margin-top: 15px;"><strong>Protein & Vitamin:</strong> Telur bebek unggul di Vitamin B12, Vitamin A, dan Omega-3. Pilihan bagus untuk pembentukan otot dan energi ekstra.</p>
+        </div>
+
+        <div class="menu-section">
+            <h2 class="menu-title"><i class="fas fa-utensils"></i> Koki Memilih: Mau Masak Apa?</h2>
+            <p>Pilih masakan di bawah untuk melihat telur mana yang menang.</p>
+            
+            <div class="menu-options">
+                <div class="menu-option active" data-content="martabak">
+                    <div class="option-icon">🥞</div>
+                    <div class="option-title">Martabak Telur</div>
+                </div>
+                <div class="menu-option" data-content="asin">
+                    <div class="option-icon">🥚</div>
+                    <div class="option-title">Telur Asin</div>
+                </div>
+                <div class="menu-option" data-content="kue">
+                    <div class="option-icon">🍰</div>
+                    <div class="option-title">Kue / Baking</div>
+                </div>
+                <div class="menu-option" data-content="sarapan">
+                    <div class="option-icon">☕</div>
+                    <div class="option-title">Sarapan Harian</div>
+                </div>
+            </div>
+            
+            <div class="content-display">
+                <div id="martabak-content" class="content active">
+                    <h3 class="content-title">Martabak Telur <span class="winner-badge">PEMENANG: Telur Bebek</span></h3>
+                    <p><strong>Sang Raja Martabak</strong></p>
+                    <p>Telur bebek adalah kunci martabak yang istimewa. Kandungan lemaknya yang tinggi dan protein putih telur yang unik membuat isian martabak lebih padat, tidak mudah kempes, dan kulit luarnya lebih renyah. Rasanya pun jauh lebih gurih.</p>
+                    <div class="texture-tag">Padat & Renyah</div>
+                    <div class="taste-tag">Gurih Kuat</div>
+                    
+                    <div style="margin-top: 20px;">
+                        <h4><i class="fas fa-question-circle"></i> Kenapa Martabak pakai telur bebek?</h4>
+                        <p>Putih telur bebek lebih kental dan memiliki kadar protein albumin yang berbeda, sehingga saat dikocok dan digoreng, ia menjadi lebih kaku dan renyah. Selain itu, kuningnya yang berminyak membuat isian martabak lebih gurih dan padat (tidak kempes) dibandingkan telur ayam.</p>
+                    </div>
+                </div>
+                
+                <div id="asin-content" class="content">
+                    <h3 class="content-title">Telur Asin <span class="winner-badge">PEMENANG: Telur Bebek</span></h3>
+                    <p><strong>Juaranya Telur Asin</strong></p>
+                    <p>Cangkang telur bebek memiliki pori-pori yang lebih besar, memungkinkan larutan garam meresap sempurna. Kuning telurnya yang besar dan berminyak (masir) menciptakan sensasi lumer di mulut yang tidak bisa ditandingi telur ayam.</p>
+                    <div class="texture-tag">Masir & Berminyak</div>
+                    <div class="taste-tag">Asin Creamy</div>
+                </div>
+                
+                <div id="kue-content" class="content">
+                    <h3 class="content-title">Kue / Baking</h3>
+                    <p><strong>Beda Kue, Beda Telur</strong></p>
+                    <p>Untuk Sponge Cake atau Bolu yang ingin sangat mengembang dan kokoh, putih telur bebek sangat baik karena struktur proteinnya. Namun, baunya yang amis dan rasanya yang berat kadang kurang cocok untuk kue modern yang "delicate". Telur ayam lebih aman untuk pemula dan kue ringan.</p>
+                    <div class="texture-tag">Ayam: Lembut / Bebek: Kokoh</div>
+                    <div class="taste-tag">Ayam: Netral / Bebek: Amis</div>
+                </div>
+                
+                <div id="sarapan-content" class="content">
+                    <h3 class="content-title">Sarapan Harian <span class="winner-badge">PEMENANG: Telur Ayam</span></h3>
+                    <p><strong>Juara Harian</strong></p>
+                    <p>Untuk sarapan sehari-hari seperti telur ceplok atau dadar ringan, telur ayam adalah pilihan terbaik. Rasanya tidak 'mahal' (terlalu berat), lebih rendah kolesterol, dan cocok dengan lidah kebanyakan orang untuk konsumsi rutin.</p>
+                    <div class="texture-tag">Lembut & Ringan</div>
+                    <div class="taste-tag">Netral & Familiar</div>
+                </div>
+            </div>
+            
+            <!-- Gambar untuk konten Martabak -->
+            <div id="martabak-image" class="content-image">
+                <img src="ayamvsbebek2.jpg" alt="Martabak Telur" style="width: 100%; border-radius: 8px; margin-top: 15px;">
+            </div>
+        </div>
+
+        <!-- Carousel/Slideshow Section -->
+        <div class="carousel-section">
+            <h2 class="carousel-title">Galeri Perbandingan Telur Ayam vs Bebek</h2>
+            
+            <div class="carousel-container">
+                <div class="carousel-track" id="carouselTrack">
+                    <!-- Slide 1 -->
+                    <div class="carousel-slide">
+                        <img src="ayamvsbebek.jpg" alt="Perbandingan Telur Ayam vs Bebek">
+                        <div class="carousel-caption">Perbandingan visual telur ayam dan bebek</div>
+                    </div>
+                    <!-- Slide 2 -->
+                    <div class="carousel-slide">
+                        <img src="bebekvsayam.jpg" alt="Bebek vs Ayam">
+                        <div class="carousel-caption">Telur bebek vs telur ayam - perbedaan ukuran dan warna</div>
+                    </div>
+                    <!-- Slide 3 -->
+                    <div class="carousel-slide">
+                        <img src="ayamvsbebek3.jpg" alt="Infografis Ayam vs Bebek">
+                        <div class="carousel-caption">Infografis lengkap perbandingan telur</div>
+                    </div>
+                    <!-- Slide 4 -->
+                    <div class="carousel-slide">
+                        <img src="ayamvsbebek4.jpg" alt="Detail Perbandingan">
+                        <div class="carousel-caption">Detail perbandingan nutrisi dan karakteristik</div>
+                    </div>
+                    <!-- Slide 5 -->
+                    <div class="carousel-slide">
+                        <img src="ayamvsbebek5.jpg" alt="Kelebihan Masing-masing">
+                        <div class="carousel-caption">Kelebihan masing-masing jenis telur</div>
+                    </div>
+                    <!-- Slide 6 -->
+                    <div class="carousel-slide">
+                        <img src="ayamvsbebek6.jpg" alt="Kesimpulan">
+                        <div class="carousel-caption">Kesimpulan perbandingan telur ayam dan bebek</div>
+                    </div>
+                </div>
+                
+                <div class="carousel-timer" id="carouselTimer"></div>
+            </div>
+            
+            <div class="carousel-controls">
+                <button class="carousel-btn" id="prevBtn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                
+                <div class="carousel-dots" id="carouselDots">
+                    <!-- Dots akan di-generate oleh JavaScript -->
+                </div>
+                
+                <button class="carousel-btn" id="nextBtn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <div style="text-align: center; margin-top: 15px;">
+                <button id="playPauseBtn" class="start-button" style="padding: 8px 16px; font-size: 14px;">
+                    <i class="fas fa-pause"></i> Jeda Auto-slide
+                </button>
+                <p style="font-size: 14px; color: #5f6368; margin-top: 10px;">
+                    <i class="fas fa-info-circle"></i> Gambar akan berganti otomatis setiap 8 detik. Klik tombol untuk navigasi manual.
+                </p>
+            </div>
+        </div>
+        
+        <div class="nutrition-section">
+            <h2 class="card-title"><i class="fas fa-lightbulb"></i> Kesimpulan Cepat</h2>
+            <p><strong>Mana yang lebih enak?</strong></p>
+            <p>Tergantung selera! Telur bebek punya rasa "creamy" dan gurih yang jauh lebih kuat (rich) karena kandungan lemaknya yang tinggi. Telur ayam rasanya lebih ringan dan netral. Kalau Anda suka rasa yang nendang dan berani, pilih bebek. Kalau suka yang lembut dan tidak mendominasi, pilih ayam.</p>
+            
+            <div class="warning-note" style="margin-top: 20px;">
+                <i class="fas fa-heartbeat"></i> <strong>Apakah telur bebek aman untuk kolesterol tinggi?</strong> Sebaiknya dibatasi. Satu butir telur bebek bisa mengandung lebih dari 600mg kolesterol, yang mana itu dua kali lipat batas harian yang disarankan untuk orang sehat (300mg). Telur ayam "hanya" mengandung sekitar 185mg. Jika Anda punya riwayat kolesterol, telur ayam (atau hanya putih telurnya) adalah pilihan yang lebih aman.
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <div class="footer-links">
+            <a href="#">William Yap</a>
+            <a href="#">Secara ilmiah</a>
+        </div>
+        <div class="music-section">
+            <i class="fas fa-music"></i>
+            <span>My Music</span>
+        </div>
+        <div>© 12/2025</div>
+    </div>
+
+    <script>
+        // Fungsi untuk toggle menu
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fungsi untuk menu interaktif
+            const menuOptions = document.querySelectorAll('.menu-option');
+            const contentDivs = document.querySelectorAll('.content');
+            
+            menuOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Hapus kelas active dari semua opsi menu
+                    menuOptions.forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    
+                    // Tambah kelas active ke opsi yang diklik
+                    this.classList.add('active');
+                    
+                    // Sembunyikan semua konten
+                    contentDivs.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Tampilkan konten yang sesuai
+                    const contentId = this.getAttribute('data-content') + '-content';
+                    const targetContent = document.getElementById(contentId);
+                    if (targetContent) {
+                        targetContent.classList.add('active');
+                    }
+                });
+            });
+            
+            // Fungsi untuk toggle nutrisi
+            const per100Btn = document.getElementById('per100');
+            const perButirBtn = document.getElementById('perButir');
+            const nutritionValues = document.querySelectorAll('.nutrition-item .nutrition-value');
+            
+            per100Btn.addEventListener('click', function() {
+                per100Btn.classList.add('active');
+                perButirBtn.classList.remove('active');
+                
+                // Update nilai nutrisi untuk per 100 gram
+                if (nutritionValues.length >= 4) {
+                    nutritionValues[0].textContent = '143';
+                    nutritionValues[1].textContent = '372';
+                    nutritionValues[2].textContent = '185';
+                    nutritionValues[3].textContent = '619';
+                }
+            });
+            
+            perButirBtn.addEventListener('click', function() {
+                perButirBtn.classList.add('active');
+                per100Btn.classList.remove('active');
+                
+                // Update nilai nutrisi untuk per butir
+                if (nutritionValues.length >= 4) {
+                    nutritionValues[0].textContent = '72';
+                    nutritionValues[1].textContent = '186';
+                    nutritionValues[2].textContent = '130';
+                    nutritionValues[3].textContent = '619';
+                }
+            });
+            
+            // Fungsi untuk tombol mulai
+            document.querySelector('.start-button').addEventListener('click', function() {
+                alert('Pertarungan dimulai! Mari kita bandingkan telur ayam dan bebek!');
+                // Scroll ke section perbandingan
+                document.querySelector('.comparison-section').scrollIntoView({ behavior: 'smooth' });
+            });
+
+            // Carousel/Slideshow Functionality
+            const carouselTrack = document.getElementById('carouselTrack');
+            const slides = document.querySelectorAll('.carousel-slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const carouselDots = document.getElementById('carouselDots');
+            const carouselTimer = document.getElementById('carouselTimer');
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            
+            let currentSlide = 0;
+            let slideInterval;
+            const slideDuration = 8000; // 8 detik per slide
+            let isPlaying = true;
+            
+            // Create dots
+            slides.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.classList.add('carousel-dot');
+                if (index === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => goToSlide(index));
+                carouselDots.appendChild(dot);
+            });
+            
+            // Update dots
+            function updateDots() {
+                const dots = document.querySelectorAll('.carousel-dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentSlide);
+                });
+            }
+            
+            // Go to specific slide
+            function goToSlide(slideIndex) {
+                currentSlide = slideIndex;
+                carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+                updateDots();
+                resetTimer();
+            }
+            
+            // Next slide
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % slides.length;
+                goToSlide(currentSlide);
+            }
+            
+            // Previous slide
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+                goToSlide(currentSlide);
+            }
+            
+            // Reset timer
+            function resetTimer() {
+                carouselTimer.style.width = '0%';
+                if (isPlaying) {
+                    clearInterval(slideInterval);
+                    startTimer();
+                }
+            }
+            
+            // Start timer for auto-slide
+            function startTimer() {
+                let startTime = Date.now();
+                carouselTimer.style.width = '0%';
+                
+                slideInterval = setInterval(() => {
+                    const elapsedTime = Date.now() - startTime;
+                    const progress = (elapsedTime / slideDuration) * 100;
+                    
+                    if (progress >= 100) {
+                        nextSlide();
+                        startTime = Date.now();
+                        carouselTimer.style.width = '0%';
+                    } else {
+                        carouselTimer.style.width = `${progress}%`;
+                    }
+                }, 100);
+            }
+            
+            // Toggle play/pause
+            function togglePlayPause() {
+                isPlaying = !isPlaying;
+                if (isPlaying) {
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i> Jeda Auto-slide';
+                    startTimer();
+                } else {
+                    playPauseBtn.innerHTML = '<i class="fas fa-play"></i> Mulai Auto-slide';
+                    clearInterval(slideInterval);
+                    carouselTimer.style.width = '0%';
+                }
+            }
+            
+            // Event listeners for carousel
+            prevBtn.addEventListener('click', () => {
+                prevSlide();
+                if (!isPlaying) {
+                    togglePlayPause();
+                }
+            });
+            
+            nextBtn.addEventListener('click', () => {
+                nextSlide();
+                if (!isPlaying) {
+                    togglePlayPause();
+                }
+            });
+            
+            playPauseBtn.addEventListener('click', togglePlayPause);
+            
+            // Start the carousel
+            startTimer();
+        });
+    </script>
+</body>
+</html>
