@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DNS Blocklists Collection</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      color: #333;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: linear-gradient(to right, #284e3f, #356854);
+      color: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+    
+    .subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .stat-box {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+    
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      margin-bottom: 30px;
+      background: white;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+    
+    thead {
+      background: linear-gradient(to right, #284e3f, #356854);
+      color: white;
+    }
+    
+    th {
+      padding: 18px 15px;
+      text-align: left;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    
+    th i {
+      margin-right: 8px;
+    }
+    
+    tbody tr {
+      border-bottom: 1px solid #e1e5e9;
+      transition: all 0.3s ease;
+    }
+    
+    tbody tr:hover {
+      background-color: #f8f9fa;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    td {
+      padding: 16px 15px;
+      vertical-align: top;
+    }
+    
+    .no-column {
+      width: 60px;
+      text-align: center;
+      font-weight: 700;
+      color: #284e3f;
+      font-size: 1.1rem;
+    }
+    
+    .link-column a {
+      color: #2c7be5;
+      text-decoration: none;
+      word-break: break-all;
+      display: inline-block;
+      padding: 5px 0;
+      transition: color 0.2s;
+    }
+    
+    .link-column a:hover {
+      color: #1a5bb8;
+      text-decoration: underline;
+    }
+    
+    .link-column i {
+      margin-right: 6px;
+      color: #356854;
+    }
+    
+    .name-column {
+      font-weight: 600;
+      color: #2d3748;
+    }
+    
+    .focus-column {
+      background-color: #f0f9ff;
+      border-left: 4px solid #4299e1;
+      padding-left: 12px;
+    }
+    
+    /* Warna berbeda untuk baris ganjil dan genap */
+    tbody tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+    
+    tbody tr:nth-child(odd) {
+      background-color: white;
+    }
+    
+    /* Warna khusus untuk beberapa baris tertentu */
+    tbody tr:nth-child(3n+1):hover {
+      background-color: #f0fff4;
+    }
+    
+    tbody tr:nth-child(3n+2):hover {
+      background-color: #fffaf0;
+    }
+    
+    tbody tr:nth-child(3n+3):hover {
+      background-color: #f0f9ff;
+    }
+    
+    .mobile-warning {
+      display: none;
+      background-color: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+    
+    .mobile-warning i {
+      margin-right: 10px;
+      color: #856404;
+    }
+    
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+      color: #666;
+      font-size: 0.9rem;
+      border-top: 1px solid #e1e5e9;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 992px) {
+      h1 {
+        font-size: 2rem;
+      }
+      
+      th, td {
+        padding: 14px 12px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .mobile-warning {
+        display: flex;
+        align-items: center;
+      }
+      
+      body {
+        padding: 15px;
+      }
+      
+      h1 {
+        font-size: 1.8rem;
+      }
+      
+      .subtitle {
+        font-size: 1rem;
+      }
+      
+      .stats {
+        gap: 10px;
+      }
+      
+      .stat-box {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      h1 {
+        font-size: 1.6rem;
+      }
+      
+      th {
+        font-size: 1rem;
+        padding: 12px 10px;
+      }
+      
+      td {
+        padding: 12px 10px;
+        font-size: 0.95rem;
+      }
+      
+      .no-column {
+        width: 50px;
+        font-size: 1rem;
+      }
+    }
+    
+    .tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+    
+    .tag-ads { background-color: #e3f2fd; color: #1565c0; }
+    .tag-malware { background-color: #ffebee; color: #c62828; }
+    .tag-privacy { background-color: #f3e5f5; color: #7b1fa2; }
+    .tag-phishing { background-color: #fff3e0; color: #ef6c00; }
+    .tag-tracking { background-color: #e8f5e8; color: #2e7d32; }
+    .tag-mobile { background-color: #fce4ec; color: #ad1457; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-shield-alt"></i> DNS Blocklists Collection</h1>
+      <p class="subtitle">Koleksi lengkap daftar blokir untuk iklan, pelacak, malware, dan ancaman keamanan lainnya. Cocok untuk Pi-hole, AdGuard, dan DNS filter lainnya.</p>
+      
+      <div class="stats">
+        <div class="stat-box"><i class="fas fa-list-ol"></i> 31 Daftar Blocklist</div>
+        <div class="stat-box"><i class="fas fa-mobile-alt"></i> Responsif di Semua Perangkat</div>
+        <div class="stat-box"><i class="fas fa-palette"></i> Tampilan Berwarna-warni</div>
+      </div>
+    </header>
+    
+    <div class="mobile-warning">
+      <i class="fas fa-mobile-alt fa-2x"></i>
+      <div>Geser tabel ke kanan/kiri untuk melihat semua kolom pada perangkat mobile.</div>
+    </div>
+    
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th><i class="fas fa-hashtag"></i> No.</th>
+            <th><i class="fas fa-link"></i> Full Link</th>
+            <th><i class="fas fa-tag"></i> Nama List</th>
+            <th><i class="fas fa-bullseye"></i> Fokus Utama</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="no-column">1</td>
+            <td class="link-column">
+              <a href="https://badmojr.gitlab.io/1hosts/Lite/domains.wildcards" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://badmojr.gitlab.io/1hosts/Lite/domains.wildcards
+              </a>
+            </td>
+            <td class="name-column">1Host Light</td>
+            <td class="focus-column">
+              <span class="tag tag-ads">Iklan</span>
+              <span class="tag tag-tracking">Pelacak</span>
+              <span class="tag tag-malware">Malware</span>
+              <span class="tag tag-privacy">Telemetry</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">2</td>
+            <td class="link-column">
+              <a href="https://raw.githubusercontent.com/ABPindo/indonesianadblockrules/master/subscriptions/domain.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://raw.githubusercontent.com/ABPindo/indonesianadblockrules/master/subscriptions/domain.txt
+              </a>
+            </td>
+            <td class="name-column">ABPindo</td>
+            <td class="focus-column">
+              <span class="tag tag-ads">Filter Iklan Indonesia</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">3</td>
+            <td class="link-column">
+              <a href="https://abpvn.com/android/abpvn.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://abpvn.com/android/abpvn.txt
+              </a>
+            </td>
+            <td class="name-column">ABPVN</td>
+            <td class="focus-column">
+              <span class="tag tag-ads">Filter Iklan Vietnam</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">4</td>
+            <td class="link-column">
+              <a href="https://adaway.org/hosts.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://adaway.org/hosts.txt
+              </a>
+            </td>
+            <td class="name-column">AdAway</td>
+            <td class="focus-column">
+              <span class="tag tag-ads">Blokir Iklan Android</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">5</td>
+            <td class="link-column">
+              <a href="https://phishing.army/download/phishing_army_blocklist_extended.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://phishing.army/download/phishing_army_blocklist_extended.txt
+              </a>
+            </td>
+            <td class="name-column">Phishing.army</td>
+            <td class="focus-column">
+              <span class="tag tag-phishing">Phishing/Penipuan</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">6</td>
+            <td class="link-column">
+              <a href="https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-hosts.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-hosts.txt
+              </a>
+            </td>
+            <td class="name-column">AWAvenue</td>
+            <td class="focus-column">
+              <span class="tag tag-ads">Iklan & Pelacak Aplikasi</span>
+              <span class="tag tag-tracking">Asia-fokus</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">7</td>
+            <td class="link-column">
+              <a href="https://blocklistproject.github.io/Lists/alt-version/ads-nl.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://blocklistproject.github.io/Lists/alt-version/ads-nl.txt
+              </a>
+            </td>
+            <td class="name-column">Blocklist Project (Ads)</td>
+            <td class="focus-column">
+              <span class="tag tag-ads">Iklan & Server Promosi</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">8</td>
+            <td class="link-column">
+              <a href="https://blocklistproject.github.io/Lists/alt-version/tracking-nl.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://blocklistproject.github.io/Lists/alt-version/tracking-nl.txt
+              </a>
+            </td>
+            <td class="name-column">Blocklist Project (Track)</td>
+            <td class="focus-column">
+              <span class="tag tag-tracking">Pelacakan & Telemetri</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">9</td>
+            <td class="link-column">
+              <a href="https://raw.githubusercontent.com/bongochong/CombinedPrivacyBlockLists/master/NoFormatting/cpbl-wildcard-blacklist.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://raw.githubusercontent.com/bongochong/CombinedPrivacyBlockLists/master/NoFormatting/cpbl-wildcard-blacklist.txt
+              </a>
+            </td>
+            <td class="name-column">CPBL Wildcard</td>
+            <td class="focus-column">
+              <span class="tag tag-privacy">Gabungan List Privasi</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">10</td>
+            <td class="link-column">
+              <a href="https://someonewhocares.org/hosts/hosts" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://someonewhocares.org/hosts/hosts
+              </a>
+            </td>
+            <td class="name-column">Dan Pollock's</td>
+            <td class="focus-column">
+              <span class="tag tag-ads">Iklan Legendaris</span>
+              <span class="tag tag-malware">Spyware</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">11</td>
+            <td class="link-column">
+              <a href="https://www.github.developerdan.com/hosts/lists/ads-and-tracking-extended.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://www.github.developerdan.com/hosts/lists/ads-and-tracking-extended.txt
+              </a>
+            </td>
+            <td class="name-column">Developer Dan</td>
+            <td class="focus-column">
+              <span class="tag tag-ads">Iklan Modern</span>
+              <span class="tag tag-tracking">Pelacakan</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">12</td>
+            <td class="link-column">
+              <a href="https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/heads/main/wildcard/doh.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/heads/main/wildcard/doh.txt
+              </a>
+            </td>
+            <td class="name-column">HaGeZi DoH</td>
+            <td class="focus-column">
+              <span class="tag tag-privacy">Blokir Bypass DNS</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">13</td>
+            <td class="link-column">
+              <a href="https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling/hosts" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling/hosts
+              </a>
+            </td>
+            <td class="name-column">StevenBlack</td>
+            <td class="focus-column">
+              <span class="tag tag-ads">Iklan</span>
+              <span class="tag tag-malware">Malware</span>
+              <span class="tag tag-privacy">Berita Bohong</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">14</td>
+            <td class="link-column">
+              <a href="https://raw.githubusercontent.com/jerryn70/GoodbyeAds/master/Extension/GoodbyeAds-YouTube-AdBlock.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://raw.githubusercontent.com/jerryn70/GoodbyeAds/master/Extension/GoodbyeAds-YouTube-AdBlock.txt
+              </a>
+            </td>
+            <td class="name-column">GoodbyeAds YT</td>
+            <td class="focus-column">
+              <span class="tag tag-ads">Iklan YouTube</span>
+              <span class="tag tag-tracking">Pelacak YouTube</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">15</td>
+            <td class="link-column">
+              <a href="https://raw.githubusercontent.com/jerryn70/GoodbyeAds/master/Hosts/GoodbyeAds.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://raw.githubusercontent.com/jerryn70/GoodbyeAds/master/Hosts/GoodbyeAds.txt
+              </a>
+            </td>
+            <td class="name-column">GoodbyeAds Mobile</td>
+            <td class="focus-column">
+              <span class="tag tag-mobile">Aplikasi Smartphone</span>
+              <span class="tag tag-ads">Iklan Mobile</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">16</td>
+            <td class="link-column">
+              <a href="https://hblock.molinero.dev/hosts_domains.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://hblock.molinero.dev/hosts_domains.txt
+              </a>
+            </td>
+            <td class="name-column">hBlock</td>
+            <td class="focus-column">
+              <span class="tag tag-ads">Iklan</span>
+              <span class="tag tag-tracking">Pelacak</span>
+              <span class="tag tag-malware">Malware</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">17</td>
+            <td class="link-column">
+              <a href="https://raw.githubusercontent.com/williamyaps/property/refs/heads/master/mobile/ip_clean.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://raw.githubusercontent.com/williamyaps/property/refs/heads/master/mobile/ip_clean.txt
+              </a>
+            </td>
+            <td class="name-column">William Yap IP Clean</td>
+            <td class="focus-column">
+              <span class="tag tag-malware">IP Berbahaya</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">18</td>
+            <td class="link-column">
+              <a href="https://blocklistproject.github.io/Lists/alt-version/malware-nl.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://blocklistproject.github.io/Lists/alt-version/malware-nl.txt
+              </a>
+            </td>
+            <td class="name-column">Blocklist Project (Malware)</td>
+            <td class="focus-column">
+              <span class="tag tag-malware">Virus, Trojan, Ransomware</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">19</td>
+            <td class="link-column">
+              <a href="https://raw.githubusercontent.com/tim-hub/tiny-cn-blocklist-replenish/master/common.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://raw.githubusercontent.com/tim-hub/tiny-cn-blocklist-replenish/master/common.txt
+              </a>
+            </td>
+            <td class="name-column">Tiny-CN</td>
+            <td class="focus-column">
+              <span class="tag tag-tracking">Pelacak Aplikasi Tiongkok</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">20</td>
+            <td class="link-column">
+              <a href="https://raw.githubusercontent.com/r-a-y/mobile-hosts/master/AdguardMobileSpyware.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://raw.githubusercontent.com/r-a-y/mobile-hosts/master/AdguardMobileSpyware.txt
+              </a>
+            </td>
+            <td class="name-column">AdGuard Spyware</td>
+            <td class="focus-column">
+              <span class="tag tag-mobile">Spyware Mobile</span>
+              <span class="tag tag-privacy">Stalkerware</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">21</td>
+            <td class="link-column">
+              <a href="https://gitlab.com/quidsup/notrack-blocklists/-/raw/master/malware.list" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://gitlab.com/quidsup/notrack-blocklists/-/raw/master/malware.list
+              </a>
+            </td>
+            <td class="name-column">NoTrack Malware</td>
+            <td class="focus-column">
+              <span class="tag tag-malware">Malware Manual</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">22</td>
+            <td class="link-column">
+              <a href="https://gitlab.com/quidsup/notrack-annoyance-blocklist/-/raw/master/annoyance.list" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://gitlab.com/quidsup/notrack-annoyance-blocklist/-/raw/master/annoyance.list
+              </a>
+            </td>
+            <td class="name-column">NoTrack Annoyance</td>
+            <td class="focus-column">
+              <span class="tag tag-privacy">Cookie Banner</span>
+              <span class="tag tag-privacy">Popups</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">23</td>
+            <td class="link-column">
+              <a href="https://raw.githubusercontent.com/notracking/hosts-blocklists/master/hostnames.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://raw.githubusercontent.com/notracking/hosts-blocklists/master/hostnames.txt
+              </a>
+            </td>
+            <td class="name-column">NoTracking</td>
+            <td class="focus-column">
+              <span class="tag tag-privacy">Privasi & Pelacakan Web</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">24</td>
+            <td class="link-column">
+              <a href="https://big.oisd.nl/domainswild" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://big.oisd.nl/domainswild
+              </a>
+            </td>
+            <td class="name-column">OISD Big</td>
+            <td class="focus-column">
+              <span class="tag tag-privacy">Komprehensif & Stabil</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">25</td>
+            <td class="link-column">
+              <a href="https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&amp;showintro=0&amp;mimetype=plaintext
+              </a>
+            </td>
+            <td class="name-column">Peter Lowe's</td>
+            <td class="focus-column">
+              <span class="tag tag-ads">Iklan</span>
+              <span class="tag tag-tracking">Pelacak</span>
+              <span class="tag tag-malware">Malware</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">26</td>
+            <td class="link-column">
+              <a href="https://raw.githubusercontent.com/Spam404/lists/master/main-blacklist.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://raw.githubusercontent.com/Spam404/lists/master/main-blacklist.txt
+              </a>
+            </td>
+            <td class="name-column">Spam404</td>
+            <td class="focus-column">
+              <span class="tag tag-phishing">Spam & Penipuan</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">27</td>
+            <td class="link-column">
+              <a href="https://raw.githubusercontent.com/mike-trewartha/Pi-hole-Talos-Threat-Blocklist/refs/heads/main/talos-threats.list" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://raw.githubusercontent.com/mike-trewartha/Pi-hole-Talos-Threat-Blocklist/refs/heads/main/talos-threats.list
+              </a>
+            </td>
+            <td class="name-column">Cisco Talos</td>
+            <td class="focus-column">
+              <span class="tag tag-malware">Ancaman Keamanan</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">28</td>
+            <td class="link-column">
+              <a href="https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/tif-onlydomains.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/tif-onlydomains.txt
+              </a>
+            </td>
+            <td class="name-column">HaGeZi TIF</td>
+            <td class="focus-column">
+              <span class="tag tag-malware">Botnet, Ransomware, APT</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">29</td>
+            <td class="link-column">
+              <a href="https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/ultimate-onlydomains.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/ultimate-onlydomains.txt
+              </a>
+            </td>
+            <td class="name-column">HaGeZi Ultimate</td>
+            <td class="focus-column">
+              <span class="tag tag-privacy">Sapu Jagat Privasi</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">30</td>
+            <td class="link-column">
+              <a href="https://urlhaus.abuse.ch/downloads/hostfile/" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://urlhaus.abuse.ch/downloads/hostfile/
+              </a>
+            </td>
+            <td class="name-column">URLHaus</td>
+            <td class="focus-column">
+              <span class="tag tag-malware">Malware Real-time</span>
+            </td>
+          </tr>
+          <tr>
+            <td class="no-column">31</td>
+            <td class="link-column">
+              <a href="https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/heads/main/wildcard/native.vivo.txt" target="_blank">
+                <i class="fas fa-external-link-alt"></i>https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/heads/main/wildcard/native.vivo.txt
+              </a>
+            </td>
+            <td class="name-column">HaGeZi Native Vivo</td>
+            <td class="focus-column">
+              <span class="tag tag-mobile">Telemetri HP Vivo</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <footer>
+      <p><i class="fas fa-code"></i> DNS Blocklists Collection | Tampilan responsif & berwarna-warni</p>
+      <p>Didesain untuk tampil optimal di desktop dan perangkat mobile</p>
+    </footer>
+  </div>
+  
+  <script>
+    // Tambahkan efek hover yang lebih smooth
+    document.addEventListener('DOMContentLoaded', function() {
+      const rows = document.querySelectorAll('tbody tr');
+      
+      rows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+          this.style.transition = 'all 0.3s ease';
+        });
+      });
+      
+      // Tambahkan warna acak untuk baris yang dihover
+      const hoverColors = ['#f0fff4', '#fffaf0', '#f0f9ff', '#f8f0ff', '#fff0f0'];
+      
+      rows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+          const randomColor = hoverColors[Math.floor(Math.random() * hoverColors.length)];
+          this.style.backgroundColor = randomColor;
+        });
+        
+        row.addEventListener('mouseleave', function() {
+          // Kembalikan ke warna asli berdasarkan posisi baris
+          const index = Array.from(rows).indexOf(this);
+          if (index % 2 === 0) {
+            this.style.backgroundColor = 'white';
+          } else {
+            this.style.backgroundColor = '#f8fafc';
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
