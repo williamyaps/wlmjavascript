@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Cleaner & Analyzer - Statistik Version</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f3f4f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        textarea {
+            width: 100%;
+            height: 250px;
+            padding: 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+        .btn {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background-color: #f9fafb;
+            color: #374151;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+        tr:hover {
+            background-color: #eff6ff;
+        }
+        .stat-card {
+            border-radius: 12px;
+            padding: 1rem;
+            border-width: 1px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="flex items-center justify-between mb-2">
+        <h1 class="text-2xl font-bold text-gray-800">Log Cleaner & Analyzer</h1>
+        <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded">ADVANCED STATISTICS</span>
+    </div>
+    <p class="text-gray-600 mb-6 border-b pb-4">Menganalisa log besar secara otomatis dengan perhitungan akumulasi data berulang dan pembersihan duplikat.</p>
+
+    <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Input Log Mentah:</label>
+        <textarea id="inputLog" placeholder="Tempelkan isi file log di sini..."></textarea>
+    </div>
+
+    <div class="flex flex-wrap gap-3 mb-6">
+        <button onclick="processLog()" class="btn bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-blue-700">
+            Proses & Analisis
+        </button>
+        <button onclick="copyToClipboard()" class="btn bg-green-600 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-green-700">
+            Salin List Unik
+        </button>
+        <button onclick="clearAll()" class="btn bg-red-100 text-red-600 px-6 py-2 rounded-lg font-semibold border border-red-200 hover:bg-red-200">
+            Hapus Semua
+        </button>
+    </div>
+
+    <div class="mb-8">
+        <label class="block text-sm font-medium text-gray-700 mb-2 text-blue-700 font-bold">✓ List Hasil Unik (Tanpa Duplikat):</label>
+        <textarea id="outputLog" readonly placeholder="List domain unik akan muncul di sini..."></textarea>
+    </div>
+
+    <!-- Bagian Laporan Lanjut -->
+    <div id="reportSection" class="hidden">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 border-t pt-6">Ringkasan Statistik Akumulasi</h2>
+        
+        <!-- Widget Statistik Row 1: Unik -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <div class="stat-card bg-green-50 border-green-200">
+                <div class="text-green-600 text-[10px] font-bold uppercase tracking-wider">Unik Sukses (✓)</div>
+                <div id="countSuccess" class="text-2xl font-black text-green-700">0</div>
+            </div>
+            <div class="stat-card bg-red-50 border-red-200">
+                <div class="text-red-600 text-[10px] font-bold uppercase tracking-wider">Unik Gagal (✗)</div>
+                <div id="countFailed" class="text-2xl font-black text-red-700">0</div>
+            </div>
+            <div class="stat-card bg-blue-50 border-blue-200">
+                <div class="text-blue-600 text-[10px] font-bold uppercase tracking-wider">Total Hasil Unik</div>
+                <div id="countTotal" class="text-2xl font-black text-blue-700">0</div>
+            </div>
+            <div class="stat-card bg-orange-50 border-orange-200">
+                <div class="text-orange-600 text-[10px] font-bold uppercase tracking-wider">Duplikat Dihapus</div>
+                <div id="countDuplicates" class="text-2xl font-black text-orange-700">0</div>
+            </div>
+        </div>
+
+        <!-- Widget Statistik Row 2: Berulang (Akumulasi) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div class="stat-card bg-white border-green-400 border-l-8">
+                <div class="text-gray-500 text-xs font-bold uppercase">Total Akumulasi Sukses (✓ Berulang)</div>
+                <div id="totalSuccessRepeated" class="text-3xl font-black text-green-600">0</div>
+                <p class="text-xs text-gray-400">Total baris mentah berstatus sukses di log.</p>
+            </div>
+            <div class="stat-card bg-white border-red-400 border-l-8">
+                <div class="text-gray-500 text-xs font-bold uppercase">Total Akumulasi Gagal (✗ Berulang)</div>
+                <div id="totalFailedRepeated" class="text-3xl font-black text-red-600">0</div>
+                <p class="text-xs text-gray-400">Total baris mentah berstatus gagal di log.</p>
+            </div>
+        </div>
+
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Detail Frekuensi Per Domain</h2>
+        <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+            <table>
+                <thead>
+                    <tr>
+                        <th width="80">Simbol</th>
+                        <th>Nama Domain</th>
+                        <th class="text-center" width="180">Muncul di Log Mentah</th>
+                    </tr>
+                </thead>
+                <tbody id="reportTableBody">
+                    <!-- Data laporan akan masuk di sini -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="statusMessage" class="mt-4 p-3 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hidden">
+        Berhasil diproses!
+    </div>
+</div>
+
+<script>
+    function processLog() {
+        const input = document.getElementById('inputLog').value;
+        if (!input.trim()) return;
+
+        let lines = input.split(/\r?\n/);
+        const statsMap = {};
+        
+        // Counter untuk domain Unik
+        let uniqueSuccess = 0;
+        let uniqueFailed = 0;
+
+        // Counter untuk Akumulasi Berulang (Baris Mentah)
+        let repeatedSuccess = 0;
+        let repeatedFailed = 0;
+        let rawLogCount = 0;
+
+        lines.forEach(line => {
+            let str = line.trim();
+
+            // Abaikan Timer (Format HH:MM:SS atau HH:MM)
+            if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(str)) return;
+            if (str === "") return;
+
+            rawLogCount++; // Hitung setiap baris yang valid (bukan timer/kosong)
+
+            // Masukkan ke map frekuensi
+            if (statsMap[str]) {
+                statsMap[str]++;
+            } else {
+                statsMap[str] = 1;
+            }
+
+            // Hitung akumulasi berulang langsung dari log mentah
+            if (str.startsWith('✓')) {
+                repeatedSuccess++;
+            } else if (str.startsWith('✗')) {
+                repeatedFailed++;
+            }
+        });
+
+        // Sortir Abjad berdasarkan domain
+        let uniqueEntries = Object.keys(statsMap).sort((a, b) => {
+            let domainA = a.replace(/^[✓✗\s   ]+/, '').toLowerCase();
+            let domainB = b.replace(/^[✓✗\s   ]+/, '').toLowerCase();
+            return domainA.localeCompare(domainB);
+        });
+
+        document.getElementById('outputLog').value = uniqueEntries.join('\n');
+
+        const tableBody = document.getElementById('reportTableBody');
+        tableBody.innerHTML = '';
+
+        uniqueEntries.forEach(entry => {
+            const count = statsMap[entry];
+            let symbol = entry.charAt(0);
+            let domainName = entry.substring(1).trim();
+
+            // Hitung statistik UNIK
+            if (symbol === '✓') {
+                uniqueSuccess++;
+            } else if (symbol === '✗') {
+                uniqueFailed++;
+            }
+
+            if (symbol !== '✓' && symbol !== '✗') {
+                symbol = '-';
+                domainName = entry;
+            }
+
+            const row = document.createElement('tr');
+            const symbolColor = symbol === '✓' ? 'text-green-600' : (symbol === '✗' ? 'text-red-600' : 'text-gray-400');
+            
+            row.innerHTML = `
+                <td class="font-bold text-xl ${symbolColor}">${symbol}</td>
+                <td class="text-gray-700 font-medium">${domainName}</td>
+                <td class="text-center">
+                    <span class="px-3 py-1 rounded-full font-bold text-blue-700 bg-blue-100 text-sm">
+                        ${count} kali
+                    </span>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+        // Hitung total duplikat yang dihapus
+        const duplicatesRemoved = rawLogCount - uniqueEntries.length;
+
+        // Update Widget Statistik Unik & Duplikat
+        document.getElementById('countSuccess').innerText = uniqueSuccess;
+        document.getElementById('countFailed').innerText = uniqueFailed;
+        document.getElementById('countTotal').innerText = uniqueEntries.length;
+        document.getElementById('countDuplicates').innerText = duplicatesRemoved.toLocaleString();
+
+        // Update Widget Statistik Akumulasi (Berulang)
+        document.getElementById('totalSuccessRepeated').innerText = repeatedSuccess.toLocaleString();
+        document.getElementById('totalFailedRepeated').innerText = repeatedFailed.toLocaleString();
+
+        document.getElementById('reportSection').classList.remove('hidden');
+        const status = document.getElementById('statusMessage');
+        status.innerText = `Analisis selesai! Membersihkan ${duplicatesRemoved} duplikat dari ${rawLogCount} baris log.`;
+        status.classList.remove('hidden');
+    }
+
+    function copyToClipboard() {
+        const output = document.getElementById('outputLog');
+        if (!output.value) return;
+        output.select();
+        document.execCommand('copy');
+        const status = document.getElementById('statusMessage');
+        status.innerText = "List unik telah disalin ke clipboard!";
+        status.classList.remove('hidden');
+    }
+
+    function clearAll() {
+        if(!confirm("Hapus semua data?")) return;
+        document.getElementById('inputLog').value = '';
+        document.getElementById('outputLog').value = '';
+        document.getElementById('reportTableBody').innerHTML = '';
+        document.getElementById('countSuccess').innerText = '0';
+        document.getElementById('countFailed').innerText = '0';
+        document.getElementById('countTotal').innerText = '0';
+        document.getElementById('countDuplicates').innerText = '0';
+        document.getElementById('totalSuccessRepeated').innerText = '0';
+        document.getElementById('totalFailedRepeated').innerText = '0';
+        document.getElementById('reportSection').classList.add('hidden');
+        document.getElementById('statusMessage').classList.add('hidden');
+    }
+</script>
+
+</body>
+</html>
