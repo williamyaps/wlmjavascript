@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalkulator Pembagian Hasil Ngamen - Tri Suaka</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: #1e1e2f;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      background: #2a2a3e;
+      color: #f0f0f0;
+      border-radius: 24px;
+      padding: 32px;
+      max-width: 720px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      font-size: 1.8rem;
+      text-align: center;
+      margin-bottom: 4px;
+      color: #f9c74f;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #ccc;
+      margin-bottom: 24px;
+    }
+    .input-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .input-field {
+      flex: 1 1 200px;
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #e0e0e0;
+    }
+    input, select {
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: none;
+      background: #3a3a50;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+      border: 1px solid #5a5a7a;
+    }
+    input:focus, select:focus {
+      border-color: #f9c74f;
+    }
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 16px 0 24px;
+      background: #3a3a50;
+      padding: 12px 16px;
+      border-radius: 12px;
+    }
+    .checkbox-group input[type="checkbox"] {
+      transform: scale(1.3);
+      margin-right: 6px;
+      accent-color: #f9c74f;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #f9c74f;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #1e1e2f;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-bottom: 24px;
+    }
+    button:hover {
+      background: #f7b32b;
+    }
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #3a3a50;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 16px;
+      font-size: 0.95rem;
+    }
+    th, td {
+      padding: 12px 10px;
+      text-align: right;
+    }
+    th {
+      background: #4a4a65;
+      color: #f9c74f;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+    }
+    td {
+      border-bottom: 1px solid #5a5a7a;
+    }
+    .role {
+      text-align: left;
+      font-weight: 600;
+      color: #f9c74f;
+    }
+    .net {
+      color: #8bc34a;
+      font-weight: 700;
+    }
+    .total-row td {
+      font-weight: 800;
+      background: #2a2a3e;
+    }
+    .note {
+      margin-top: 12px;
+      font-size: 0.85rem;
+      color: #aaa;
+      font-style: italic;
+      text-align: center;
+    }
+    .option-desc {
+      font-size: 0.8rem;
+      color: #ccc;
+      margin-top: 4px;
+    }
+    @media (max-width: 500px) {
+      .container { padding: 20px; }
+      th, td { padding: 8px 6px; font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>?? Pembagian Hasil Ngamen</h1>
+  <div class="subtitle">Tri Suaka & Tim • Anti Ribut ???</div>
+
+  <div class="input-group">
+    <div class="input-field">
+      <label>Total Pendapatan (Rp)</label>
+      <input type="number" id="totalIncome" placeholder="Contoh: 3500000" value="3500000">
+    </div>
+    <div class="input-field">
+      <label>Jumlah Kru (orang)</label>
+      <input type="number" id="crewCount" placeholder="Misal: 8" value="8" min="1">
+    </div>
+  </div>
+
+  <div class="input-field">
+    <label>Pilih Opsi Pembagian</label>
+    <select id="optionSelect">
+      <option value="A">A - Dengan Istri, Bagi Langsung (TS 50, Istri 25, Tamu 15, Kru 10)</option>
+      <option value="B">B - Dengan Istri, Kru 10% di awal, baru bagi sisa (TS 50, Istri 30, Tamu 20)</option>
+      <option value="C">C - Tanpa Istri, Bagi Langsung (TS 50, Tamu 30, Kru 20)</option>
+      <option value="D">D - Tanpa Istri, Kru 10% di awal, sisa 90% TS 50 / Tamu 50</option>
+      <option value="E">E - Tanpa Istri, Kru 20% di awal, sisa 80% TS 50 / Tamu 50</option>
+    </select>
+    <div class="option-desc" id="optionDesc">Pembagian: TS 50%, Istri 25%, Tamu 15%, Kru 10%</div>
+  </div>
+
+  <div class="checkbox-group">
+    <input type="checkbox" id="luarKotaCheck">
+    <label for="luarKotaCheck">?? Luar Kota? (Setiap orang potong 10% dari bagian untuk biaya operasional)</label>
+  </div>
+
+  <button onclick="hitungPembagian()">?? HITUNG SEKARANG</button>
+
+  <table class="result-table" id="resultTable" style="display: none;">
+    <thead>
+    <tr>
+      <th style="text-align:left;">Penerima</th>
+      <th>Bagian Kotor</th>
+      <th>Pot. Operasional</th>
+      <th class="net">Bersih</th>
+    </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  <div id="noteText" class="note" style="display: none;"></div>
+</div>
+
+<script>
+  const optionDescMap = {
+    'A': 'TS 50% • Istri 25% • Tamu 15% • Kru 10% (dibagi rata)',
+    'B': 'Potong 10% untuk Kru ? sisa 90%: TS 50%, Istri 30%, Tamu 20%',
+    'C': 'TS 50% • Tamu 30% • Kru 20% (tanpa istri)',
+    'D': 'Potong 10% untuk Kru ? sisa 90%: TS 50%, Tamu 50% (tanpa istri)',
+    'E': 'Potong 20% untuk Kru ? sisa 80%: TS 50%, Tamu 50% (tanpa istri)'
+  };
+
+  const optionSelect = document.getElementById('optionSelect');
+  const optionDescDiv = document.getElementById('optionDesc');
+  optionSelect.addEventListener('change', function() {
+    optionDescDiv.textContent = optionDescMap[this.value] || '';
+  });
+  // initial
+  optionDescDiv.textContent = optionDescMap[optionSelect.value];
+
+  function formatRupiah(angka) {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(angka);
+  }
+
+  function hitungPembagian() {
+    const total = parseFloat(document.getElementById('totalIncome').value);
+    const crewCount = parseInt(document.getElementById('crewCount').value, 10);
+    const opsi = document.getElementById('optionSelect').value;
+    const luarKota = document.getElementById('luarKotaCheck').checked;
+
+    if (isNaN(total) || total <= 0 || isNaN(crewCount) || crewCount < 1) {
+      alert('Masukkan total pendapatan dan jumlah kru yang valid, Bro!');
+      return;
+    }
+
+    // Hitung bagian kotor sesuai opsi
+    let tsGross = 0, istriGross = 0, tamuGross = 0, kruGross = 0;
+    const sisa = 0; // placeholder
+
+    switch (opsi) {
+      case 'A':
+        tsGross = total * 0.50;
+        istriGross = total * 0.25;
+        tamuGross = total * 0.15;
+        kruGross = total * 0.10;
+        break;
+      case 'B':
+        kruGross = total * 0.10;
+        const sisaB = total * 0.90;
+        tsGross = sisaB * 0.50;
+        istriGross = sisaB * 0.30;
+        tamuGross = sisaB * 0.20;
+        break;
+      case 'C':
+        tsGross = total * 0.50;
+        tamuGross = total * 0.30;
+        kruGross = total * 0.20;
+        break;
+      case 'D':
+        kruGross = total * 0.10;
+        const sisaD = total * 0.90;
+        tsGross = sisaD * 0.50;
+        tamuGross = sisaD * 0.50;
+        break;
+      case 'E':
+        kruGross = total * 0.20;
+        const sisaE = total * 0.80;
+        tsGross = sisaE * 0.50;
+        tamuGross = sisaE * 0.50;
+        break;
+      default:
+        break;
+    }
+
+    // Fungsi potong operasional
+    const potong = (nilai) => luarKota ? nilai * 0.10 : 0;
+    const bersih = (nilai) => luarKota ? nilai * 0.90 : nilai;
+
+    const tsPot = potong(tsGross);
+    const tsNet = bersih(tsGross);
+    const istriPot = istriGross > 0 ? potong(istriGross) : 0;
+    const istriNet = istriGross > 0 ? bersih(istriGross) : 0;
+    const tamuPot = potong(tamuGross);
+    const tamuNet = bersih(tamuGross);
+    const kruPot = potong(kruGross);
+    const kruNet = bersih(kruGross);
+    const perKruNet = crewCount > 0 ? kruNet / crewCount : 0;
+
+    // Total yang benar-benar diterima semua
+    const totalBersih = tsNet + istriNet + tamuNet + kruNet;
+    const totalPot = tsPot + istriPot + tamuPot + kruPot;
+
+    // Tampilkan tabel
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+
+    const tambahBaris = (nama, kotor, pot, net, isKru = false, perOrang = null) => {
+      const tr = document.createElement('tr');
+      let namaHtml = nama;
+      if (isKru && perOrang !== null) {
+        namaHtml = `${nama} <br><small style="color:#ccc;">(per orang: ${formatRupiah(perOrang)})</small>`;
+      }
+      tr.innerHTML = `
+        <td class="role">${namaHtml}</td>
+        <td>${formatRupiah(kotor)}</td>
+        <td>${luarKota ? formatRupiah(pot) : '-'}</td>
+        <td class="net">${formatRupiah(net)}</td>
+      `;
+      tbody.appendChild(tr);
+    };
+
+    tambahBaris('?? Tri Suaka', tsGross, tsPot, tsNet);
+    if (istriGross > 0) {
+      tambahBaris('?? Istri Tri Suaka', istriGross, istriPot, istriNet);
+    }
+    tambahBaris('?? Bintang Tamu', tamuGross, tamuPot, tamuNet);
+    tambahBaris(`?? Team & Kru (${crewCount} orang)`, kruGross, kruPot, kruNet, true, perKruNet);
+
+    // Baris total
+    const trTotal = document.createElement('tr');
+    trTotal.classList.add('total-row');
+    trTotal.innerHTML = `
+      <td style="text-align:left;">?? TOTAL</td>
+      <td>${formatRupiah(total)}</td>
+      <td>${luarKota ? formatRupiah(totalPot) : '-'}</td>
+      <td class="net">${formatRupiah(totalBersih)}</td>
+    `;
+    tbody.appendChild(trTotal);
+
+    document.getElementById('resultTable').style.display = 'table';
+    const note = document.getElementById('noteText');
+    note.style.display = 'block';
+    note.innerHTML = luarKota 
+      ? '?? Mode Luar Kota: potongan 10% dari bagian tiap orang digunakan untuk biaya operasional bersama.'
+      : '??? Mode Dalam Kota: tanpa potongan operasional.';
+  }
+</script>
+</body>
+</html>
