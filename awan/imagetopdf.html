@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to PDF Merger - William Yaps tools</title>
+
+    <!-- jsPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+    </script>
+
+    <style>
+        :root {
+            --bg: #0f0f1a;
+            --surface: #1a1a2e;
+            --surface2: #222240;
+            --border: #2a2a4a;
+            --accent: #6c5ce7;
+            --accent-hover: #7d6ff0;
+            --accent-glow: rgba(108, 92, 231, 0.35);
+            --text: #e0e0f0;
+            --text-secondary: #a0a0c0;
+            --danger: #e74c3c;
+            --danger-hover: #f05a4b;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-xs: 6px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
+            --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.4);
+            --font: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(108, 92, 231, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(108, 92, 231, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 20% 80%, rgba(46, 204, 113, 0.03) 0%, transparent 50%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 820px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), #a29bfe, #6c5ce7, #fd79a8);
+            border-radius: 3px 3px 0 0;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .header .icon-wrap {
+            width: 48px;
+            height: 48px;
+            background: var(--accent);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+            box-shadow: 0 8px 24px var(--accent-glow);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            line-height: 1.2;
+        }
+        .header h1 span {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: 0;
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-sm);
+            padding: 40px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--surface2);
+            position: relative;
+            overflow: hidden;
+        }
+        .upload-zone:hover,
+        .upload-zone.drag-over {
+            border-color: var(--accent);
+            background: rgba(108, 92, 231, 0.06);
+            box-shadow: 0 0 0 8px rgba(108, 92, 231, 0.04);
+        }
+        .upload-zone.drag-over {
+            border-style: solid;
+            box-shadow: 0 0 0 16px rgba(108, 92, 231, 0.07);
+            transform: scale(1.01);
+        }
+        .upload-zone .upload-icon {
+            font-size: 52px;
+            display: block;
+            margin-bottom: 12px;
+            transition: var(--transition);
+        }
+        .upload-zone.drag-over .upload-icon {
+            transform: translateY(-6px);
+            animation: bounce 0.5s ease infinite alternate;
+        }
+        @keyframes bounce {
+            from {
+                transform: translateY(-6px);
+            }
+            to {
+                transform: translateY(2px);
+            }
+        }
+        .upload-zone h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .upload-zone p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .upload-zone input[type="file"] {
+            display: none;
+        }
+
+        /* Info Bar */
+        .info-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+            padding: 12px 16px;
+            background: var(--surface2);
+            border-radius: var(--radius-xs);
+            border: 1px solid var(--border);
+            min-height: 48px;
+        }
+        .info-bar .file-count {
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .info-bar .file-count .badge {
+            background: var(--accent);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            min-width: 28px;
+            text-align: center;
+        }
+        .info-bar .badge.empty {
+            background: #555;
+        }
+        .btn-clear {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 7px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .btn-clear:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+            background: rgba(231, 76, 60, 0.06);
+        }
+
+        /* Preview Grid */
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 18px;
+            max-height: 420px;
+            overflow-y: auto;
+            padding: 4px 2px;
+            scroll-behavior: smooth;
+        }
+        .preview-grid::-webkit-scrollbar {
+            width: 5px;
+        }
+        .preview-grid::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .preview-grid::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+
+        .preview-card {
+            position: relative;
+            background: var(--surface2);
+            border-radius: var(--radius-xs);
+            border: 2px solid transparent;
+            overflow: hidden;
+            aspect-ratio: 3 / 4;
+            /* Approx A4 ratio */
+            cursor: grab;
+            transition: var(--transition);
+            group: card;
+        }
+        .preview-card:active {
+            cursor: grabbing;
+        }
+        .preview-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            transform: translateY(-3px);
+            z-index: 2;
+        }
+        .preview-card.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 8px var(--accent-glow);
+        }
+        .preview-card.drag-target {
+            border-color: var(--success);
+            box-shadow: 0 0 0 6px rgba(46, 204, 113, 0.25);
+            transform: scale(1.03);
+        }
+        .preview-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #0a0a15;
+            display: block;
+            pointer-events: none;
+        }
+        .preview-card .page-number {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 12px;
+            pointer-events: none;
+            letter-spacing: 0.3px;
+            backdrop-filter: blur(4px);
+        }
+        .preview-card .card-actions {
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: var(--transition);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 4px 6px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .preview-card:hover .card-actions {
+            opacity: 1;
+        }
+        .card-actions button {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            line-height: 1;
+        }
+        .card-actions button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+        .card-actions .btn-remove:hover {
+            background: var(--danger);
+        }
+        .card-actions .btn-move:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Action Buttons */
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 22px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            letter-spacing: -0.2px;
+            font-family: var(--font);
+        }
+        .btn:active {
+            transform: scale(0.96);
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 10px 28px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+        .btn-primary:disabled {
+            background: #555;
+            box-shadow: none;
+            cursor: not-allowed;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--text);
+        }
+        .btn-outline:hover {
+            border-color: var(--accent);
+            background: rgba(108, 92, 231, 0.06);
+        }
+        .btn-success {
+            background: var(--success);
+            color: #000;
+            font-weight: 700;
+        }
+        .btn-success:hover {
+            filter: brightness(1.1);
+            box-shadow: 0 8px 24px rgba(46, 204, 113, 0.3);
+            transform: translateY(-2px);
+        }
+        .btn-success:disabled {
+            background: #555;
+            color: #999;
+            box-shadow: none;
+            cursor: not-allowed;
+            pointer-events: none;
+            filter: none;
+        }
+        .btn .emoji {
+            font-size: 1.2em;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+        }
+        .toast {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text);
+            box-shadow: var(--shadow-md);
+            animation: slideIn 0.35s ease, fadeOut 0.4s ease 2.5s forwards;
+            pointer-events: auto;
+            max-width: 380px;
+            backdrop-filter: blur(8px);
+        }
+        .toast.success {
+            border-color: var(--success);
+            background: rgba(46, 204, 113, 0.1);
+        }
+        .toast.error {
+            border-color: var(--danger);
+            background: rgba(231, 76, 60, 0.1);
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(60%);
+            }
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+            backdrop-filter: blur(4px);
+        }
+        .loading-overlay.hidden {
+            display: none;
+        }
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .loading-overlay p {
+            color: #fff;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 14px;
+                border-radius: 12px;
+            }
+            .preview-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 8px;
+                max-height: 320px;
+            }
+            .actions {
+                flex-direction: column;
+            }
+            .btn {
+                justify-content: center;
+                width: 100%;
+            }
+            .header h1 {
+                font-size: 1.2rem;
+            }
+            .upload-zone {
+                padding: 28px 16px;
+            }
+            .upload-zone .upload-icon {
+                font-size: 38px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="icon-wrap">??</div>
+            <h1>
+                Gambar ke PDF Merger
+                <span>Upload • Susun • Gabungkan • Unduh</span>
+            </h1>
+        </div>
+
+        <!-- Upload Zone -->
+        <div class="upload-zone" id="uploadZone" title="Klik atau seret file ke sini">
+            <span class="upload-icon">???</span>
+            <h3>Upload Gambar Kamu</h3>
+            <p>Klik atau seret & lepas file JPG / PNG di sini</p>
+            <p style="font-size:0.75rem;margin-top:4px;color:#777;">Mendukung multi-file • Maks 50 file</p>
+            <input type="file" id="fileInput" accept="image/jpeg,image/png,image/jpg" multiple>
+        </div>
+
+        <!-- Info Bar -->
+        <div class="info-bar" id="infoBar">
+            <div class="file-count">
+                ?? File: <span class="badge empty" id="fileCountBadge">0</span>
+            </div>
+            <button class="btn-clear" id="btnClearAll" disabled>??? Hapus Semua</button>
+        </div>
+
+        <!-- Preview Grid -->
+        <div class="preview-grid" id="previewGrid">
+            <div style="grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--text-secondary);font-size:0.9rem;" id="emptyState">
+                Belum ada gambar. Yuk upload dulu! ??
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="actions">
+            <button class="btn btn-primary" id="btnPreview" disabled>
+                <span class="emoji">???</span> Preview PDF
+            </button>
+            <button class="btn btn-success" id="btnDownload" disabled>
+                <span class="emoji">??</span> Unduh PDF
+            </button>
+            <button class="btn btn-outline" id="btnAddMore">
+                <span class="emoji">?</span> Tambah Gambar
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p id="loadingText">Memproses PDF...</p>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        (function() {
+            // ============ DOM ELEMENTS ============
+            const uploadZone = document.getElementById('uploadZone');
+            const fileInput = document.getElementById('fileInput');
+            const previewGrid = document.getElementById('previewGrid');
+            const emptyState = document.getElementById('emptyState');
+            const fileCountBadge = document.getElementById('fileCountBadge');
+            const btnClearAll = document.getElementById('btnClearAll');
+            const btnPreview = document.getElementById('btnPreview');
+            const btnDownload = document.getElementById('btnDownload');
+            const btnAddMore = document.getElementById('btnAddMore');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
+            const toastContainer = document.getElementById('toastContainer');
+            const infoBar = document.getElementById('infoBar');
+
+            // ============ STATE ============
+            const MAX_FILES = 50;
+            let imageItems = []; // { id, file, objectURL, name }
+
+            // ============ TOAST ============
+            function showToast(message, type = '') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                toastContainer.appendChild(toast);
+                // Auto remove after animation
+                setTimeout(() => {
+                    if (toast.parentNode) toast.remove();
+                }, 3000);
+            }
+
+            // ============ LOADING ============
+            function showLoading(text = 'Memproses...') {
+                loadingText.textContent = text;
+                loadingOverlay.classList.remove('hidden');
+            }
+
+            function hideLoading() {
+                loadingOverlay.classList.add('hidden');
+            }
+
+            // ============ UPDATE UI ============
+            function updateUI() {
+                const count = imageItems.length;
+                fileCountBadge.textContent = count;
+                if (count === 0) {
+                    fileCountBadge.classList.add('empty');
+                    emptyState.style.display = 'block';
+                    btnClearAll.disabled = true;
+                    btnPreview.disabled = true;
+                    btnDownload.disabled = true;
+                } else {
+                    fileCountBadge.classList.remove('empty');
+                    emptyState.style.display = 'none';
+                    btnClearAll.disabled = false;
+                    btnPreview.disabled = false;
+                    btnDownload.disabled = false;
+                }
+            }
+
+            function renderGrid() {
+                // Clear grid except empty state
+                const cards = previewGrid.querySelectorAll('.preview-card');
+                cards.forEach(c => c.remove());
+
+                imageItems.forEach((item, index) => {
+                    const card = createPreviewCard(item, index);
+                    previewGrid.appendChild(card);
+                });
+
+                updateUI();
+            }
+
+            function createPreviewCard(item, index) {
+                const card = document.createElement('div');
+                card.className = 'preview-card';
+                card.draggable = true;
+                card.dataset.index = index;
+                card.dataset.id = item.id;
+
+                // Page number badge
+                const pageNum = document.createElement('span');
+                pageNum.className = 'page-number';
+                pageNum.textContent = `Hal ${index + 1}`;
+
+                // Image
+                const img = document.createElement('img');
+                img.src = item.objectURL;
+                img.alt = item.name;
+                img.loading = 'lazy';
+
+                // Card actions
+                const actions = document.createElement('div');
+                actions.className = 'card-actions';
+
+                const btnUp = document.createElement('button');
+                btnUp.className = 'btn-move';
+                btnUp.innerHTML = '?';
+                btnUp.title = 'Pindah ke atas';
+                btnUp.disabled = index === 0;
+                btnUp.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    moveItem(index, -1);
+                });
+
+                const btnDown = document.createElement('button');
+                btnDown.className = 'btn-move';
+                btnDown.innerHTML = '?';
+                btnDown.title = 'Pindah ke bawah';
+                btnDown.disabled = index === imageItems.length - 1;
+                btnDown.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    moveItem(index, 1);
+                });
+
+                const btnRemove = document.createElement('button');
+                btnRemove.className = 'btn-remove';
+                btnRemove.innerHTML = '?';
+                btnRemove.title = 'Hapus gambar ini';
+                btnRemove.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeItem(index);
+                });
+
+                actions.appendChild(btnUp);
+                actions.appendChild(btnDown);
+                actions.appendChild(btnRemove);
+
+                card.appendChild(pageNum);
+                card.appendChild(img);
+                card.appendChild(actions);
+
+                // Drag & Drop events
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+                card.addEventListener('dragover', handleDragOver);
+                card.addEventListener('dragenter', handleDragEnter);
+                card.addEventListener('dragleave', handleDragLeave);
+                card.addEventListener('drop', handleDrop);
+
+                return card;
+            }
+
+            // ============ DRAG & DROP (Reordering) ============
+            let draggedIndex = null;
+
+            function handleDragStart(e) {
+                draggedIndex = parseInt(this.dataset.index);
+                this.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', draggedIndex);
+                // Set drag image to semi-transparent
+                try {
+                    const img = this.querySelector('img');
+                    if (img) {
+                        const rect = img.getBoundingClientRect();
+                        e.dataTransfer.setDragImage(img, rect.width / 2, rect.height / 2);
+                    }
+                } catch (err) {
+                    // Fallback
+                }
+            }
+
+            function handleDragEnd(e) {
+                this.classList.remove('dragging');
+                // Remove all drag-target classes
+                document.querySelectorAll('.preview-card.drag-target').forEach(c => c.classList.remove(
+                    'drag-target'));
+                draggedIndex = null;
+            }
+
+            function handleDragOver(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            }
+
+            function handleDragEnter(e) {
+                e.preventDefault();
+                const targetIndex = parseInt(this.dataset.index);
+                if (targetIndex !== draggedIndex && draggedIndex !== null) {
+                    this.classList.add('drag-target');
+                }
+            }
+
+            function handleDragLeave(e) {
+                this.classList.remove('drag-target');
+            }
+
+            function handleDrop(e) {
+                e.preventDefault();
+                this.classList.remove('drag-target');
+                const targetIndex = parseInt(this.dataset.index);
+                if (draggedIndex !== null && targetIndex !== draggedIndex) {
+                    reorderItems(draggedIndex, targetIndex);
+                }
+                draggedIndex = null;
+            }
+
+            function reorderItems(fromIndex, toIndex) {
+                const item = imageItems.splice(fromIndex, 1)[0];
+                imageItems.splice(toIndex, 0, item);
+                renderGrid();
+                showToast(`Gambar dipindahkan ke halaman ${toIndex + 1}`, 'success');
+            }
+
+            function moveItem(index, direction) {
+                const newIndex = index + direction;
+                if (newIndex < 0 || newIndex >= imageItems.length) return;
+                reorderItems(index, newIndex);
+            }
+
+            function removeItem(index) {
+                const item = imageItems[index];
+                // Revoke object URL
+                URL.revokeObjectURL(item.objectURL);
+                imageItems.splice(index, 1);
+                renderGrid();
+                showToast('Gambar dihapus dari daftar');
+            }
+
+            // ============ FILE HANDLING ============
+            function addFiles(fileList) {
+                const validFiles = [];
+                const invalidFiles = [];
+
+                for (const file of fileList) {
+                    if (file.type === 'image/jpeg' || file.type === 'image/png' || file.type ===
+                        'image/jpg') {
+                        validFiles.push(file);
+                    } else {
+                        invalidFiles.push(file.name);
+                    }
+                }
+
+                if (invalidFiles.length > 0) {
+                    showToast(`? ${invalidFiles.length} file bukan JPG/PNG dan dilewati`, 'error');
+                }
+
+                const remainingSlots = MAX_FILES - imageItems.length;
+                if (validFiles.length > remainingSlots) {
+                    showToast(`?? Hanya ${remainingSlots} file yang bisa ditambahkan (maks ${MAX_FILES})`,
+                        'error');
+                    validFiles.splice(remainingSlots);
+                }
+
+                if (validFiles.length === 0) return;
+
+                validFiles.forEach(file => {
+                    const id = generateId();
+                    const objectURL = URL.createObjectURL(file);
+                    imageItems.push({
+                        id,
+                        file,
+                        objectURL,
+                        name: file.name
+                    });
+                });
+
+                renderGrid();
+                // Scroll to bottom of grid
+                previewGrid.scrollTop = previewGrid.scrollHeight;
+
+                if (validFiles.length > 0) {
+                    showToast(`? ${validFiles.length} gambar berhasil ditambahkan!`, 'success');
+                }
+            }
+
+            function generateId() {
+                return 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            }
+
+            function clearAll() {
+                if (imageItems.length === 0) return;
+                if (confirm(`Yakin ingin menghapus semua ${imageItems.length} gambar?`)) {
+                    // Revoke all object URLs
+                    imageItems.forEach(item => URL.revokeObjectURL(item.objectURL));
+                    imageItems = [];
+                    renderGrid();
+                    showToast('Semua gambar dihapus');
+                }
+            }
+
+            // ============ PDF GENERATION ============
+            async function generatePDFBlob() {
+                if (imageItems.length === 0) {
+                    throw new Error('Tidak ada gambar untuk digabungkan');
+                }
+
+                // Use jsPDF
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4',
+                });
+
+                const pageWidth = 210; // A4 width in mm
+                const pageHeight = 297; // A4 height in mm
+                const margin = 10; // margin in mm
+                const maxWidth = pageWidth - margin * 2;
+                const maxHeight = pageHeight - margin * 2;
+
+                for (let i = 0; i < imageItems.length; i++) {
+                    const item = imageItems[i];
+
+                    // Load image to get dimensions
+                    const img = await loadImage(item.objectURL);
+                    const imgWidth = img.naturalWidth;
+                    const imgHeight = img.naturalHeight;
+
+                    // Calculate scaling to fit within margins
+                    let drawWidth = maxWidth;
+                    let drawHeight = (imgHeight / imgWidth) * drawWidth;
+
+                    if (drawHeight > maxHeight) {
+                        // Scale down further to fit height
+                        drawHeight = maxHeight;
+                        drawWidth = (imgWidth / imgHeight) * drawHeight;
+                    }
+
+                    // Center on page
+                    const x = (pageWidth - drawWidth) / 2;
+                    const y = (pageHeight - drawHeight) / 2;
+
+                    // Add new page if not first
+                    if (i > 0) {
+                        doc.addPage();
+                    }
+
+                    // Determine image format
+                    const format = item.file.type === 'image/png' ? 'PNG' : 'JPEG';
+
+                    // Add image to PDF
+                    doc.addImage(img, format, x, y, drawWidth, drawHeight);
+
+                    // Optional: add subtle page number at bottom
+                    doc.setFontSize(8);
+                    doc.setTextColor(150, 150, 150);
+                    doc.text(`Halaman ${i + 1}`, pageWidth / 2, pageHeight - 5, { align: 'center' });
+                }
+
+                const blob = doc.output('blob');
+                return blob;
+            }
+
+            function loadImage(src) {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.onerror = () => reject(new Error(`Gagal memuat gambar: ${src}`));
+                    img.src = src;
+                });
+            }
+
+            async function previewPDF() {
+                if (imageItems.length === 0) return;
+                try {
+                    showLoading('Membuat preview PDF...');
+                    const blob = await generatePDFBlob();
+                    const blobUrl = URL.createObjectURL(blob);
+                    // Open in new tab
+                    const newTab = window.open(blobUrl, '_blank');
+                    if (!newTab) {
+                        showToast('?? Pop-up diblokir. Izinkan pop-up untuk preview.', 'error');
+                    }
+                    // Clean up after a delay
+                    setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+                    showToast('?? Preview PDF siap!', 'success');
+                } catch (err) {
+                    console.error(err);
+                    showToast('? Gagal membuat preview: ' + err.message, 'error');
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            async function downloadPDF() {
+                if (imageItems.length === 0) return;
+                try {
+                    showLoading('Menggabungkan gambar menjadi PDF...');
+                    const blob = await generatePDFBlob();
+                    const blobUrl = URL.createObjectURL(blob);
+
+                    // Trigger download
+                    const link = document.createElement('a');
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+                    link.href = blobUrl;
+                    link.download = `gabungan-${timestamp}.pdf`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    // Clean up
+                    setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+                    showToast('?? PDF berhasil diunduh!', 'success');
+                } catch (err) {
+                    console.error(err);
+                    showToast('? Gagal mengunduh PDF: ' + err.message, 'error');
+                } finally {
+                    hideLoading();
+                }
+            }
+
+            // ============ EVENT LISTENERS ============
+            // Upload zone click
+            uploadZone.addEventListener('click', (e) => {
+                // Don't trigger if clicking on the file input itself
+                if (e.target !== fileInput) {
+                    fileInput.click();
+                }
+            });
+
+            // File input change
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                    addFiles(e.target.files);
+                    // Reset input so the same files can be re-selected
+                    fileInput.value = '';
+                }
+            });
+
+            // Drag & drop on upload zone
+            uploadZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadZone.classList.add('drag-over');
+            });
+
+            uploadZone.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadZone.classList.add('drag-over');
+            });
+
+            uploadZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                // Only remove if actually leaving the zone
+                if (!uploadZone.contains(e.relatedTarget)) {
+                    uploadZone.classList.remove('drag-over');
+                }
+            });
+
+            uploadZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadZone.classList.remove('drag-over');
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    addFiles(e.dataTransfer.files);
+                }
+            });
+
+            // Prevent default drag behavior on body to avoid file opening in browser
+            document.body.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+            document.body.addEventListener('drop', (e) => {
+                e.preventDefault();
+            });
+
+            // Button: Clear All
+            btnClearAll.addEventListener('click', clearAll);
+
+            // Button: Preview PDF
+            btnPreview.addEventListener('click', previewPDF);
+
+            // Button: Download PDF
+            btnDownload.addEventListener('click', downloadPDF);
+
+            // Button: Add More
+            btnAddMore.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // Ctrl+Enter = Download, Ctrl+P = Preview
+                if (e.ctrlKey && e.key === 'Enter') {
+                    e.preventDefault();
+                    downloadPDF();
+                }
+                if (e.ctrlKey && e.key === 'p') {
+                    e.preventDefault();
+                    previewPDF();
+                }
+            });
+
+            // ============ INITIAL RENDER ============
+            updateUI();
+
+            // ============ SERVICE WORKER REGISTRATION FOR PWA-LIKE ============
+            // (Optional - just a nice touch)
+            console.log('?? Image to PDF Merger siap digunakan!');
+            console.log('   ?? Upload gambar JPG/PNG');
+            console.log('   ?? Susun ulang dengan drag & drop');
+            console.log('   ??? Preview PDF (Ctrl+P)');
+            console.log('   ?? Unduh PDF (Ctrl+Enter)');
+            console.log('   ?? Maks ' + MAX_FILES + ' file');
+        })();
+    </script>
+</body>
+</html>
