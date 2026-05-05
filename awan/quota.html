@@ -3,83 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Kuota v3</title>
+    <title>Kalkulator Kuota v4</title>
     <style>
         * { box-sizing: border-box; }
-        body { font-family: sans-serif; background-color: #0f172a; color: white; margin: 0; padding: 15px; }
-        .card { background: #1e293b; padding: 20px; border-radius: 20px; width: 100%; max-width: 500px; margin: auto; border: 1px solid #334155; }
-        h2 { color: #22d3ee; text-align: center; margin-bottom: 20px; }
-        label { display: block; margin: 10px 0 5px; font-size: 13px; color: #94a3b8; font-weight: bold; }
-        input { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid #334155; background: #0f172a; color: #fff; font-size: 1rem; margin-bottom: 10px; }
+        body { font-family: sans-serif; background-color: #0f172a; color: white; padding: 15px; margin: 0; }
+        .card { background: #1e293b; padding: 25px; border-radius: 20px; width: 100%; max-width: 500px; margin: auto; border: 1px solid #334155; }
+        h2 { color: #22d3ee; text-align: center; margin-top: 0; }
+        label { display: block; margin: 15px 0 5px; font-size: 13px; color: #94a3b8; font-weight: bold; }
+        input { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid #334155; background: #0f172a; color: #fff; font-size: 1.1rem; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        button { padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1rem; }
-        .btn-calc { background: #22d3ee; color: #0f172a; grid-column: span 2; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        button { width: 100%; padding: 18px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-top: 15px; }
+        .btn-calc { background: #22d3ee; color: #0f172a; font-size: 1.2rem; }
         .btn-radio { background: #ec4899; color: white; }
         .btn-video { background: #f59e0b; color: white; }
-        #result { margin-top: 20px; padding: 15px; border-radius: 12px; background: #0f172a; display: none; border-left: 5px solid #22d3ee; }
-        .res-val { color: #22d3ee; font-family: monospace; font-size: 1.2rem; display: block; margin-top: 5px; word-wrap: break-word; }
+        #result { margin-top: 25px; padding: 20px; border-radius: 15px; background: #0f172a; display: none; border-left: 5px solid #22d3ee; }
+        .res-val { color: #22d3ee; font-family: monospace; font-size: 1.3rem; display: block; margin-top: 5px; word-wrap: break-word; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>📻 Kalkulator Kuota v3</h2>
+    <h2>📻 Kalkulator Kuota v4</h2>
     
-    <div class="btn-group" style="margin-bottom: 20px;">
-        <button class="btn-radio" onclick="setPreset(64)">Mode Radio</button>
-        <button class="btn-video" onclick="setPreset(2500)">Mode 2K Video</button>
+    <div class="btn-group">
+        <button class="btn-radio" onclick="document.getElementById('speed').value=64">Mode Radio</button>
+        <button class="btn-video" onclick="document.getElementById('speed').value=2500">Mode 2K</button>
     </div>
 
-    <label>Kecepatan (KB/s):</label>
+    <label>Kecepatan Internet (KB/s):</label>
     <input type="number" id="speed" value="897">
 
-    <label>Atau Input Byte Langsung (Opsional):</label>
-    <input type="number" id="manualByte" placeholder="Isi jika ada data Byte">
-
-    <label>Durasi Menonton/Mendengar:</label>
+    <label>Durasi (Jam : Menit : Detik):</label>
     <div class="grid-3">
-        <input type="number" id="hr" placeholder="Jam" value="0">
-        <input type="number" id="min" placeholder="Menit" value="4">
-        <input type="number" id="sec" placeholder="Detik" value="24">
+        <input type="number" id="hr" value="0">
+        <input type="number" id="min" value="4">
+        <input type="number" id="sec" value="24">
     </div>
 
-    <button class="btn-calc" onclick="hitung()">HITUNG SEKARANG</button>
+    <button class="btn-calc" onclick="hitung()">HITUNG KUOTA</button>
 
     <div id="result">
-        <small>Hasil Akhir:</small>
-        <strong>Total Byte:</strong> <span id="totalByte" class="res-val"></span>
-        <hr style="border: 0.5px solid #334155; margin: 10px 0;">
-        <strong>Total Kuota (MB):</strong> <span id="totalMB" class="res-val"></span>
+        <strong>Total Waktu:</strong> <span id="resWaktu" class="res-val"></span>
+        <hr style="border: 0.5px solid #334155; margin: 15px 0;">
+        <strong>Total Byte:</strong> <span id="resByte" class="res-val"></span>
+        <strong>Total MB:</strong> <span id="resMB" class="res-val"></span>
+        <strong>Total GB:</strong> <span id="resGB" class="res-val"></span>
     </div>
 </div>
 
 <script>
-    function setPreset(val) {
-        document.getElementById('speed').value = val;
-        alert("Mode Berubah! Kecepatan diset ke " + val + " KB/s");
-    }
-
     function hitung() {
         const speed = parseFloat(document.getElementById('speed').value) || 0;
-        const manualByte = parseFloat(document.getElementById('manualByte').value) || 0;
         const hr = parseInt(document.getElementById('hr').value) || 0;
         const min = parseInt(document.getElementById('min').value) || 0;
         const sec = parseInt(document.getElementById('sec').value) || 0;
 
+        // Hitung total detik
         const totalDetik = (hr * 3600) + (min * 60) + sec;
         
-        let totalByte;
-        if (manualByte > 0) {
-            totalByte = manualByte; // Pakai input byte kalau diisi
-        } else {
-            totalByte = speed * totalDetik * 1024;
-        }
+        // Rumus: Kecepatan (KB) * Waktu (Detik) * 1024 (ke Byte)
+        const totalKB = speed * totalDetik;
+        const totalByte = totalKB * 1024;
+        const totalMB = totalKB / 1024;
+        const totalGB = totalMB / 1024;
 
-        const totalMB = totalByte / (1024 * 1024);
-
-        document.getElementById('totalByte').innerText = Math.round(totalByte).toLocaleString('id-ID') + " B";
-        document.getElementById('totalMB').innerText = totalMB.toFixed(2) + " MB";
+        document.getElementById('resWaktu').innerText = totalDetik.toLocaleString('id-ID') + " Detik";
+        document.getElementById('resByte').innerText = Math.round(totalByte).toLocaleString('id-ID') + " Byte";
+        document.getElementById('resMB').innerText = totalMB.toFixed(2) + " MB";
+        document.getElementById('resGB').innerText = totalGB.toFixed(3) + " GB";
         document.getElementById('result').style.display = 'block';
     }
 </script>
