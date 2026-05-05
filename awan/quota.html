@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Kuota Streaming</title>
+    <style>
+        body { font-family: sans-serif; background-color: #121212; color: white; display: flex; justify-content: center; padding: 20px; }
+        .card { background: #1e1e1e; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); width: 100%; max-width: 400px; }
+        h2 { color: #00e5ff; text-align: center; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 14px; }
+        input { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #2c2c2c; color: white; box-sizing: border-box; }
+        .time-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 6px; background: #00e5ff; color: #000; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #00b8d4; }
+        #result { margin-top: 20px; padding: 15px; border-radius: 6px; background: #2c2c2c; display: none; }
+        .res-val { color: #00e5ff; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>📊 Kalkulator Kuota</h2>
+    
+    <div class="input-group">
+        <label>Kecepatan (KB/s):</label>
+        <input type="number" id="speed" placeholder="Contoh: 897" value="897">
+    </div>
+
+    <label>Durasi Menonton:</label>
+    <div class="time-inputs">
+        <div class="input-group">
+            <input type="number" id="hr" placeholder="Jam" value="0">
+        </div>
+        <div class="input-group">
+            <input type="number" id="min" placeholder="Menit" value="4">
+        </div>
+        <div class="input-group">
+            <input type="number" id="sec" placeholder="Detik" value="24">
+        </div>
+    </div>
+
+    <button onclick="hitung()">Hitung Sekarang</button>
+
+    <div id="result">
+        <p>Total Detik: <span id="totalSec" class="res-val"></span> detik</p>
+        <p>Total Byte: <span id="totalByte" class="res-val"></span> Byte</p>
+        <p>Total MB: <span id="totalMB" class="res-val"></span> MB</p>
+    </div>
+</div>
+
+<script>
+    function hitung() {
+        const speed = parseFloat(document.getElementById('speed').value) || 0;
+        const hr = parseInt(document.getElementById('hr').value) || 0;
+        const min = parseInt(document.getElementById('min').value) || 0;
+        const sec = parseInt(document.getElementById('sec').value) || 0;
+
+        // 1. Hitung total detik
+        const totalDetik = (hr * 3600) + (min * 60) + sec;
+
+        // 2. Hitung total KB
+        const totalKB = speed * totalDetik;
+
+        // 3. Konversi ke Byte (1 KB = 1024 Byte)
+        const totalByte = totalKB * 1024;
+
+        // 4. Konversi ke MB (untuk gampang dibaca)
+        const totalMB = totalKB / 1024;
+
+        // Tampilkan hasil
+        document.getElementById('totalSec').innerText = totalDetik.toLocaleString('id-ID');
+        document.getElementById('totalByte').innerText = totalByte.toLocaleString('id-ID');
+        document.getElementById('totalMB').innerText = totalMB.toFixed(2);
+        document.getElementById('result').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
