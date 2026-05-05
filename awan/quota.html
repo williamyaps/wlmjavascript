@@ -3,92 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Jujur v5</title>
+    <title>Kalkulator Kuota Ultimate</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background-color: #0f172a; color: white; padding: 15px; margin: 0; }
-        .card { background: #1e293b; padding: 20px; border-radius: 20px; width: 100%; max-width: 500px; margin: auto; border: 1px solid #334155; }
-        h2 { color: #22d3ee; text-align: center; margin: 0 0 20px 0; }
+        .card { background: #1e293b; padding: 20px; border-radius: 20px; width: 100%; max-width: 500px; margin: auto; border: 1px solid #334155; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { color: #22d3ee; text-align: center; margin: 0 0 20px 0; text-transform: uppercase; font-size: 1.2rem; }
         
-        .input-box { background: #0f172a; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #334155; }
-        label { display: block; font-size: 11px; color: #94a3b8; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
-        input { width: 100%; background: transparent; border: none; color: #fff; font-size: 1.2rem; outline: none; border-bottom: 2px solid #334155; padding: 5px 0; }
-        input:focus { border-bottom-color: #22d3ee; }
-
-        button { width: 100%; padding: 18px; border: none; border-radius: 15px; font-weight: 800; cursor: pointer; font-size: 1.1rem; background: #22d3ee; color: #0f172a; margin-bottom: 20px; transition: 0.2s; }
+        .input-box { background: #0f172a; padding: 12px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #334155; }
+        label { display: block; font-size: 10px; color: #94a3b8; font-weight: bold; text-transform: uppercase; }
+        input { width: 100%; background: transparent; border: none; color: #fff; font-size: 1.1rem; outline: none; padding: 5px 0; }
+        
+        .grid-time { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-top: 5px; }
+        
+        button { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 1.1rem; background: #22d3ee; color: #0f172a; margin: 15px 0; transition: 0.2s; }
         button:active { transform: scale(0.98); }
 
         .result-panel { background: #0f172a; border-radius: 15px; padding: 15px; display: none; border: 1px solid #22d3ee; }
-        .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1e293b; }
-        .row:last-child { border: none; }
+        .res-group { margin-bottom: 15px; border-bottom: 1px solid #1e293b; padding-bottom: 10px; }
+        .row { display: flex; justify-content: space-between; padding: 4px 0; }
         .label { color: #94a3b8; font-size: 13px; }
-        .val { color: #22d3ee; font-weight: bold; }
+        .val { color: #22d3ee; font-weight: bold; font-family: monospace; }
         
-        .highlight-box { background: rgba(34, 211, 238, 0.1); padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px dashed #22d3ee; }
-        .warn { color: #f43f5e; font-size: 12px; text-align: center; font-weight: bold; margin-top: 10px; }
+        .highlight { color: #f59e0b; font-weight: bold; text-align: center; display: block; margin-top: 10px; font-size: 14px; }
+        .bad { color: #f43f5e; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>📊 Kalkulator Jujur</h2>
+    <h2>💰 Rincian Dompet & Kuota</h2>
     
-    <div class="input-box">
-        <label>Paket Data (GB):</label>
-        <input type="number" id="totalGB" value="18">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="input-box"><label>Total Kuota (GB)</label><input type="number" id="totalGB" value="18"></div>
+        <div class="input-box"><label>Harga Paket (Rp)</label><input type="number" id="harga" value="450000"></div>
     </div>
 
-    <div class="input-box">
-        <label>Harga Paket (Rp):</label>
-        <input type="number" id="harga" value="450000">
-    </div>
+    <div class="input-box"><label>Kecepatan (KB/s)</label><input type="number" id="speed" value="897"></div>
 
     <div class="input-box">
-        <label>Kecepatan (KB/s):</label>
-        <input type="number" id="speed" value="897">
+        <label>Durasi Terpakai</label>
+        <div class="grid-time">
+            <input type="number" id="day" value="0" placeholder="Hr">
+            <input type="number" id="hr" value="0" placeholder="Jam">
+            <input type="number" id="min" value="4" placeholder="Min">
+            <input type="number" id="sec" value="24" placeholder="Det">
+        </div>
     </div>
 
-    <button onclick="hitung()">CEK RINCIAN BIAYA</button>
+    <button onclick="hitungSemua()">CEK NASIB SAYA</button>
 
     <div id="result" class="result-panel">
-        <div class="row"><span class="label">Harga 1 GB:</span> <span class="val" id="pricePerGB"></span></div>
-        <div class="row"><span class="label">Harga 1 MB:</span> <span class="val" id="pricePerMB"></span></div>
-        
-        <div class="highlight-box">
-            <div style="text-align: center; font-size: 14px; margin-bottom: 10px; color: #f59e0b;">JIKA KAMU PAKAI 1 JAM:</div>
-            <div class="row"><span class="label">Data Ludes:</span> <span class="val" id="gbPerHour"></span></div>
-            <div class="row"><span class="label">Uang Hangus:</span> <span class="val" id="rpPerHour"></span></div>
+        <div class="res-group">
+            <div style="color: #f59e0b; font-size: 11px; margin-bottom: 5px;">BIAYA REAL-TIME:</div>
+            <div class="row"><span class="label">Per Detik:</span> <span class="val" id="rpSec"></span></div>
+            <div class="row"><span class="label">Per Menit:</span> <span class="val" id="rpMin"></span></div>
+            <div class="row"><span class="label">Per Jam:</span> <span class="val" id="rpJam"></span></div>
         </div>
 
-        <div id="summary" class="warn"></div>
+        <div class="res-group">
+            <div style="color: #f59e0b; font-size: 11px; margin-bottom: 5px;">BEBAN DATA:</div>
+            <div class="row"><span class="label">Pakai Per Jam:</span> <span class="val" id="gbJam"></span></div>
+            <div class="row"><span class="label">Total Terpakai:</span> <span class="val" id="totalUsed"></span></div>
+        </div>
+
+        <div class="res-group" style="border:none;">
+            <div class="row"><span class="label">Uang Melayang:</span> <span class="val" id="totalRp" style="font-size: 1.2rem;"></span></div>
+            <span class="highlight" id="kapanHabis"></span>
+        </div>
     </div>
 </div>
 
 <script>
-    function hitung() {
-        const totalGB = parseFloat(document.getElementById('totalGB').value) || 1;
-        const harga = parseFloat(document.getElementById('harga').value) || 0;
-        const speed = parseFloat(document.getElementById('speed').value) || 0;
+    function hitungSemua() {
+        const tGB = parseFloat(document.getElementById('totalGB').value) || 1;
+        const hrg = parseFloat(document.getElementById('harga').value) || 0;
+        const spd = parseFloat(document.getElementById('speed').value) || 0;
+        
+        const d = parseInt(document.getElementById('day').value) || 0;
+        const h = parseInt(document.getElementById('hr').value) || 0;
+        const m = parseInt(document.getElementById('min').value) || 0;
+        const s = parseInt(document.getElementById('sec').value) || 0;
 
-        // 1. Hitung harga satuan
-        const pricePerGB = harga / totalGB;
-        const pricePerMB = pricePerGB / 1024;
+        // Dasar perhitungan
+        const totalDetik = (d * 86400) + (h * 3600) + (m * 60) + s;
+        const hargaPerKB = hrg / (tGB * 1024 * 1024);
+        
+        // Biaya Rupiah
+        const rpDetik = spd * hargaPerKB;
+        const rpMenit = rpDetik * 60;
+        const rpJam = rpDetik * 3600;
+        const totalUangHangus = rpDetik * totalDetik;
 
-        // 2. Hitung penggunaan per jam (3600 detik)
-        const mbPerSec = speed / 1024;
-        const mbPerHour = mbPerSec * 3600;
-        const gbPerHour = mbPerHour / 1024;
-        const rpPerHour = mbPerHour * pricePerMB;
+        // Beban Data
+        const gbJam = (spd * 3600) / (1024 * 1024);
+        const totalDataUsedMB = (spd * totalDetik) / 1024;
 
-        // 3. Tampilkan
-        document.getElementById('pricePerGB').innerText = "Rp " + Math.round(pricePerGB).toLocaleString('id-ID');
-        document.getElementById('pricePerMB').innerText = "Rp " + pricePerMB.toFixed(2);
-        document.getElementById('gbPerHour').innerText = gbPerHour.toFixed(2) + " GB";
-        document.getElementById('rpPerHour').innerText = "Rp " + Math.round(rpPerHour).toLocaleString('id-ID');
+        // Estimasi Sisa Waktu
+        const sisaDetik = ((tGB * 1024 * 1024) - (spd * totalDetik)) / spd;
+        const sisaJam = Math.floor(sisaDetik / 3600);
+        const sisaHari = Math.floor(sisaJam / 24);
 
-        // 4. Prediksi Ketahanan
-        const totalJamKuat = totalGB / gbPerHour;
-        document.getElementById('summary').innerText = "⚠️ Dengan kecepatan ini, paket 18GB kamu cuma bertahan " + totalJamKuat.toFixed(1) + " jam saja!";
+        // Tampilkan
+        document.getElementById('rpSec').innerText = "Rp " + rpDetik.toFixed(2);
+        document.getElementById('rpMin').innerText = "Rp " + rpMenit.toFixed(2);
+        document.getElementById('rpJam').innerText = "Rp " + Math.round(rpJam).toLocaleString('id-ID');
+        
+        document.getElementById('gbJam').innerText = gbJam.toFixed(2) + " GB";
+        document.getElementById('totalUsed').innerText = totalDataUsedMB.toFixed(2) + " MB";
+        document.getElementById('totalRp').innerText = "Rp " + Math.round(totalUangHangus).toLocaleString('id-ID');
+
+        let teksHabis = "Kuota habis dalam " + sisaHari + " hari " + (sisaJam % 24) + " jam lagi.";
+        document.getElementById('kapanHabis').innerText = teksHabis;
+        if(sisaHari < 1) document.getElementById('kapanHabis').className = "highlight bad";
 
         document.getElementById('result').style.display = 'block';
     }
