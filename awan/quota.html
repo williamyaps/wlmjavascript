@@ -3,96 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Kuota Rapi v7</title>
+    <title>Kalkulator Kuota 3 Tab</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background-color: #0f172a; color: white; padding: 15px; margin: 0; }
-        .card { background: #1e293b; padding: 25px; border-radius: 20px; width: 100%; max-width: 500px; margin: auto; border: 1px solid #334155; }
-        h2 { color: #22d3ee; text-align: center; margin-bottom: 20px; }
+        .card { background: #1e293b; padding: 20px; border-radius: 20px; width: 100%; max-width: 550px; margin: auto; border: 1px solid #334155; }
         
-        .input-box { background: #0f172a; padding: 12px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #334155; }
-        label { display: block; font-size: 10px; color: #94a3b8; font-weight: bold; text-transform: uppercase; }
-        input { width: 100%; background: transparent; border: none; color: #fff; font-size: 1.2rem; outline: none; padding: 5px 0; }
-        
-        .grid-time { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
-        button { width: 100%; padding: 18px; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 1.2rem; background: #22d3ee; color: #0f172a; margin-top: 10px; }
+        /* Tab Styling */
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; background: #0f172a; padding: 5px; border-radius: 12px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; background: transparent; color: #94a3b8; cursor: pointer; font-weight: bold; font-size: 11px; text-transform: uppercase; }
+        .tab-btn.active { background: #22d3ee; color: #0f172a; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
-        .result-panel { background: #0f172a; border-radius: 15px; padding: 20px; display: none; border: 1px solid #22d3ee; margin-top: 20px; }
-        .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1e293b; }
+        .input-box { background: #0f172a; padding: 12px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #334155; }
+        label { display: block; font-size: 10px; color: #94a3b8; font-weight: bold; margin-bottom: 5px; }
+        input { width: 100%; background: transparent; border: none; color: #fff; font-size: 1rem; outline: none; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 5px; }
+        
+        button.main-btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; background: #22d3ee; color: #0f172a; font-size: 1rem; margin-top: 10px; }
+
+        .result-panel { background: #0f172a; border-radius: 15px; padding: 15px; border: 1px solid #22d3ee; margin-top: 15px; }
+        .row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1e293b; font-size: 13px; }
         .val { color: #22d3ee; font-weight: bold; font-family: monospace; }
-        .highlight { color: #f59e0b; font-weight: bold; text-align: center; display: block; margin-top: 10px; }
+        .highlight { color: #f59e0b; text-align: center; display: block; margin-top: 10px; font-weight: bold; font-size: 12px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>💰 Kalkulator Anti-Hancur</h2>
-    
-    <div class="input-box"><label>Total Kuota (GB)</label><input type="number" id="totalGB" value="18"></div>
-    
-    <!-- Input harga dengan format otomatis -->
-    <div class="input-box">
-        <label>Harga Paket (Rp)</label>
-        <input type="text" id="hargaInput" value="85.000" oninput="formatRupiah(this)">
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'tab1')">⚡ Kecepatan</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab2')">📅 Harian</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab3')">🌙 Bulanan</button>
     </div>
 
-    <div class="input-box"><label>Kecepatan (KB/s)</label><input type="number" id="speed" value="897"></div>
-
-    <div class="input-box">
-        <label>Durasi Pemakaian</label>
-        <div class="grid-time">
-            <input type="number" id="day" value="0" placeholder="Hr">
-            <input type="number" id="hr" value="0" placeholder="Jam">
-            <input type="number" id="min" value="4" placeholder="Min">
-            <input type="number" id="sec" value="24" placeholder="Det">
-        </div>
+    <!-- Info Paket (Global) -->
+    <div class="grid-2">
+        <div class="input-box"><label>Total Kuota (GB)</label><input type="number" id="gTotalGB" value="18"></div>
+        <div class="input-box"><label>Harga (Rp)</label><input type="text" id="gHarga" value="85.000" oninput="fmtRp(this)"></div>
     </div>
 
-    <button onclick="hitungSemua()">CEK NASIB KUOTA</button>
-
-    <div id="result" class="result-panel">
-        <div class="row"><span>Biaya Per Detik:</span> <span class="val" id="rpSec"></span></div>
-        <div class="row"><span>Biaya Per Jam:</span> <span class="val" id="rpJam"></span></div>
-        <div class="row"><span>Data Per Jam:</span> <span class="val" id="gbJam"></span></div>
-        <div class="row" style="border:none; margin-top:10px; font-size: 1.2rem;">
-            <span>Uang Melayang:</span> <span class="val" id="totalRp"></span>
+    <!-- TAB 1: Berdasarkan Kecepatan -->
+    <div id="tab1" class="tab-content active">
+        <div class="input-box"><label>Kecepatan (KB/s)</label><input type="number" id="t1Speed" value="897"></div>
+        <div class="input-box">
+            <label>Durasi Pemakaian (H:J:M:D)</label>
+            <div class="grid-4">
+                <input type="number" id="t1D" value="0"> <input type="number" id="t1H" value="0">
+                <input type="number" id="t1M" value="4"> <input type="number" id="t1S" value="24">
+            </div>
         </div>
-        <span class="highlight" id="kapanHabis"></span>
+        <button class="main-btn" onclick="calcT1()">CEK KECEPATAN</button>
+    </div>
+
+    <!-- TAB 2: Berdasarkan Hari Ini -->
+    <div id="tab2" class="tab-content">
+        <div class="input-box"><label>Data Terpakai Hari Ini (GB)</label><input type="number" id="t2UsedGB" value="2.26" step="0.01"></div>
+        <div class="grid-2">
+            <div class="input-box"><label>Jam Sekarang (0-23)</label><input type="number" id="t2Jam" value="10"></div>
+            <div class="input-box"><label>Menit Sekarang</label><input type="number" id="t2Min" value="33"></div>
+        </div>
+        <div class="input-box"><label>Tanggal (Tgl/Bln/Thn)</label>
+            <div class="grid-4" style="grid-template-columns: 1fr 1fr 2fr;">
+                <input type="number" id="t2Tgl" value="6"> <input type="number" id="t2Bln" value="5"> <input type="number" id="t2Thn" value="2026">
+            </div>
+        </div>
+        <button class="main-btn" onclick="calcT2()">HITUNG RATA-RATA HARIAN</button>
+    </div>
+
+    <!-- TAB 3: Berdasarkan Bulanan -->
+    <div id="tab3" class="tab-content">
+        <div class="input-box"><label>Target Pemakaian (GB/Bulan)</label><input type="number" id="t3Target" value="18"></div>
+        <div class="input-box"><label>Sudah Terpakai (GB)</label><input type="number" id="t3Current" value="5"></div>
+        <button class="main-btn" onclick="calcT3()">HITUNG ESTIMASI BULANAN</button>
+    </div>
+
+    <!-- Result Panel -->
+    <div id="resPanel" class="result-panel" style="display:none;">
+        <div class="row"><span>Rata-rata Speed:</span> <span class="val" id="resAvgSpd"></span></div>
+        <div class="row"><span>Harga Per Detik:</span> <span class="val" id="resRpS"></span></div>
+        <div class="row"><span>Harga Per Menit:</span> <span class="val" id="resRpM"></span></div>
+        <div class="row"><span>Harga Per Jam:</span> <span class="val" id="resRpH"></span></div>
+        <div class="row"><span>Sisa Kuota:</span> <span class="val" id="resSisa"></span></div>
+        <span class="highlight" id="resKet"></span>
     </div>
 </div>
 
 <script>
-    // Fungsi ajaib kasih titik otomatis saat ketik
-    function formatRupiah(input) {
-        let val = input.value.replace(/\D/g, "");
-        input.value = val.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    function fmtRp(i){ i.value = i.value.replace(/\D/g,"").replace(/\B(?=(\d{3})+(?!\d))/g,"."); }
+    function openTab(e, n) {
+        var i, tc, tb;
+        tc = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tc.length; i++) tc[i].style.display = "none";
+        tb = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tb.length; i++) tb[i].className = tb[i].className.replace(" active", "");
+        document.getElementById(n).style.display = "block";
+        e.currentTarget.className += " active";
+        document.getElementById('resPanel').style.display = "none";
     }
 
-    function hitungSemua() {
-        const tGB = parseFloat(document.getElementById('totalGB').value) || 1;
-        // Ambil harga dan buang titiknya buat dihitung
-        const hrg = parseFloat(document.getElementById('hargaInput').value.replace(/\./g, "")) || 0;
-        const spd = parseFloat(document.getElementById('speed').value) || 0;
+    function getBase() {
+        return {
+            gb: parseFloat(document.getElementById('gTotalGB').value) || 1,
+            rp: parseFloat(document.getElementById('gHarga').value.replace(/\./g,"")) || 0
+        };
+    }
+
+    function showRes(spd, used, sisa, ket) {
+        const b = getBase();
+        const rpPerKB = b.rp / (b.gb * 1024 * 1024);
+        const rps = spd * rpPerKB;
         
-        const totalDetik = (parseInt(document.getElementById('day').value || 0) * 86400) + 
-                           (parseInt(document.getElementById('hr').value || 0) * 3600) + 
-                           (parseInt(document.getElementById('min').value || 0) * 60) + 
-                           parseInt(document.getElementById('sec').value || 0);
+        document.getElementById('resAvgSpd').innerText = spd.toFixed(2) + " KB/s";
+        document.getElementById('resRpS').innerText = "Rp " + rps.toLocaleString('id-ID',{minimumFractionDigits:2});
+        document.getElementById('resRpM').innerText = "Rp " + (rps*60).toLocaleString('id-ID');
+        document.getElementById('resRpH').innerText = "Rp " + (rps*3600).toLocaleString('id-ID');
+        document.getElementById('resSisa').innerText = sisa.toFixed(2) + " GB";
+        document.getElementById('resKet').innerText = ket;
+        document.getElementById('resPanel').style.display = "block";
+    }
 
-        const hargaPerKB = hrg / (tGB * 1024 * 1024);
-        const rpDetik = spd * hargaPerKB;
-        const totalUang = rpDetik * totalDetik;
-        const gbJam = (spd * 3600) / (1024 * 1024);
+    function calcT1() {
+        const b = getBase();
+        const spd = parseFloat(document.getElementById('t1Speed').value) || 0;
+        const sec = (parseInt(document.getElementById('t1D').value)||0)*86400 + (parseInt(document.getElementById('t1H').value)||0)*3600 + (parseInt(document.getElementById('t1M').value)||0)*60 + (parseInt(document.getElementById('t1S').value)||0);
+        const usedGB = (spd * sec) / (1024 * 1024);
+        showRes(spd, usedGB, b.gb - usedGB, "Berdasarkan kecepatan real-time kamu.");
+    }
 
-        // Tampilkan dengan format titik (Locale ID)
-        document.getElementById('rpSec').innerText = "Rp " + rpDetik.toLocaleString('id-ID', {minimumFractionDigits: 2});
-        document.getElementById('rpJam').innerText = "Rp " + Math.round(rpDetik * 3600).toLocaleString('id-ID');
-        document.getElementById('gbJam').innerText = gbJam.toFixed(2) + " GB";
-        document.getElementById('totalRp').innerText = "Rp " + Math.round(totalUang).toLocaleString('id-ID');
+    function calcT2() {
+        const b = getBase();
+        const usedGB = parseFloat(document.getElementById('t2UsedGB').value) || 0;
+        const h = parseInt(document.getElementById('t2Jam').value) || 0;
+        const m = parseInt(document.getElementById('t2Min').value) || 0;
+        const totalSec = (h * 3600) + (m * 60); 
+        const avgSpd = (usedGB * 1024 * 1024) / totalSec;
+        showRes(avgSpd, usedGB, b.gb - usedGB, "Rata-rata kecepatan sejak jam 00:00 hari ini.");
+    }
 
-        const sisaDetik = ((tGB * 1024 * 1024) - (spd * totalDetik)) / spd;
-        document.getElementById('kapanHabis').innerText = "Habis dalam " + Math.floor(sisaDetik/3600) + " jam lagi.";
-        document.getElementById('result').style.display = 'block';
+    function calcT3() {
+        const b = getBase();
+        const current = parseFloat(document.getElementById('t3Current').value) || 0;
+        const sisa = b.gb - current;
+        showRes(0, current, sisa, "Sisa kuota kamu untuk bulan ini adalah " + sisa.toFixed(2) + " GB.");
     }
 </script>
 </body>
