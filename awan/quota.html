@@ -3,152 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Kuota 3 Tab</title>
+    <title>Kalkulator Kuota Pro</title>
     <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #0f172a; color: white; padding: 15px; margin: 0; }
-        .card { background: #1e293b; padding: 20px; border-radius: 20px; width: 100%; max-width: 550px; margin: auto; border: 1px solid #334155; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background-color: #0f172a; color: white; padding: 10px; margin: 0; }
+        .card { background: #1e293b; padding: 20px; border-radius: 20px; width: 100%; max-width: 500px; margin: auto; border: 1px solid #334155; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
-        /* Tab Styling */
-        .tabs { display: flex; gap: 5px; margin-bottom: 20px; background: #0f172a; padding: 5px; border-radius: 12px; }
-        .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; background: transparent; color: #94a3b8; cursor: pointer; font-weight: bold; font-size: 11px; text-transform: uppercase; }
+        /* Tab Navigation */
+        .tabs { display: flex; background: #0f172a; padding: 5px; border-radius: 15px; margin-bottom: 20px; gap: 5px; }
+        .tab-btn { flex: 1; padding: 12px 5px; border: none; border-radius: 10px; background: transparent; color: #94a3b8; cursor: pointer; font-weight: bold; font-size: 10px; text-transform: uppercase; transition: 0.3s; }
         .tab-btn.active { background: #22d3ee; color: #0f172a; }
+
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .input-box { background: #0f172a; padding: 12px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #334155; }
-        label { display: block; font-size: 10px; color: #94a3b8; font-weight: bold; margin-bottom: 5px; }
-        input { width: 100%; background: transparent; border: none; color: #fff; font-size: 1rem; outline: none; }
-        
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 5px; }
-        
-        button.main-btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; background: #22d3ee; color: #0f172a; font-size: 1rem; margin-top: 10px; }
+        /* Input Styling */
+        .input-box { background: #0f172a; padding: 12px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #334155; }
+        label { display: block; font-size: 10px; color: #22d3ee; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
+        input { width: 100%; background: transparent; border: none; color: #fff; font-size: 1.1rem; outline: none; border-bottom: 1px solid #1e293b; }
+        input:focus { border-bottom-color: #22d3ee; }
 
-        .result-panel { background: #0f172a; border-radius: 15px; padding: 15px; border: 1px solid #22d3ee; margin-top: 15px; }
-        .row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1e293b; font-size: 13px; }
-        .val { color: #22d3ee; font-weight: bold; font-family: monospace; }
-        .highlight { color: #f59e0b; text-align: center; display: block; margin-top: 10px; font-weight: bold; font-size: 12px; }
+        .grid-time { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        button.calc-btn { width: 100%; padding: 18px; border: none; border-radius: 15px; font-weight: 800; cursor: pointer; background: #22d3ee; color: #0f172a; font-size: 1.1rem; margin-top: 10px; text-transform: uppercase; }
+
+        /* Result Area */
+        .res-panel { background: #0f172a; border-radius: 15px; padding: 20px; border: 1px solid #22d3ee; margin-top: 20px; display: none; }
+        .res-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1e293b; font-size: 14px; }
+        .res-val { color: #22d3ee; font-weight: bold; font-family: monospace; font-size: 1.1rem; }
+        .footer-msg { color: #f59e0b; text-align: center; display: block; margin-top: 15px; font-size: 13px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <div class="tabs">
-        <button class="tab-btn active" onclick="openTab(event, 'tab1')">⚡ Kecepatan</button>
-        <button class="tab-btn" onclick="openTab(event, 'tab2')">📅 Harian</button>
-        <button class="tab-btn" onclick="openTab(event, 'tab3')">🌙 Bulanan</button>
+        <button class="tab-btn active" onclick="openTab(event, 'speedTab')">1. Speed</button>
+        <button class="tab-btn" onclick="openTab(event, 'dayTab')">2. Hari Ini</button>
+        <button class="tab-btn" onclick="openTab(event, 'monthTab')">3. Bulanan</button>
     </div>
 
-    <!-- Info Paket (Global) -->
+    <!-- Info Utama Paket -->
     <div class="grid-2">
-        <div class="input-box"><label>Total Kuota (GB)</label><input type="number" id="gTotalGB" value="18"></div>
-        <div class="input-box"><label>Harga (Rp)</label><input type="text" id="gHarga" value="85.000" oninput="fmtRp(this)"></div>
+        <div class="input-box"><label>Total Kuota (GB)</label><input type="number" id="baseGB" value="18"></div>
+        <div class="input-box"><label>Harga Paket (Rp)</label><input type="text" id="baseRp" value="85.000" oninput="formatRp(this)"></div>
     </div>
 
     <!-- TAB 1: Berdasarkan Kecepatan -->
-    <div id="tab1" class="tab-content active">
+    <div id="speedTab" class="tab-content active">
         <div class="input-box"><label>Kecepatan (KB/s)</label><input type="number" id="t1Speed" value="897"></div>
         <div class="input-box">
-            <label>Durasi Pemakaian (H:J:M:D)</label>
-            <div class="grid-4">
+            <label>Durasi Pakai (Hari : Jam : Min : Det)</label>
+            <div class="grid-time">
                 <input type="number" id="t1D" value="0"> <input type="number" id="t1H" value="0">
                 <input type="number" id="t1M" value="4"> <input type="number" id="t1S" value="24">
             </div>
         </div>
-        <button class="main-btn" onclick="calcT1()">CEK KECEPATAN</button>
+        <button class="calc-btn" onclick="calcSpeed()">Hitung Speed</button>
     </div>
 
-    <!-- TAB 2: Berdasarkan Hari Ini -->
-    <div id="tab2" class="tab-content">
-        <div class="input-box"><label>Data Terpakai Hari Ini (GB)</label><input type="number" id="t2UsedGB" value="2.26" step="0.01"></div>
+    <!-- TAB 2: Berdasarkan Pemakaian Harian -->
+    <div id="dayTab" class="tab-content">
+        <div class="input-box"><label>Data Terpakai S/D Sekarang (GB)</label><input type="number" id="t2Used" value="2.26" step="0.01"></div>
         <div class="grid-2">
-            <div class="input-box"><label>Jam Sekarang (0-23)</label><input type="number" id="t2Jam" value="10"></div>
+            <div class="input-box"><label>Jam Sekarang</label><input type="number" id="t2Hr" value="10"></div>
             <div class="input-box"><label>Menit Sekarang</label><input type="number" id="t2Min" value="33"></div>
         </div>
-        <div class="input-box"><label>Tanggal (Tgl/Bln/Thn)</label>
-            <div class="grid-4" style="grid-template-columns: 1fr 1fr 2fr;">
-                <input type="number" id="t2Tgl" value="6"> <input type="number" id="t2Bln" value="5"> <input type="number" id="t2Thn" value="2026">
+        <div class="input-box">
+            <label>Tanggal / Bulan / Tahun</label>
+            <div class="grid-time" style="grid-template-columns: 1fr 1fr 2fr;">
+                <input type="number" id="t2Date" value="6"> <input type="number" id="t2Mo" value="5"> <input type="number" id="t2Yr" value="2026">
             </div>
         </div>
-        <button class="main-btn" onclick="calcT2()">HITUNG RATA-RATA HARIAN</button>
+        <button class="calc-btn" onclick="calcDay()">Hitung Rata-Rata</button>
     </div>
 
     <!-- TAB 3: Berdasarkan Bulanan -->
-    <div id="tab3" class="tab-content">
-        <div class="input-box"><label>Target Pemakaian (GB/Bulan)</label><input type="number" id="t3Target" value="18"></div>
-        <div class="input-box"><label>Sudah Terpakai (GB)</label><input type="number" id="t3Current" value="5"></div>
-        <button class="main-btn" onclick="calcT3()">HITUNG ESTIMASI BULANAN</button>
+    <div id="monthTab" class="tab-content">
+        <div class="input-box"><label>Sudah Terpakai Bulan Ini (GB)</label><input type="number" id="t3Used" value="5"></div>
+        <button class="calc-btn" onclick="calcMonth()">Hitung Sisa Bulan</button>
     </div>
 
-    <!-- Result Panel -->
-    <div id="resPanel" class="result-panel" style="display:none;">
-        <div class="row"><span>Rata-rata Speed:</span> <span class="val" id="resAvgSpd"></span></div>
-        <div class="row"><span>Harga Per Detik:</span> <span class="val" id="resRpS"></span></div>
-        <div class="row"><span>Harga Per Menit:</span> <span class="val" id="resRpM"></span></div>
-        <div class="row"><span>Harga Per Jam:</span> <span class="val" id="resRpH"></span></div>
-        <div class="row"><span>Sisa Kuota:</span> <span class="val" id="resSisa"></span></div>
-        <span class="highlight" id="resKet"></span>
+    <!-- Hasil Panel (Satu untuk Semua) -->
+    <div id="resPanel" class="res-panel">
+        <div class="res-row"><span>Rata-Rata Speed:</span> <span class="res-val" id="outSpd"></span></div>
+        <div class="res-row"><span>Biaya Per Detik:</span> <span class="res-val" id="outRpS"></span></div>
+        <div class="res-row"><span>Biaya Per Menit:</span> <span class="res-val" id="outRpM"></span></div>
+        <div class="res-row"><span>Biaya Per Jam:</span> <span class="res-val" id="outRpH"></span></div>
+        <div class="res-row" style="border:none; margin-top:10px;"><span>Sisa Kuota:</span> <span class="res-val" id="outSisa"></span></div>
+        <span class="footer-msg" id="outMsg"></span>
     </div>
 </div>
 
 <script>
-    function fmtRp(i){ i.value = i.value.replace(/\D/g,"").replace(/\B(?=(\d{3})+(?!\d))/g,"."); }
-    function openTab(e, n) {
-        var i, tc, tb;
-        tc = document.getElementsByClassName("tab-content");
-        for (i = 0; i < tc.length; i++) tc[i].style.display = "none";
-        tb = document.getElementsByClassName("tab-btn");
-        for (i = 0; i < tb.length; i++) tb[i].className = tb[i].className.replace(" active", "");
-        document.getElementById(n).style.display = "block";
-        e.currentTarget.className += " active";
+    function formatRp(i) { i.value = i.value.replace(/\D/g,"").replace(/\B(?=(\d{3})+(?!\d))/g,"."); }
+    
+    function openTab(evt, tabName) {
+        var i, content, btns;
+        content = document.getElementsByClassName("tab-content");
+        for (i = 0; i < content.length; i++) content[i].classList.remove("active");
+        btns = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < btns.length; i++) btns[i].classList.remove("active");
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
         document.getElementById('resPanel').style.display = "none";
     }
 
-    function getBase() {
+    function getCommon() {
         return {
-            gb: parseFloat(document.getElementById('gTotalGB').value) || 1,
-            rp: parseFloat(document.getElementById('gHarga').value.replace(/\./g,"")) || 0
+            totalGB: parseFloat(document.getElementById('baseGB').value) || 1,
+            price: parseFloat(document.getElementById('baseRp').value.replace(/\./g,"")) || 0
         };
     }
 
-    function showRes(spd, used, sisa, ket) {
-        const b = getBase();
-        const rpPerKB = b.rp / (b.gb * 1024 * 1024);
+    function display(spd, usedGB, sisaGB, msg) {
+        const c = getCommon();
+        const rpPerKB = c.price / (c.totalGB * 1024 * 1024);
         const rps = spd * rpPerKB;
         
-        document.getElementById('resAvgSpd').innerText = spd.toFixed(2) + " KB/s";
-        document.getElementById('resRpS').innerText = "Rp " + rps.toLocaleString('id-ID',{minimumFractionDigits:2});
-        document.getElementById('resRpM').innerText = "Rp " + (rps*60).toLocaleString('id-ID');
-        document.getElementById('resRpH').innerText = "Rp " + (rps*3600).toLocaleString('id-ID');
-        document.getElementById('resSisa').innerText = sisa.toFixed(2) + " GB";
-        document.getElementById('resKet').innerText = ket;
+        document.getElementById('outSpd').innerText = spd.toFixed(2) + " KB/s";
+        document.getElementById('outRpS').innerText = "Rp " + rps.toLocaleString('id-ID', {minimumFractionDigits:2, maximumFractionDigits:2});
+        document.getElementById('outRpM').innerText = "Rp " + (rps*60).toLocaleString('id-ID', {maximumFractionDigits:0});
+        document.getElementById('outRpH').innerText = "Rp " + (rps*3600).toLocaleString('id-ID', {maximumFractionDigits:0});
+        document.getElementById('outSisa').innerText = sisaGB.toFixed(2) + " GB";
+        document.getElementById('outMsg').innerText = msg;
         document.getElementById('resPanel').style.display = "block";
     }
 
-    function calcT1() {
-        const b = getBase();
+    function calcSpeed() {
+        const c = getCommon();
         const spd = parseFloat(document.getElementById('t1Speed').value) || 0;
-        const sec = (parseInt(document.getElementById('t1D').value)||0)*86400 + (parseInt(document.getElementById('t1H').value)||0)*3600 + (parseInt(document.getElementById('t1M').value)||0)*60 + (parseInt(document.getElementById('t1S').value)||0);
-        const usedGB = (spd * sec) / (1024 * 1024);
-        showRes(spd, usedGB, b.gb - usedGB, "Berdasarkan kecepatan real-time kamu.");
+        const totalSec = (parseInt(document.getElementById('t1D').value)||0)*86400 + (parseInt(document.getElementById('t1H').value)||0)*3600 + (parseInt(document.getElementById('t1M').value)||0)*60 + (parseInt(document.getElementById('t1S').value)||0);
+        const used = (spd * totalSec) / (1024 * 1024);
+        display(spd, used, c.totalGB - used, "Hitungan berdasarkan kecepatan yang kamu input.");
     }
 
-    function calcT2() {
-        const b = getBase();
-        const usedGB = parseFloat(document.getElementById('t2UsedGB').value) || 0;
-        const h = parseInt(document.getElementById('t2Jam').value) || 0;
+    function calcDay() {
+        const c = getCommon();
+        const used = parseFloat(document.getElementById('t2Used').value) || 0;
+        const h = parseInt(document.getElementById('t2Hr').value) || 0;
         const m = parseInt(document.getElementById('t2Min').value) || 0;
-        const totalSec = (h * 3600) + (m * 60); 
-        const avgSpd = (usedGB * 1024 * 1024) / totalSec;
-        showRes(avgSpd, usedGB, b.gb - usedGB, "Rata-rata kecepatan sejak jam 00:00 hari ini.");
+        const totalSec = (h * 3600) + (m * 60) || 1; // total detik dari jam 00:00
+        const avgSpd = (used * 1024 * 1024) / totalSec;
+        display(avgSpd, used, c.totalGB - used, "Rata-rata kecepatan pemakaianmu hari ini.");
     }
 
-    function calcT3() {
-        const b = getBase();
-        const current = parseFloat(document.getElementById('t3Current').value) || 0;
-        const sisa = b.gb - current;
-        showRes(0, current, sisa, "Sisa kuota kamu untuk bulan ini adalah " + sisa.toFixed(2) + " GB.");
+    function calcMonth() {
+        const c = getCommon();
+        const used = parseFloat(document.getElementById('t3Used').value) || 0;
+        display(0, used, c.totalGB - used, "Sisa kuota kamu bulan ini. Hemat ya, Bestie!");
     }
 </script>
 </body>
