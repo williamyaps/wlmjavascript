@@ -3,150 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kompresor Video Browser Lokal</title>
-    <!-- Tailwind CSS untuk Tampilan Modern -->
+    <title>Kompresor Video Ringan</title>
+    <!-- PERBAIKAN: Link CDN Tailwind yang benar -->
     <script src="tailwindcss.com"></script>
-    <!-- FFmpeg UMD Version untuk kompatibilitas Browser Tanpa Server -->
-    <script src="https://cdn.jsdelivr.net/npm/@salomvary/ffmpeg.js-umd@3.1.9001/ffmpeg-mp4.min.js"></script>
 </head>
-<body class="bg-gray-900 text-gray-100 min-h-screen p-6 flex flex-col items-center">
+<body class="bg-gray-950 text-gray-100 min-h-screen p-6 flex flex-col items-center justify-center">
 
-    <div class="max-w-xl w-full bg-gray-800 p-6 rounded-2xl shadow-xl border border-gray-700">
-        <h2 class="text-2xl font-bold text-center mb-2 text-indigo-400">🎬 Kompresor Video Browser</h2>
-        <p class="text-xs text-gray-400 text-center mb-6">Murni HTML5 + JS. File berukuran besar tidak diupload ke internet, melainkan diproses langsung di internal RAM HP/PC Anda.</p>
+    <div class="max-w-md w-full bg-gray-900 p-6 rounded-2xl shadow-2xl border border-gray-800">
+        <h2 class="text-xl font-bold text-center mb-2 text-emerald-400">🎬 Kompresor Video Browser v2</h2>
+        <p class="text-xs text-gray-400 text-center mb-6">Menggunakan akselerasi hardware internal peramban (Anti-Crash RAM).</p>
 
-        <!-- Input File -->
         <div class="mb-4">
-            <label class="block text-sm font-medium mb-2">Pilih/Upload Video (MP4, MKV, WebM, dll):</label>
-            <input type="file" id="videoInput" accept="video/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Pilih File Video:</label>
+            <input type="file" id="videoInput" accept="video/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer">
         </div>
 
-        <!-- Pengaturan Opsi Kompresi -->
-        <div class="grid grid-cols-2 gap-4 mb-4">
-            <div>
-                <label class="block text-sm font-medium mb-1">Format Tujuan:</label>
-                <select id="formatSelect" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white">
-                    <option value="mp4">MP4 (H.264 - Universal)</option>
-                    <option value="webm">WebM (VP8 - Ringan untuk Web)</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium mb-1">Resolusi Kualitas:</label>
-                <select id="resolutionSelect" class="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white">
-                    <option value="1080">1080p (FHD - Lambat)</option>
-                    <option value="720" selected>720p (HD - Rekomendasi)</option>
-                    <option value="480">480p (SD - Cepat)</option>
-                    <option value="360">360p (Rendah - Sangat Cepat)</option>
-                </select>
-            </div>
+        <div class="mb-6">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Pilih Resolusi:</label>
+            <select id="resSelect" class="w-full bg-gray-800 border border-gray-700 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500">
+                <option value="1280x720">720p (HD - Rekomendasi)</option>
+                <option value="854x480">480p (SD - Ringan)</option>
+                <option value="640x360">360p (Rendah - Sangat Cepat)</option>
+            </select>
         </div>
 
-        <!-- Tombol Eksekusi -->
-        <button id="processBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200 mt-2">
-            Mulai Kompres Video
+        <button id="startBtn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-gray-950 font-bold py-3 px-4 rounded-xl transition duration-200">
+            Kompres Sekarang
         </button>
 
-        <!-- Indikator Status & Loading -->
-        <div id="statusContainer" class="hidden mt-6 p-4 bg-gray-700 rounded-lg">
-            <p id="statusText" class="text-sm font-semibold text-yellow-400">Menginisialisasi Engine FFmpeg...</p>
-            <div class="w-full bg-gray-600 h-2 rounded-full mt-2 overflow-hidden">
-                <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-300"></div>
-            </div>
+        <!-- Status -->
+        <div id="statusBox" class="hidden mt-4 p-3 bg-gray-800 rounded-xl text-center">
+            <p id="statusTxt" class="text-sm text-yellow-400 font-medium">Memproses...</p>
         </div>
 
-        <!-- Tempat Output Hasil Video -->
-        <div id="outputContainer" class="hidden mt-6 border-t border-gray-700 pt-4">
-            <h3 class="text-md font-bold text-green-400 mb-2">🎉 Hasil Kompresi Selesai!</h3>
-            <video id="videoPlayer" controls class="w-full rounded-lg bg-black mb-4 max-h-64"></video>
-            <a id="downloadLink" class="block text-center bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition">
-                Simpan Hasil Video ke HP/PC
+        <!-- Output -->
+        <div id="resultBox" class="hidden mt-6 text-center">
+            <p class="text-sm text-emerald-400 font-bold mb-2">🎉 Kompresi Selesai!</p>
+            <a id="dlLink" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-xl transition">
+                Unduh Hasil Video
             </a>
         </div>
     </div>
 
+    <!-- Elemen tersembunyi untuk memproses video frame demi frame -->
+    <canvas id="procCanvas" class="hidden"></canvas>
+
     <script>
         const videoInput = document.getElementById('videoInput');
-        const formatSelect = document.getElementById('formatSelect');
-        const resolutionSelect = document.getElementById('resolutionSelect');
-        const processBtn = document.getElementById('processBtn');
-        const statusContainer = document.getElementById('statusContainer');
-        const statusText = document.getElementById('statusText');
-        const progressBar = document.getElementById('progressBar');
-        const outputContainer = document.getElementById('outputContainer');
-        const videoPlayer = document.getElementById('videoPlayer');
-        const downloadLink = document.getElementById('downloadLink');
-
-        processBtn.addEventListener('click', async () => {
-            if (videoInput.files.length === 0) {
-                alert('Silakan pilih file video rekaman layar Anda terlebih dahulu!');
-                return;
-            }
+        const resSelect = document.getElementById('resSelect');
+        const startBtn = document.getElementById('startBtn');
+        const statusBox = document.getElementById('statusBox');
+        const statusTxt = document.getElementById('statusTxt');
+        const resultBox = document.getElementById('resultBox');
+        const dlLink = document.getElementById('dlLink');
+        
+        // Menggunakan MediaRecorder bawaan browser agar tidak memakan RAM besar
+        startBtn.addEventListener('click', () => {
+            if (!videoInput.files[0]) return alert('Pilih file videonya dulu!');
+            
+            statusBox.classList.remove('hidden');
+            resultBox.classList.add('hidden');
+            statusTxt.innerText = "Sedang menyiapkan pemrosesan video...";
 
             const file = videoInput.files[0];
-            const targetFormat = formatSelect.value;
-            const targetHeight = resolutionSelect.value;
-            
-            // Tampilkan panel status loading
-            statusContainer.classList.remove('hidden');
-            outputContainer.classList.add('hidden');
-            statusText.innerText = "Membaca file rekaman ke memori browser...";
-            progressBar.style.width = "20%";
+            const videoUrl = URL.createObjectURL(file);
+            const videoEl = document.createElement('video');
+            videoEl.src = videoUrl;
+            videoEl.muted = true;
+            videoEl.playsInline = true;
 
-            try {
-                // Membaca file mentah menjadi ArrayBuffer (Binary data komputer)
-                const fileData = await readFileAsArrayBuffer(file);
-                statusText.innerText = "Memproses Enkoding Video (Jangan tutup tab ini)...";
-                progressBar.style.width = "50%";
+            videoEl.onloadedmetadata = () => {
+                const [targetWidth, targetHeight] = resSelect.value.split('x').map(Number);
+                const canvas = document.getElementById('procCanvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = targetWidth;
+                canvas.height = targetHeight;
 
-                // Mempersiapkan parameter CLI FFmpeg internal browser
-                // Mengatur skala tinggi sesuai pilihan (1080p, 720p, dsb) dan lebar otomatis proporsional (-1)
-                const resultData = ffmpeg_mp4({
-                    arguments: [
-                        '-i', 'input.mp4', 
-                        '-vf', `scale=-2:${targetHeight}`, 
-                        '-c:v', targetFormat === 'mp4' ? 'libx264' : 'libvpx',
-                        '-preset', 'veryfast', 
-                        '-crf', '28', // Angka CRF mengatur tingkat kompresi (23-28 ideal untuk hemat size)
-                        `output.${targetFormat}`
-                    ],
-                    files: [
-                        {
-                            name: 'input.mp4',
-                            data: new Uint8Array(fileData)
-                        }
-                    ]
+                videoEl.play();
+
+                // Menangkap stream dari canvas dengan resolusi yang sudah diturunkan
+                const stream = canvas.captureStream(25); 
+                const recorder = new MediaRecorder(stream, {
+                    mimeType: 'video/webm;codecs=vp8',
+                    videoBitsPerSecond: 1200000 // Batasi bitrate di 1.2 Mbps agar ukuran file drop drastis
                 });
 
-                // Mengambil hasil kompresi dari sistem file virtual browser
-                const outBlob = new Blob([resultData.MEMFS[0].data], { type: `video/${targetFormat}` });
-                const blobUrl = URL.createObjectURL(outBlob);
+                const chunks = [];
+                recorder.ondataavailable = e => chunks.push(e.data);
+                recorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'video/webm' });
+                    const url = URL.createObjectURL(blob);
+                    dlLink.href = url;
+                    dlLink.download = "video_terkompresi.webm";
+                    
+                    statusBox.classList.add('hidden');
+                    resultBox.classList.remove('hidden');
+                    // Bersihkan memori browser
+                    URL.revokeObjectURL(videoUrl);
+                };
 
-                // Tampilkan ke komponen pemutar video HTML5
-                videoPlayer.src = blobUrl;
-                downloadLink.href = blobUrl;
-                downloadLink.download = `hasil_kompresi_${targetHeight}p.${targetFormat}`;
+                recorder.start();
+                statusTxt.innerText = "Video sedang direkam ulang ke ukuran lebih kecil... Silakan tunggu.";
 
-                // Selesai
-                progressBar.style.width = "100%";
-                statusText.innerText = "Selesai 100%!";
-                outputContainer.classList.remove('hidden');
-
-            } catch (error) {
-                console.error(error);
-                statusText.innerText = "Gagal memproses video. Pastikan RAM memadai untuk file berukuran besar.";
-                alert("Terjadi kesalahan kompresi: Browser kekurangan alokasi memori.");
-            }
+                // Lakukan penggambaran frame video ke canvas secara berkala
+                function drawFrame() {
+                    if (videoEl.paused || videoEl.ended) {
+                        recorder.stop();
+                        return;
+                    }
+                    ctx.drawImage(videoEl, 0, 0, targetWidth, targetHeight);
+                    requestAnimationFrame(drawFrame);
+                }
+                drawFrame();
+            };
         });
-
-        // Helper fungsi mengubah File Input menjadi Buffer data
-        function readFileAsArrayBuffer(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = () => reject(reader.error);
-                reader.readAsArrayBuffer(file);
-            });
-        }
     </script>
 </body>
 </html>
