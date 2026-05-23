@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
+    <title>🧠 Lapis Akhir – Argon2 + AES-GCM + Wasm Shield</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0a0c12;
+            color: #e2e8f0;
+            max-width: 750px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(2px);
+            border: 1px solid #2d3a5e;
+            border-radius: 32px;
+            padding: 30px;
+            margin-bottom: 28px;
+            box-shadow: 0 25px 40px -12px black;
+        }
+        h1, h2 { color: #facc15; margin-top: 0; }
+        label { font-weight: 600; display: block; margin: 18px 0 6px; color: #cbd5e6; }
+        input, input[type="file"] {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 20px;
+            color: white;
+            font-size: 15px;
+            transition: 0.2s;
+        }
+        input:focus { border-color: #facc15; outline: none; }
+        button {
+            background: #facc15;
+            color: #0f172a;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 40px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.2s;
+        }
+        button:hover { background: #eab308; transform: scale(1.02); }
+        .info-badge {
+            background: #1e293b;
+            padding: 12px 16px;
+            border-radius: 24px;
+            font-size: 14px;
+            border-left: 5px solid #facc15;
+            margin: 20px 0;
+        }
+        .error-msg { color: #f87171; margin-top: 12px; font-weight: bold; }
+        .success-box {
+            background: #064e3b;
+            border-radius: 24px;
+            padding: 20px;
+            display: none;
+            margin-top: 20px;
+        }
+        .download-btn {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="glass-card">
+    <h1>⚡ Argon2id + WebAssembly Vault</h1>
+    <p>Enkripsi permanen dengan <strong>Argon2id (wasm)</strong>, AES‑GCM 256, dan injeksi kode polimorfik dinamis.<br>
+    ✅ Password emoji / unicode apa pun.<br>
+    ✅ Single‑file output – cukup simpan dan buka di browser.</p>
+    <div class="info-badge">
+        🔐 Argon2id: memori 32 MB, iterasi 4, paralelisme 2<br>
+        🧬 Garbage code: 600+ baris acak setiap enkripsi<br>
+        🧠 WebAssembly: library asli dari <strong>argon2-browser</strong>
+    </div>
+</div>
+
+<div class="glass-card">
+    <h2>📁 1. Pilih file HTML yang ingin dilindungi</h2>
+    <input type="file" id="sourceFile" accept=".html,.htm">
+
+    <h2>🔑 2. Password (bisa emoji / 1 karakter)</h2>
+    <input type="password" id="password" placeholder="Contoh: 🥰 atau Secret123!">
+    <input type="password" id="confirmPass" placeholder="Ulangi password">
+
+    <div id="errorMsg" class="error-msg"></div>
+    <button id="encryptBtn">🔒 Enkripsi & Cetak Benteng</button>
+</div>
+
+<div class="glass-card success-box" id="successPanel">
+    <h2>✅ Benteng tercipta!</h2>
+    <p>File hasil enkripsi sudah siap. Klik tombol di bawah untuk menyimpan.</p>
+    <a href="#" id="downloadLink" class="download-btn">📥 Unduh File Terproteksi</a>
+</div>
+
+<script>
+    (function() {
+        // ---------- library Argon2 (via CDN, tetapi kita embed dalam output nanti) ----------
+        // Kita akan muat Argon2 wasm dari CDN saat proses enkripsi (tool ini butuh online)
+        // Tapi file hasil akan mengandung CDN yang sama.
+        let argon2Ready = false;
+        let argon2Lib = null;
+        
+        function loadArgon2() {
+            return new Promise((resolve, reject) => {
+                if (window.argon2) {
+                    argon2Lib = window.argon2;
+                    argon2Ready = true;
+                    resolve();
+                    return;
+                }
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/argon2-browser@1.18.0/dist/argon2.min.js';
+                script.onload = () => {
+                    if (window.argon2) {
+                        argon2Lib = window.argon2;
+                        argon2Ready = true;
+                        resolve();
+                    } else reject(new Error('Argon2 gagal dimuat'));
+                };
+                script.onerror = () => reject(new Error('Gagal mengambil library Argon2 (periksa koneksi)'));
+                document.head.appendChild(script);
+            });
+        }
+
+        // Helper: Uint8Array <-> Base64
+        function bufToBase64(buf) {
+            let bin = '';
+            const bytes = new Uint8Array(buf);
+            bytes.forEach(b => bin += String.fromCharCode(b));
+            return btoa(bin);
+        }
+        function base64ToBuf(b64) {
+            const bin = atob(b64);
+            const bytes = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+            return bytes;
+        }
+
+        // Polymorphic garbage generator (untuk diselipkan ke file output)
+        function generateGarbageCode(lines = 620) {
+            let garbage = '';
+            const randOps = ['+', '-', '*', '^', '&', '|', '<<', '>>'];
+            const fakeVars = ['_0xshield', '_wasmGuard', '_polyHeap', '_vaultBlob', '_cryptoNode'];
+            for (let i = 0; i < lines; i++) {
+                let r = Math.random();
+                let name = fakeVars[Math.floor(Math.random() * fakeVars.length)] + '_' + Math.floor(Math.random() * 99999);
+                if (r < 0.3) {
+                    garbage += `let ${name} = ${Math.floor(Math.random() * 9000)} ${randOps[Math.floor(Math.random()*randOps.length)]} ${Math.floor(Math.random() * 700)};\n`;
+                } else if (r < 0.6) {
+                    garbage += `const _func_${Math.floor(Math.random()*100000)} = () => (window._nonce || 0) + ${Math.random().toFixed(4)};\n`;
+                } else {
+                    garbage += `if (Math.sin(${Math.random()*Math.PI}) > 1.5) { console.log("${name}"); }\n`;
+                }
+            }
+            return garbage;
+        }
+
+        // Enkripsi utama: Argon2id -> AES-GCM
+        async function encryptWithArgon2(plainText, passwordStr) {
+            if (!argon2Ready || !argon2Lib) await loadArgon2();
+            const salt = crypto.getRandomValues(new Uint8Array(16));
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+
+            // Argon2id parameters: 32 MB mem, 4 iterasi, 2 paralel, hash length 32 byte (AES-256)
+            const argon2res = await argon2Lib.hash({
+                pass: passwordStr,
+                salt: salt,
+                time: 4,           // iterasi
+                mem: 32768,        // 32 MB
+                hashLen: 32,
+                parallelism: 2,
+                type: argon2Lib.ArgonType.Argon2id,
+                secret: new Uint8Array(0)
+            });
+            const rawKey = argon2res.hash; // Uint8Array(32)
+
+            // Import key untuk AES-GCM
+            const cryptoKey = await crypto.subtle.importKey(
+                'raw', rawKey, { name: 'AES-GCM' }, false, ['encrypt']
+            );
+            const encrypted = await crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv: iv }, cryptoKey, new TextEncoder().encode(plainText)
+            );
+            // format: salt (16) + iv (12) + ciphertext
+            const combined = new Uint8Array(16 + 12 + encrypted.byteLength);
+            combined.set(salt, 0);
+            combined.set(iv, 16);
+            combined.set(new Uint8Array(encrypted), 28);
+            return bufToBase64(combined);
+        }
+
+        // Membangun template output yang berisi WASM Argon2 + garbage + dekripsi
+        async function buildEncryptedOutput(originalHtml, password) {
+            const encryptedB64 = await encryptWithArgon2(originalHtml, password);
+            const garbageScript = generateGarbageCode(680);
+            const argonCdn = 'https://cdn.jsdelivr.net/npm/argon2-browser@1.18.0/dist/argon2.min.js';
+
+            return `<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex, nofollow">
+    <title>🔐 Dokumen Terproteksi (Argon2 + AES-GCM + Wasm)</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: #0b0f19;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .lock-card {
+            background: #111827;
+            border: 1px solid #2d3a5e;
+            border-radius: 32px;
+            padding: 40px;
+            max-width: 460px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.5);
+        }
+        h2 { color: #facc15; margin-bottom: 15px; }
+        input {
+            width: 100%;
+            padding: 14px;
+            margin: 15px 0;
+            background: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 40px;
+            color: white;
+            font-size: 16px;
+        }
+        button {
+            background: #facc15;
+            color: #0f172a;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .err { color: #f87171; margin-top: 12px; }
+    </style>
+</head>
+<body>
+<div class="lock-card">
+    <h2>🧠 Verifikasi Kunci Argon2id</h2>
+    <p style="margin-bottom: 15px; color: #94a3b8;">Masukkan password (bisa emoji) untuk membuka dokumen terenkripsi.</p>
+    <input type="password" id="passInput" placeholder="Password / emoji ..." autofocus>
+    <button id="unlockBtn">🔓 Buka Dokumen</button>
+    <div id="errorMsg" class="err"></div>
+</div>
+
+<script src="${argonCdn}"></script>
+<script>
+    // === INJECTED POLYMORPHIC GARBAGE ===
+    ${garbageScript}
+    // === END POLYMORPHIC GARBAGE ===
+
+    const encryptedPayload = "${encryptedB64}";
+
+    async function decryptAndShow(passwordStr) {
+        const errDiv = document.getElementById('errorMsg');
+        try {
+            const combined = Uint8Array.from(atob(encryptedPayload), c => c.charCodeAt(0));
+            const salt = combined.slice(0, 16);
+            const iv = combined.slice(16, 28);
+            const ciphertext = combined.slice(28);
+
+            // Argon2id derive key
+            const argonRes = await argon2.hash({
+                pass: passwordStr,
+                salt: salt,
+                time: 4,
+                mem: 32768,
+                hashLen: 32,
+                parallelism: 2,
+                type: argon2.ArgonType.Argon2id,
+                secret: new Uint8Array(0)
+            });
+            const rawKey = argonRes.hash;
+            const cryptoKey = await crypto.subtle.importKey('raw', rawKey, { name: 'AES-GCM' }, false, ['decrypt']);
+            const decrypted = await crypto.subtle.decrypt(
+                { name: 'AES-GCM', iv: iv }, cryptoKey, ciphertext
+            );
+            const htmlContent = new TextDecoder().decode(decrypted);
+            document.open();
+            document.write(htmlContent);
+            document.close();
+        } catch(e) {
+            errDiv.innerText = '❌ Gagal membuka. Password salah atau file rusak.';
+        }
+    }
+
+    document.getElementById('unlockBtn').onclick = () => {
+        const pwd = document.getElementById('passInput').value;
+        if (!pwd) { document.getElementById('errorMsg').innerText = 'Password tidak boleh kosong!'; return; }
+        decryptAndShow(pwd);
+    };
+    document.getElementById('passInput').addEventListener('keypress', e => { if(e.key === 'Enter') document.getElementById('unlockBtn').click(); });
+<\/script>
+</body>
+</html>`;
+        }
+
+        // ------------------------------------------------------------------
+        let uploadedContent = null;
+        const fileInput = document.getElementById('sourceFile');
+        const passField = document.getElementById('password');
+        const confirmField = document.getElementById('confirmPass');
+        const encryptBtn = document.getElementById('encryptBtn');
+        const errorDiv = document.getElementById('errorMsg');
+        const successPanel = document.getElementById('successPanel');
+        const downloadLink = document.getElementById('downloadLink');
+
+        fileInput.addEventListener('change', (e) => {
+            const f = e.target.files[0];
+            if (!f) return;
+            const reader = new FileReader();
+            reader.onload = ev => { uploadedContent = ev.target.result; errorDiv.textContent = ''; };
+            reader.onerror = () => errorDiv.textContent = '❌ Gagal baca file.';
+            reader.readAsText(f);
+        });
+
+        encryptBtn.addEventListener('click', async () => {
+            errorDiv.textContent = '';
+            if (!uploadedContent) { errorDiv.textContent = '❌ Pilih file HTML dulu.'; return; }
+            const pwd = passField.value;
+            if (!pwd) { errorDiv.textContent = '❌ Password harus diisi.'; return; }
+            if (pwd !== confirmField.value) { errorDiv.textContent = '❌ Password tidak cocok.'; return; }
+
+            try {
+                // Pastikan Argon2 siap
+                if (!argon2Ready) await loadArgon2();
+                const finalHtml = await buildEncryptedOutput(uploadedContent, pwd);
+                const blob = new Blob([finalHtml], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                downloadLink.href = url;
+                downloadLink.download = 'fortress_level4.html';
+                successPanel.style.display = 'block';
+                downloadLink.click();
+            } catch (err) {
+                errorDiv.textContent = '❌ Enkripsi gagal: ' + err.message;
+            }
+        });
+
+        // Preload Argon2 agar tidak delay saat tombol ditekan
+        loadArgon2().catch(e => console.warn('Argon2 preload warning', e));
+    })();
+</script>
+</body>
+</html>
