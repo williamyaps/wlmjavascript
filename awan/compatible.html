@@ -3,149 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Kosmik & Weton Jawa Multitradisi</title>
-    <!-- Menggunakan Tailwind CSS untuk tampilan modern & responsif -->
-    <script src="https://jsdelivr.net"></script>
+    <title>Kalkulator Kosmik & Weton Jawa</title>
     <style>
-        body { background-color: #0f172a; color: #f1f5f9; }
+        /* Gaya Tampilan Gelap Modern & Stabil Tanpa Error */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f1f5f9; padding: 20px; margin: 0; }
+        .container { max-width: 800px; margin: 0 auto; bg-color: #1e293b; background: #1e293b; padding: 25px; rounded-radius: 12px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #334155; }
+        h1 { text-align: center; color: #818cf8; margin-top: 0; }
+        p.subtitle { text-align: center; color: #94a3b8; font-size: 14px; margin-bottom: 30px; }
+        .box-input { background: #0f172a; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #475569; }
+        .box-input-utama { border-color: #6366f1; }
+        h2 { font-size: 18px; margin-top: 0; margin-bottom: 15px; color: #cbd5e1; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 5px; }
+        input { w-width: 100%; width: 90%; background: #334155; border: 1px solid #475569; padding: 10px; border-radius: 6px; color: #fff; font-size: 16px; }
+        input:focus { border-color: #818cf8; outline: none; }
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        button { padding: 12px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; transition: 0.2s; }
+        .btn-add { background: #475569; color: white; }
+        .btn-add:hover { background: #64748b; }
+        .btn-calc { background: #4f46e5; color: white; flex: 1; }
+        .btn-calc:hover { background: #6366f1; }
+        .compare-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 6px; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #334155; }
+        th { background: #0f172a; color: #94a3b8; }
+        .badge { background: #475569; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
+        .hidden { display: none; }
+        .card-detail { background: #0f172a; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #4f46e5; }
+        .card-detail h3 { margin-top: 0; color: #34d399; font-size: 16px; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body>
 
-    <div class="max-w-4xl mx-auto bg-slate-900 rounded-2xl p-6 shadow-2xl border border-slate-800">
-        <h1 class="text-3xl font-bold text-center text-indigo-400 mb-2">🌌 Analisis Kosmik Multitradisi</h1>
-        <p class="text-center text-slate-400 text-sm mb-8">Hitung otomatis Weton, Zodiak, Shio, Sifat Bawaan, dan Perbandingan Hubungan.</p>
+    <div class="container">
+        <h1>🌌 Analisis Kosmik Multitradisi</h1>
+        <p class="subtitle">Hitung otomatis Weton, Zodiak, Shio, Sifat Bawaan, dan Perbandingan Hubungan.</p>
 
         <!-- INPUT TANGGAL UTAMA -->
-        <div class="bg-slate-800 p-5 rounded-xl border border-indigo-500/30 mb-6">
-            <h2 class="text-lg font-semibold text-indigo-300 mb-3">👤 Tanggal Lahir Utama (Anda)</h2>
-            <div class="grid grid-cols-3 gap-3">
+        <div class="box-input box-input-utama">
+            <h2 style="color: #818cf8;">👤 Tanggal Lahir Utama (Anda)</h2>
+            <div class="grid-3">
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Tanggal</label>
-                    <input type="number" id="mainDay" min="1" max="31" value="15" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:outline-none focus:border-indigo-500">
+                    <label>Tanggal</label>
+                    <input type="number" id="mainDay" min="1" max="31" value="15">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Bulan (1-12)</label>
-                    <input type="number" id="mainMonth" min="1" max="12" value="5" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:outline-none focus:border-indigo-500">
+                    <label>Bulan (1-12)</label>
+                    <input type="number" id="mainMonth" min="1" max="12" value="5">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Tahun</label>
-                    <input type="number" id="mainYear" min="1900" max="2100" value="1994" class="w-full bg-slate-700 border border-slate-600 rounded p-2 text-white focus:outline-none focus:border-indigo-500">
+                    <label>Tahun</label>
+                    <input type="number" id="mainYear" min="1900" max="2100" value="1994">
                 </div>
             </div>
-            <!-- Hasil Analisis Utama -->
-            <div id="mainResult" class="mt-4 pt-4 border-t border-slate-700 hidden"></div>
+            <div id="mainResult" class="hidden" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #334155; color: #cbd5e1; font-weight: bold;"></div>
         </div>
 
-        <!-- INPUT TANGGAL PEMBANDING (BANYAK) -->
-        <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 mb-6">
-            <h2 class="text-lg font-semibold text-emerald-400 mb-3">👥 Tanggal Lahir Pembanding (Bisa Banyak)</h2>
-            
-            <div id="compareInputsContainer" class="space-y-4">
-                <!-- Baris input pertama secara default -->
-                <div class="compare-row grid grid-cols-3 gap-3 p-3 bg-slate-700/30 rounded-lg relative">
-                    <div>
-                        <input type="number" placeholder="Tgl" class="comp-day w-full bg-slate-700 border border-slate-600 rounded p-2 text-white" value="1">
-                    </div>
-                    <div>
-                        <input type="number" placeholder="Bln" class="comp-month w-full bg-slate-700 border border-slate-600 rounded p-2 text-white" value="1">
-                    </div>
-                    <div>
-                        <input type="number" placeholder="Thn" class="comp-year w-full bg-slate-700 border border-slate-600 rounded p-2 text-white" value="1999">
-                    </div>
+        <!-- INPUT TANGGAL PEMBANDING -->
+        <div class="box-input">
+            <h2>👥 Tanggal Lahir Pembanding (Bisa Banyak)</h2>
+            <div id="compareInputsContainer">
+                <!-- Baris default pertama -->
+                <div class="compare-row">
+                    <div><label>Tanggal</label><input type="number" class="comp-day" value="1"></div>
+                    <div><label>Bulan</label><input type="number" class="comp-month" value="1"></div>
+                    <div><label>Tahun</label><input type="number" class="comp-year" value="1999"></div>
                 </div>
             </div>
 
-            <div class="mt-4 flex gap-3">
-                <button onclick="addCompareRow()" class="bg-slate-700 hover:bg-slate-600 text-white font-medium py-2 px-4 rounded transition text-sm">
-                    ➕ Tambah Tanggal Lagi
-                </button>
-                <button onclick="processAll()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded transition text-sm tracking-wide shadow-lg shadow-indigo-600/20">
-                    🔮 Hitung & Bandingkan Semua
-                </button>
+            <div class="btn-group">
+                <button type="button" class="btn-add" onclick="addCompareRow()">➕ Tambah Tanggal</button>
+                <button type="button" class="btn-calc" onclick="processAll()">🔮 Hitung & Bandingkan</button>
             </div>
         </div>
 
-        <!-- TABEL & HASIL PERBANDINGAN -->
-        <div id="comparisonSection" class="hidden mt-8">
-            <h2 class="text-xl font-bold text-slate-200 mb-4 border-b border-slate-700 pb-2">📊 Hasil Tabel Perbandingan</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm text-left text-slate-300">
-                    <thead class="text-xs uppercase bg-slate-800 text-slate-400">
+        <!-- SEKSI HASIL -->
+        <div id="comparisonSection" class="hidden">
+            <h2>📊 Tabel Perbandingan Hubungan</h2>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
                         <tr>
-                            <th class="p-3">Tanggal Lahir</th>
-                            <th class="p-3">Weton (Neptu)</th>
-                            <th class="p-3">Zodiak (Elemen)</th>
-                            <th class="p-3">Shio</th>
-                            <th class="p-3 text-indigo-400">Hasil Hubungan (Primbon)</th>
+                            <th>Tanggal Lahir</th>
+                            <th>Weton (Neptu)</th>
+                            <th>Zodiak (Elemen)</th>
+                            <th>Shio</th>
+                            <th>Hasil Hubungan (Primbon)</th>
                         </tr>
                     </thead>
-                    <tbody id="comparisonTableBody">
-                        <!-- Diisi otomatis oleh JavaScript -->
-                    </tbody>
+                    <tbody id="comparisonTableBody"></tbody>
                 </table>
             </div>
 
-            <!-- DETAIL SIFAT DAN KARAKTER -->
-            <h2 class="text-xl font-bold text-slate-200 mt-8 mb-4 border-b border-slate-700 pb-2">🧠 Bedah Sifat & Karakter Bawaan</h2>
-            <div id="characterDetails" class="space-y-4">
-                <!-- Diisi otomatis oleh JavaScript -->
-            </div>
+            <h2>🧠 Bedah Sifat & Karakter Bawaan</h2>
+            <div id="characterDetails"></div>
         </div>
-
     </div>
 
     <script>
-        // Data Basis Analisis Tradisional (Algoritma Pendekatan Sederhana)
         const HARI = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
         const NEPTU_HARI = { "Minggu": 5, "Senin": 4, "Selasa": 3, "Rabu": 7, "Kamis": 8, "Jumat": 6, "Sabtu": 9 };
         const PASARAN = ["Legi", "Pahing", "Pon", "Wage", "Kliwon"];
         const NEPTU_PASARAN = { "Legi": 5, "Pahing": 9, "Pon": 7, "Wage": 4, "Kliwon": 8 };
-        
         const SHIO = ["Tikus", "Kerbau", "Macan", "Kelinci", "Naga", "Ular", "Kuda", "Kambing", "Monyet", "Ayam", "Anjing", "Babi"];
         const SHIO_ELEMENT = ["Logam", "Air", "Kayu", "Api", "Tanah"];
 
-        // Fungsi Tambah Input Baris Baru
         function addCompareRow() {
             const container = document.getElementById('compareInputsContainer');
             const newRow = document.createElement('div');
-            newRow.className = "compare-row grid grid-cols-3 gap-3 p-3 bg-slate-700/30 rounded-lg relative";
+            newRow.className = "compare-row";
             newRow.innerHTML = `
-                <div><input type="number" placeholder="Tgl" class="comp-day w-full bg-slate-700 border border-slate-600 rounded p-2 text-white"></div>
-                <div><input type="number" placeholder="Bln" class="comp-month w-full bg-slate-700 border border-slate-600 rounded p-2 text-white"></div>
-                <div><input type="number" placeholder="Thn" class="comp-year w-full bg-slate-700 border border-slate-600 rounded p-2 text-white"></div>
+                <div><label>Tanggal</label><input type="number" class="comp-day" placeholder="Tgl"></div>
+                <div><label>Bulan</label><input type="number" class="comp-month" placeholder="Bln"></div>
+                <div><label>Tahun</label><input type="number" class="comp-year" placeholder="Thn"></div>
             `;
             container.appendChild(newRow);
         }
 
-        // Hitung Data Metafisika Lengkap berdasarkan Tanggal
         function hitungMetrik(d, m, y) {
             const dateObj = new Date(y, m - 1, d);
-            if (isNaN(dateObj.getTime())) return null;
+            if (isNaN(dateObj.getTime()) || dateObj.getDate() !== d) return null;
 
-            // 1. Hari & Pasaran (Menggunakan acuan Epoch dasar)
+            // Algoritma Kalender Jawa Akurat berdasar Epoch Unix (4 Jan 1970 = Minggu Wage)
             const namaHari = HARI[dateObj.getDay()];
-            const baseDate = new Date(1970, 0, 2); // 2 Jan 1970 adalah Wage
-            const diffDays = Math.floor((dateObj - baseDate) / (1000 * 60 * 60 * 24));
-            let pasaranIdx = diffDays % 5;
+            const baseDate = new Date(1970, 0, 4); 
+            const diffTime = dateObj.getTime() - baseDate.getTime();
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            
+            let pasaranIdx = (diffDays % 5 + 3) % 5;
             if (pasaranIdx < 0) pasaranIdx += 5;
             const namaPasaran = PASARAN[pasaranIdx];
             const neptu = NEPTU_HARI[namaHari] + NEPTU_PASARAN[namaPasaran];
 
-            // 2. Zodiak & Elemen Barat
+            // Hitung Zodiak Barat
             let zodiak = "", elemenZod = "", sifatZod = "";
-            if ((m == 3 && d >= 21) || (m == 4 && d <= 19)) { zodiak = "Aries"; elemenZod = "Api"; sifatZod = "Berjiwa pemimpin, agresif, dan penuh semangat."; }
+            if ((m == 3 && d >= 21) || (m == 4 && d <= 19)) { zodiak = "Aries"; elemenZod = "Api"; sifatZod = "Berjiwa pemimpin, tangguh, dan penuh semangat."; }
             else if ((m == 4 && d >= 20) || (m == 5 && d <= 20)) { zodiak = "Taurus"; elemenZod = "Tanah"; sifatZod = "Setia, penyabar, praktis, namun cenderung keras kepala."; }
-            else if ((m == 5 && d >= 21) || (m == 6 && d <= 20)) { zodiak = "Gemini"; elemenZod = "Udara"; sifatZod = "Komunikatif, cerdas, mudah beradaptasi, namun tidak konsisten."; }
-            else if ((m == 6 && d >= 21) || (m == 7 && d <= 22)) { zodiak = "Cancer"; elemenZod = "Air"; sifatZod = "Sensitif, protektif, penuh kasih sayang, dan intuitif."; }
-            else if ((m == 7 && d >= 23) || (m == 8 && d <= 22)) { zodiak = "Leo"; elemenZod = "Api"; sifatZod = "Percaya diri, berjiwa besar, dominan, dan setia."; }
-            else if ((m == 8 && d >= 23) || (m == 9 && d <= 22)) { zodiak = "Virgo"; elemenZod = "Tanah"; sifatZod = "Analitis, perfeksionis, pekerja keras, dan suka menolong."; }
-            else if ((m == 9 && d >= 23) || (m == 10 && d <= 22)) { zodiak = "Libra"; elemenZod = "Udara"; sifatZod = "Diplomatis, cinta damai, artistik, namun sering ragu-ragu."; }
-            else if ((m == 10 && d >= 23) || (m == 11 && d <= 21)) { zodiak = "Scorpio"; elemenZod = "Air"; sifatZod = "Penuh gairah, misterius, bertekad kuat, tapi pencemburu."; }
-            else if ((m == 11 && d >= 22) || (m == 12 && d <= 21)) { zodiak = "Sagitarius"; elemenZod = "Api"; sifatZod = "Optimis, suka kebebasan, jujur, dan berjiwa petualang."; }
-            else if ((m == 12 && d >= 22) || (m == 1 && d <= 19)) { zodiak = "Capricorn"; elemenZod = "Tanah"; sifatZod = "Disiplin, bertanggung jawab, realistis, dan ambisius."; }
-            else if ((m == 1 && d >= 20) || (m == 2 && d <= 18)) { zodiak = "Aquarius"; elemenZod = "Udara"; sifatZod = "Independen, unik, humanistis, dan pemikir visioner."; }
-            else { zodiak = "Pisces"; elemenZod = "Air"; sifatZod = "Imajinatif, penuh empati, artistik, dan romantis."; }
+            else if ((m == 5 && d >= 21) || (m == 6 && d <= 20)) { zodiak = "Gemini"; elemenZod = "Udara"; sifatZod = "Komunikatif, cerdas, humoris, namun mudah bosan."; }
+            else if ((m == 6 && d >= 21) || (m == 7 && d <= 22)) { zodiak = "Cancer"; elemenZod = "Air"; sifatZod = "Sensitif, sangat protektif, penuh kasih sayang, dan setia."; }
+            else if ((m == 7 && d >= 23) || (m == 8 && d <= 22)) { zodiak = "Leo"; elemenZod = "Api"; sifatZod = "Percaya diri, berjiwa besar, berani, dan dominan."; }
+            else if ((m == 8 && d >= 23) || (m == 9 && d <= 22)) { zodiak = "Virgo"; elemenZod = "Tanah"; sifatZod = "Analitis, perfeksionis, sangat rapi, dan pekerja keras."; }
+            else if ((m == 9 && d >= 23) || (m == 10 && d <= 22)) { zodiak = "Libra"; elemenZod = "Udara"; sifatZod = "Diplomatis, menyukai harmoni, adil, namun sering ragu-ragu."; }
+            else if ((m == 10 && d >= 23) || (m == 11 && d <= 21)) { zodiak = "Scorpio"; elemenZod = "Air"; sifatZod = "Penuh tekad kuat, misterius, setia, tetapi pencemburu berat."; }
+            else if ((m == 11 && d >= 22) || (m == 12 && d <= 21)) { zodiak = "Sagitarius"; elemenZod = "Api"; sifatZod = "Optimis, menyukai kebebasan, jujur, dan suka berpetualang."; }
+            else if ((m == 12 && d >= 22) || (m == 1 && d <= 19)) { zodiak = "Capricorn"; elemenZod = "Tanah"; sifatZod = "Disiplin, bertanggung jawab, realistis, dan berorientasi kerja."; }
+            else if ((m == 1 && d >= 20) || (m == 2 && d <= 18)) { zodiak = "Aquarius"; elemenZod = "Udara"; sifatZod = "Independen, berpikir visioner, setia kawan, dan unik."; }
+            else { zodiak = "Pisces"; elemenZod = "Air"; sifatZod = "Penuh empati, imajinatif, romantis, dan sensitif."; }
 
-            // 3. Shio & Elemen Cina (Estimasi Berdasarkan Tahun)
+            // Hitung Shio
             const shioNama = SHIO[(y - 4) % 12];
+            const elemenShio = SHIO_ELEMENT[Math.floor((y - 4) % 10 / 2)];
+
+            // Watak Weton Ringkas
+            let sifatWeton = "Memiliki kombinasi karakter bawaan lahir yang dinamis dan pekerja keras.";
