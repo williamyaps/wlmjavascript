@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jam Bicara V7 - Fixed Jam Jalan + Auto Guard</title>
+<style>
+:root{--bg:linear-gradient(135deg,#0b0c10 0%,#1a1c24 100%);--glass:rgba(20,22,28,.93);--bd:rgba(255,255,255,.12);--accent:#00e5ff;--glow:rgba(0,229,255,.4);--text:#e0e0e0;--dim:#8b92a5;--btn:#252830;--red:#ff3b30}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif}
+body{background:var(--bg);color:var(--text);display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:16px}
+.box{width:460px;max-width:100%;background:var(--glass);backdrop-filter:blur(20px);border-radius:24px;padding:18px;border:1px solid var(--bd);box-shadow:0 20px 50px rgba(0,0,0,.8);text-align:center}
+h1{font-size:1.2rem;color:var(--accent)} .sub{font-size:.74rem;color:var(--dim);margin:2px 0 10px}
+.badges{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+.badge{font-size:.68rem;padding:5px 9px;border-radius:20px;border:1px solid var(--bd);background:rgba(0,0,0,.3)}
+.badge.on{background:rgba(0,200,83,.14);border-color:rgba(0,200,83,.4);color:#a5d6a7;box-shadow:0 0 10px rgba(0,200,83,.25)}
+.badge.warn{background:rgba(255,234,0,.1);border-color:rgba(255,234,0,.3);color:#ffea00}
+.controls{display:flex;gap:7px;margin-bottom:10px} .controls select{flex:1;background:var(--btn);color:var(--text);border:1px solid var(--bd);padding:7px;border-radius:8px;font-size:.82rem;outline:none}
+.clock{perspective:900px;height:108px;display:flex;justify-content:center;align-items:center;margin-bottom:2px}
+.clock-inner{position:relative;width:320px;height:90px}
+.digit{position:absolute;width:50px;height:78px;top:6px;margin-left:-25px}
+.digit .face{position:absolute;inset:0;background:rgba(0,0,0,.58);border:1px solid rgba(255,255,255,.14);border-radius:10px;display:flex;justify-content:center;align-items:center;font-size:2.25rem;font-weight:900;font-family:'Courier New',monospace;color:#fff;text-shadow:0 0 10px var(--glow)}
+.d-h1{left:40px}.d-h2{left:104px}.d-col{left:168px;width:36px}.d-m1{left:220px}.d-m2{left:284px}
+#digital{font-size:.88rem;color:var(--accent);font-family:'Courier New',monospace;letter-spacing:1px;margin-bottom:10px;font-weight:700}
+.guardBox{width:100%;padding:10px 12px;border-radius:11px;border:1px dashed var(--accent);background:rgba(0,229,255,.08);margin-bottom:11px;transition:.3s}
+.guardBox.active{border-style:solid;background:rgba(0,200,83,.12);border-color:#00c853}
+.guardBox .gTitle{font-size:.82rem;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px}
+.guardBox .gSub{font-size:.68rem;color:var(--dim);margin-top:3px;line-height:1.3}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:1px solid var(--bd);padding-top:11px;text-align:left}
+.card{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.06);padding:10px;border-radius:12px;display:flex;flex-direction:column;gap:5px}
+.card label{font-size:.64rem;color:var(--dim);text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.card input{background:var(--btn);border:1px solid var(--bd);color:#fff;padding:7px;border-radius:7px;text-align:center;outline:none}
+.card button{border:none;padding:8px;border-radius:7px;font-weight:800;cursor:pointer;font-size:.8rem}
+.btn-a{background:var(--accent);color:#000} .btn-r{background:var(--red);color:#fff}
+.count{font-size:1.55rem;font-weight:900;font-family:'Courier New',monospace;color:var(--accent);text-align:center}
+.preset{display:flex;gap:4px;flex-wrap:wrap;justify-content:center} .preset button{font-size:.66rem;padding:3px 7px;background:#2e313d;color:#ccc;border:1px solid var(--bd);border-radius:12px;cursor:pointer}
+#status{font-size:.73rem;margin-top:10px;background:rgba(0,0,0,.32);padding:8px;border-radius:8px;color:#aaa;min-height:22px;text-align:left;line-height:1.35}
+#superOverlay{position:fixed;inset:0;background:rgba(90,0,0,.96);display:none;flex-direction:column;justify-content:center;align-items:center;z-index:9999;padding:20px}
+#superOverlay.on{display:flex;animation:bgP .6s infinite alternate} @keyframes bgP{from{background:rgba(120,0,0,.96)}to{background:rgba(20,0,0,.99)}}
+.rT{font-size:2.2rem;font-weight:900;color:#fff;text-shadow:0 0 18px #ff1744;animation:shake .28s infinite;text-align:center} .rS{color:#ffb3b3;margin:10px 0 20px;text-align:center}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px) scale(1.03)}75%{transform:translateX(7px) scale(1.03)}}
+#btnStop{width:92%;max-width:380px;padding:20px;font-size:1.5rem;font-weight:900;background:linear-gradient(180deg,#ff3b30,#b71c1c);color:#fff;border:4px solid #fff;border-radius:18px;box-shadow:0 0 35px rgba(255,23,68,.9);cursor:pointer}
+</style>
+</head>
+<body>
+<div id="superOverlay">
+  <div class="rT" id="rTitle">⏰ BANGUN BRO!!!</div>
+  <div class="rS" id="rSub">Bunyi TERUS tahan pindah app!<br>Tekan STOP!</div>
+  <button id="btnStop">⛔ STOP ALARM ⛔</button>
+</div>
+
+<div class="box">
+  <h1>⏰ Jam Bicara V7</h1>
+  <p class="sub">19 Bahasa • Jam Jalan • Auto Anti-Stop • Teknik Playermini</p>
+  <div class="badges">
+    <span class="badge on" id="clockBadge">🕐 Jam: Jalan</span>
+    <span class="badge" id="guardBadge">🛡️ Guard: Menunggu tap...</span>
+    <span class="badge warn">🌐 19 Bahasa</span>
+  </div>
+
+  <div class="controls">
+    <select id="langSelect">
+      <option value="id-ID">🇮🇩 Indonesia</option>
+      <option value="jv-ID">🌿 Jawa</option>
+      <option value="su-ID">🌿 Sunda</option>
+      <option value="zh-HK">🇭🇰 Kanton</option>
+      <option value="hokkien">🏮 Hokkien</option>
+      <option value="nan-TW">🏮 Hokkien Taiwan</option>
+      <option value="zh-CN">🇨🇳 Mandarin</option>
+      <option value="ja-JP">🇯🇵 Jepang</option>
+      <option value="ko-KR">🇰🇷 Korea</option>
+      <option value="en-US">🇺🇸 English US</option>
+      <option value="en-GB">🇬🇧 English UK</option>
+      <option value="fr-FR">🇫🇷 Prancis</option>
+      <option value="it-IT">🇮🇹 Italia</option>
+      <option value="es-ES">🇪🇸 Spanyol</option>
+      <option value="de-DE">🇩🇪 Jerman</option>
+      <option value="pt-BR">🇧🇷 Portugis</option>
+      <option value="ru-RU">🇷🇺 Rusia</option>
+      <option value="ar-SA">🇸🇦 Arab</option>
+      <option value="hi-IN">🇮🇳 Hindi</option>
+    </select>
+    <select id="intervalSelect">
+      <option value="0">🔇 Jam Diam</option>
+      <option value="1">🔔 Tiap 1 menit</option>
+      <option value="5">🔔 Tiap 5 menit</option>
+      <option value="10">🔔 Tiap 10 menit</option>
+      <option value="15">🔔 Tiap 15 menit</option>
+      <option value="30">🔔 Tiap 30 menit</option>
+      <option value="60" selected>🔔 Tiap 1 jam</option>
+    </select>
+  </div>
+
+  <div class="clock"><div class="clock-inner">
+    <div class="digit d-h1" id="h1"><div class="face">0</div></div>
+    <div class="digit d-h2" id="h2"><div class="face">0</div></div>
+    <div class="digit d-col"><div class="face" style="background:transparent;border:none;color:var(--accent);font-size:1.7rem">:</div></div>
+    <div class="digit d-m1" id="m1"><div class="face">0</div></div>
+    <div class="digit d-m2" id="m2"><div class="face">0</div></div>
+  </div></div>
+  <div id="digital">00:00:00</div>
+
+  <div class="guardBox" id="guardBox">
+    <div class="gTitle" id="gTitle">👆 Tap dimana saja untuk aktifkan Anti-Stop</div>
+    <div class="gSub" id="gSub">Sekali tap, jam langsung pakai teknik playermini: Silent WAV 1 detik + 1 Audio Session. Habis itu pindah app tetap bunyi, gak perlu tekan apa-apa lagi.</div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <label>⏰ Alarm Tidur (Loop)</label>
+      <input type="time" id="alarmTime" value="05:00">
+      <button class="btn-a" id="setAlarm">Set Alarm</button>
+      <button class="btn-r" id="clearAlarm" style="display:none">Batal Alarm</button>
+      <div style="font-size:.6rem;color:var(--dim)">Loop terus sampai STOP</div>
+    </div>
+    <div class="card">
+      <label>🍳 Timer Anti Gosong</label>
+      <input type="number" id="cdInput" value="600" min="1">
+      <div class="count" id="cdDisplay">10:00</div>
+      <div class="preset"><button data-s="180">3m</button><button data-s="300">5m</button><button data-s="600">10m</button><button data-s="900">15m</button><button data-s="1800">30m</button></div>
+      <button class="btn-a" id="startCd">▶ Mulai</button>
+      <button class="btn-r" id="stopCd" style="display:none">■ Stop</button>
+    </div>
+  </div>
+  <div id="status">✅ Jam jalan normal. Tap layar sekali biar Guard ON otomatis.</div>
+</div>
+
+<script>
+(() => {
+  const TIME_TEXTS = {
+    'id-ID':{prefix:'Pukul ',exact:' tepat',min:' menit',h:h=>h<10?`nol ${h}`:h,m:m=>m<10?`nol ${m}`:m},
+    'jv-ID':{prefix:'Saiki jam ',exact:' pas',min:' menit',h:h=>['rolas','siji','loro','telu','papat','lima','enem','pitu','wolu','songo','sepuluh','sewelas','rolas','telulas','patbelas','limalas','nembelas','pitulas','wolulas','sangalas','rongpuluh','rongpuluh siji','rongpuluh loro','rongpuluh telu'][h]||h,m:m=>m},
+    'su-ID':{prefix:'Ayeuna jam ',exact:' pas',min:' menit',h:h=>['rolas','hiji','dua','tilu','opat','lima','genep','tujuh','dalapan','salapan','sapuluh','sabelas','roalas','tilulas','opatbelas','limabelas','genepbelas','tujuhbelas','dalapanbelas','salapanbelas','duapuluh','duapuluh hiji','duapuluh dua','duapuluh tilu'][h]||h,m:m=>m},
+    'zh-HK':{prefix:'而家係',exact:'點整',min:'分',h:h=>h,m:m=>m},
+    'hokkien':{prefix:'Tsit-má sī ',exact:' tiám tsing',min:' hun',h:h=>['tsap-jī','tsit','nn̄g','sann','sì','gōo','la̍k','tshit','peh','káu','tsa̍p','tsa̍p-it','tsa̍p-jī','tsa̍p-sann','tsa̍p-sì','tsa̍p-gōo','tsa̍p-la̍k','tsa̍p-tshit','tsa̍p-peh','tsa̍p-káu','jī-tsa̍p','jī-tsa̍p-it','jī-tsa̍p-jī','jī-tsa̍p-sann'][h]||h,m:m=>m},
+    'nan-TW':{prefix:'Tsit-má sī ',exact:' tiám tsing',min:' hun',h:h=>['tsap-jī','tsit','nn̄g','sann','sì','gōo','la̍k','tshit','peh','káu','tsa̍p','tsa̍p-it','tsa̍p-jī','tsa̍p-sann','tsa̍p-sì','tsa̍p-gōo','tsa̍p-la̍k','tsa̍p-tshit','tsa̍p-peh','tsa̍p-káu','jī-tsa̍p','jī-tsa̍p-it','jī-tsa̍p-jī','jī-tsa̍p-sann'][h]||h,m:m=>m},
+    'zh-CN':{prefix:'现在是',exact:'点整',min:'分',h:h=>h,m:m=>m},
+    'ja-JP':{prefix:'ただいま',exact:'時ちょうどです',min:'分です',h:h=>h,m:m=>m},
+    'ko-KR':{prefix:'지금은 ',exact:'시 정각입니다',min:'분입니다',h:h=>h,m:m=>m},
+    'en-US':{prefix:'It is ',exact:" o'clock",min:'',h:h=>h%12||12,m:m=>String(m).padStart(2,'0')},
+    'en-GB':{prefix:'It is ',exact:" o'clock",min:'',h:h=>h,m:m=>String(m).padStart(2,'0')},
+    'fr-FR':{prefix:'Il est ',exact:' heure pile',min:' heure ',h:h=>h,m:m=>m},
+    'it-IT':{prefix:'Sono le ',exact:' in punto',min:' e ',h:h=>h,m:m=>m},
+    'es-ES':{prefix:'Son las ',exact:' en punto',min:' y ',h:h=>h,m:m=>m},
+    'de-DE':{prefix:'Es ist ',exact:' Uhr genau',min:' Uhr ',h:h=>h,m:m=>m},
+    'pt-BR':{prefix:'São ',exact:' em ponto',min:' e ',h:h=>h,m:m=>m},
+    'ru-RU':{prefix:'Сейчас ',exact:' часа ровно',min:' часов ',h:h=>h,m:m=>m},
+    'ar-SA':{prefix:'إنها ',exact:' بالضبط',min:' و ',h:h=>h,m:m=>m},
+    'hi-IN':{prefix:'अभी ',exact:' बजे हैं',min:' बजकर ',h:h=>h,m:m=>m}
+  };
+  const getTL = l=>{if(['hokkien','nan-TW'].includes(l))return 'zh-TW'; if(['jv-ID','su-ID'].includes(l))return 'id-ID'; return l;};
+  const buildText=(lang,h,m)=>{const db=TIME_TEXTS[lang]||TIME_TEXTS['id-ID'];const hs=db.h?db.h(h):h;const ms=db.m?db.m(m):m;if(m===0)return (db.prefix||'')+hs+(db.exact||'');if(lang.startsWith('en'))return `${db.prefix}${hs}:${ms}`;return `${db.prefix}${hs} ${ms}${db.min||' menit'}`;};
+
+  const $=id=>document.getElementById(id);
+  const DOM={lang:$('langSelect'),interval:$('intervalSelect'),digital:$('digital'),h1:$('h1'),h2:$('h2'),m1:$('m1'),m2:$('m2'),status:$('status'),alarmTime:$('alarmTime'),setAlarm:$('setAlarm'),clearAlarm:$('clearAlarm'),cdInput:$('cdInput'),cdDisplay:$('cdDisplay'),startCd:$('startCd'),stopCd:$('stopCd'),overlay:$('superOverlay'),rTitle:$('rTitle'),rSub:$('rSub'),btnStop:$('btnStop'),guardBox:$('guardBox'),gTitle:$('gTitle'),gSub:$('gSub'),guardBadge:$('guardBadge')};
+
+  // ==== AUDIO ENGINE - TEKNIK PLAYERMINI ASLI ====
+  let audioCtx=null, silentAudio=null, silentConnected=false, talkNode=null, alarmLoop=null, alarmLoopConnected=false, wakeLock=null;
+  function makeSilent(){const a=document.createElement('audio');(function(){try{const sr=8000,n=sr,buf=new ArrayBuffer(44+n),v=new DataView(buf);const s2=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};s2(0,'RIFF');v.setUint32(4,36+n,true);s2(8,'WAVE');s2(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr,true);v.setUint16(32,1,true);v.setUint16(34,8,true);s2(36,'data');v.setUint32(40,n,true);new Uint8Array(buf,44).fill(0x80);a.src=URL.createObjectURL(new Blob([buf],{type:'audio/wav'}));}catch(e){a.src='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';}})();a.loop=true;a.volume=0.001;a.setAttribute('playsinline','');return a;}
+  function makeSiren(){const sr=22050,dur=2.3,len=Math.floor(sr*dur),out=new Int16Array(len);for(let i=0;i<len;i++){const t=i/sr,f=820+380*Math.sin(t*2.6),ph=2*Math.PI*f*t,sq=Math.sin(ph)>0?1:-1,env=(Math.floor(t*3.2)%2===0)?1:0.16;out[i]=Math.floor(sq*env*30000);}const buf=new ArrayBuffer(44+len*2),v=new DataView(buf),w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};w(0,'RIFF');v.setUint32(4,36+len*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,len*2,true);let o=44;for(let i=0;i<len;i++){v.setInt16(o,out[i],true);o+=2;}return URL.createObjectURL(new Blob([buf],{type:'audio/wav'}));}
+  function initAudio(){if(audioCtx&&audioCtx.state!=='closed')return audioCtx;try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}if(!silentAudio)silentAudio=makeSilent();if(!alarmLoop){alarmLoop=document.createElement('audio');alarmLoop.loop=true;alarmLoop.volume=1;alarmLoop.setAttribute('playsinline','');alarmLoop.src=makeSiren();}if(!talkNode){talkNode=new Audio();talkNode.setAttribute('playsinline','');}return audioCtx;}
+  function ensurePipeline(){const ctx=(audioCtx&&audioCtx.state!=='closed')?audioCtx:null;if(!ctx)return;if(ctx.state==='suspended')ctx.resume().catch(()=>{});if(!silentConnected&&silentAudio){try{const n=ctx.createMediaElementSource(silentAudio);const g=ctx.createGain();g.gain.value=0;n.connect(g);g.connect(ctx.destination);silentConnected=true;}catch(e){silentConnected=true;}}if(!alarmLoopConnected&&alarmLoop){try{const n=ctx.createMediaElementSource(alarmLoop);const g=ctx.createGain();g.gain.value=1;n.connect(g);g.connect(ctx.destination);alarmLoopConnected=true;}catch(e){alarmLoopConnected=true;}}}
+  async function acqWL(){if(!('wakeLock' in navigator))return;try{if(wakeLock&&!wakeLock.released)return;wakeLock=await navigator.wakeLock.request('screen');wakeLock.addEventListener('release',()=>{if(talkInterval>0||alarmActive||countdownActive||ringSt.active)setTimeout(acqWL,900);});}catch(e){}}
+  function speakGoogle(text,lang){const ctx=initAudio();if(ctx&&ctx.state==='suspended')ctx.resume().catch(()=>{});ensurePipeline();if(!talkNode)talkNode=new Audio();else{try{talkNode.pause();talkNode.currentTime=0;}catch(e){}}const tl=getTL(lang).split('-')[0];const url='https://translate.google.com/translate_tts?ie=UTF-8&tl='+encodeURIComponent(tl)+'&client=tw-ob&q='+encodeURIComponent(text);talkNode.volume=1;talkNode.src=url;talkNode.play().catch(()=>{});}
+
+  // ==== JAM JALAN - FIX UTAMA: SELALU UPDATE, TIDAK TERGANTUNG WORKER ====
+  function updClock(h,m,s){DOM.digital.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;DOM.h1.querySelector('.face').textContent=Math.floor(h/10);DOM.h2.querySelector('.face').textContent=h%10;DOM.m1.querySelector('.face').textContent=Math.floor(m/10);DOM.m2.querySelector('.face').textContent=m%10;}
+  setInterval(()=>{const n=new Date();updClock(n.getHours(),n.getMinutes(),n.getSeconds());},1000);
+  (function(){const n=new Date();updClock(n.getHours(),n.getMinutes(),n.getSeconds());})();
+
+  // ==== WORKER (HANYA UNTUK JAM BICARA + ALARM + COUNTDOWN, TIDAK URUS DISPLAY JAM) ====
+  let talkInterval=parseInt(DOM.interval.value)||0, alarmActive=false, alarmH=0,alarmM=0, countdownActive=false, cdRem=0, talkWorker=null;
+  const WORKER_SRC=`var iMin=0,lastMin=-1,aH=-1,aM=-1,aOn=false,cSec=0,cOn=false;setInterval(function(){var d=new Date(),h=d.getHours(),m=d.getMinutes(),s=d.getSeconds(),tot=h*60+m;if(iMin!==0&&tot!==lastMin&&tot%iMin===0){lastMin=tot;postMessage({t:'SPEAK'})}if(aOn&&h===aH&&m===aM&&s<=2){postMessage({t:'ALARM'})}if(cOn){cSec--;postMessage({t:'CD_TICK',sec:cSec});if(cSec<=0){cOn=false;postMessage({t:'CD_DONE'})}}},1000);onmessage=function(e){var x=e.data||{};if(x.cmd==='TALK'){iMin=x.v;lastMin=-1}if(x.cmd==='ALARM'){aH=x.h;aM=x.m;aOn=x.on}if(x.cmd==='CD'){cSec=x.sec;cOn=x.on}if(x.cmd==='CDSTOP'){cOn=false}};`;
+  function startW(){if(talkWorker)try{talkWorker.terminate()}catch(e){}try{const b=new Blob([WORKER_SRC],{type:'text/javascript'}),u=URL.createObjectURL(b);talkWorker=new Worker(u);URL.revokeObjectURL(u);talkWorker.onmessage=e=>{const d=e.data||{};if(d.t==='SPEAK'){const now=new Date();const txt=buildText(DOM.lang.value,now.getHours(),now.getMinutes());speakGoogle(txt,DOM.lang.value);DOM.status.textContent='🗣️ '+txt;}if(d.t==='ALARM'){if(!ringSt.active)startRing('alarm')}if(d.t==='CD_TICK'){DOM.cdDisplay.textContent=fmt(Math.max(0,d.sec))}if(d.t==='CD_DONE'){startRing('countdown')}};talkWorker.postMessage({cmd:'TALK',v:talkInterval});}catch(e){}}
+  function fmt(s){s=Math.max(0,s);const mm=Math.floor(s/60),ss=s%60;return String(mm).padStart(2,'0')+':'+String(ss).padStart(2,'0')}
+
+  // ==== RING ====
+  let ringSt={active:false,type:'',sInt:null,vInt:null,nInt:null};
+  function showN(t,b){if(!('Notification'in window)||Notification.permission!=='granted')return;try{new Notification(t,{body:b,requireInteraction:true})}catch(e){}}
+  function startRing(type){if(ringSt.active)return;ringSt.active=true;ringSt.type=type;initAudio();if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});ensurePipeline();if(silentAudio)silentAudio.play().catch(()=>{});DOM.overlay.classList.add('on');if(type==='alarm'){DOM.rTitle.textContent='⏰ BANGUN BRO!!!';DOM.rSub.innerHTML='Alarm tidur! Tahan pindah app!<br>Tekan STOP!';}else{DOM.rTitle.textContent='🍳 MATANG BRO!!!';DOM.rSub.innerHTML='Timer habis! Matikan kompor!<br>Jangan gosong!';}document.body.style.overflow='hidden';if(alarmLoop){try{alarmLoop.currentTime=0;alarmLoop.volume=1;alarmLoop.play().catch(()=>{});}catch(e){}}const first=type==='alarm'?'Bangun! Bangun! Waktunya bangun! Tekan stop!':'Waktu habis! Matikan kompor! Masakan matang!';speakGoogle(first,DOM.lang.value);showN(type==='alarm'?'⏰ BANGUN':'🍳 MATANG',first);if(navigator.vibrate)navigator.vibrate([700,200,700]);ringSt.sInt=setInterval(()=>{if(alarmLoop&&alarmLoop.paused)alarmLoop.play().catch(()=>{});if(navigator.vibrate)navigator.vibrate([400,100,400]);},1100);let vc=0;ringSt.vInt=setInterval(()=>{vc++;const msgs=type==='alarm'?[`Bangun bro jam ${new Date().getHours()}!`,'Alarm masih bunyi!','Tekan stop bro!']:['Cek masakan!','Matikan kompor!','Jangan gosong!'];speakGoogle(msgs[vc%msgs.length],DOM.lang.value);},2800);ringSt.nInt=setInterval(()=>{showN('🚨 ALARM MASIH BUNYI','Buka app & tekan STOP');},3800);acqWL();}
+  function stopRing(){const was=ringSt.active;ringSt.active=false;clearInterval(ringSt.sInt);clearInterval(ringSt.vInt);clearInterval(ringSt.nInt);ringSt.sInt=ringSt.vInt=ringSt.nInt=null;DOM.overlay.classList.remove('on');document.body.style.overflow='';try{window.speechSynthesis.cancel()}catch(e){}if(alarmLoop)try{alarmLoop.pause();alarmLoop.currentTime=0}catch(e){}if(navigator.vibrate)navigator.vibrate(0);if(was){if(ringSt.type==='alarm'){alarmActive=false;DOM.clearAlarm.style.display='none';DOM.setAlarm.style.display='block';if(talkWorker)talkWorker.postMessage({cmd:'ALARM',on:false});}else{countdownActive=false;DOM.stopCd.style.display='none';DOM.startCd.style.display='block';if(talkWorker)talkWorker.postMessage({cmd:'CDSTOP'});}}DOM.status.textContent='✅ Dihentikan. Guard tetap ON.';ringSt.type='';}
+
+  // ==== UI ====
+  DOM.interval.addEventListener('change',()=>{talkInterval=parseInt(DOM.interval.value)||0;if(talkWorker)talkWorker.postMessage({cmd:'TALK',v:talkInterval});if(talkInterval>0){initAudio();if(silentAudio)silentAudio.play().catch(()=>{});ensurePipeline();acqWL();}});
+  DOM.setAlarm.addEventListener('click',()=>{const v=DOM.alarmTime.value;if(!v){DOM.status.textContent='❌ Pilih jam!';return;}const [hh,mm]=v.split(':').map(Number);alarmH=hh;alarmM=mm;alarmActive=true;DOM.setAlarm.style.display='none';DOM.clearAlarm.style.display='block';initAudio();if(silentAudio)silentAudio.play().catch(()=>{});ensurePipeline();if(!talkWorker)startW();talkWorker.postMessage({cmd:'ALARM',h:hh,m:mm,on:true});acqWL();DOM.status.textContent=`⏰ Alarm ${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')} aktif - tahan background!`;speakGoogle(`Alarm jam ${hh} ${mm} aktif`,DOM.lang.value);});
+  DOM.clearAlarm.addEventListener('click',()=>{alarmActive=false;if(talkWorker)talkWorker.postMessage({cmd:'ALARM',on:false});DOM.clearAlarm.style.display='none';DOM.setAlarm.style.display='block';DOM.status.textContent='⏰ Alarm batal';stopRing();});
+  DOM.startCd.addEventListener('click',()=>{let v=parseInt(DOM.cdInput.value);if(isNaN(v)||v<1){DOM.status.textContent='❌ Isi detik!';return;}cdRem=v;countdownActive=true;DOM.cdDisplay.textContent=fmt(v);DOM.startCd.style.display='none';DOM.stopCd.style.display='block';initAudio();if(silentAudio)silentAudio.play().catch(()=>{});ensurePipeline();if(!talkWorker)startW();talkWorker.postMessage({cmd:'CD',sec:v,on:true});acqWL();DOM.status.textContent=`🍳 Timer ${fmt(v)} mulai!`;});
+  DOM.stopCd.addEventListener('click',()=>{countdownActive=false;if(talkWorker)talkWorker.postMessage({cmd:'CDSTOP'});DOM.stopCd.style.display='none';DOM.startCd.style.display='block';DOM.status.textContent='⏳ Timer stop';stopRing();});
+  document.querySelectorAll('.preset button').forEach(b=>b.addEventListener('click',()=>{const s=parseInt(b.dataset.s);DOM.cdInput.value=s;DOM.cdDisplay.textContent=fmt(s);}));
+  DOM.cdInput.addEventListener('input',()=>{const v=parseInt(DOM.cdInput.value)||0;DOM.cdDisplay.textContent=fmt(v);});
+  DOM.btnStop.addEventListener('click',stopRing);
+
+  // ==== AUTO GUARD - USER GAK PERLU BINGUNG TEKAN APA ====
+  let guardOn=false;
+  async function activateGuardAuto(){
+    if(guardOn) return; guardOn=true;
+    initAudio();const ctx=audioCtx;if(ctx&&ctx.state==='suspended')try{await ctx.resume()}catch(e){}
+    if(silentAudio)try{await silentAudio.play()}catch(e){}
+    ensurePipeline();await acqWL();
+    if(!talkWorker)startW();
+    if('Notification' in window && Notification.permission==='default'){try{await Notification.requestPermission()}catch(e){}}
+    DOM.guardBadge.textContent='🛡️ Guard: ON ✅ 1 Session';DOM.guardBadge.className='badge on';
+    DOM.guardBox.classList.add('active');DOM.gTitle.textContent='✅ Anti-Stop AKTIF - Siap pindah app!';
+    DOM.gSub.textContent='Teknik playermini aktif: Silent WAV 1 detik loop + 1 Audio Session. Sekarang jam, alarm & timer tetap bunyi walau pindah app. Gak perlu tekan apa-apa lagi.';
+    DOM.status.textContent='✅ Guard ON otomatis! Jam jalan, 19 bahasa siap, tahan background.';
+    try{if('mediaSession' in navigator){navigator.mediaSession.metadata=new MediaMetadata({title:'Jam Bicara Anti-Stop',artist:'19 Bahasa',album:'Playermini'});navigator.mediaSession.setActionHandler('stop',()=>stopRing());}}catch(e){}
+  }
+  // Trigger di interaksi pertama apapun
+  ['click','touchend','keydown'].forEach(ev=>{document.addEventListener(ev,function h(){activateGuardAuto();document.removeEventListener(ev,h);},{once:true});});
+  // Juga auto coba pas load (kadang browser allow)
+  window.addEventListener('load',()=>{setTimeout(()=>{if(!guardOn){DOM.gTitle.textContent='👆 Tap layar sekali untuk aktifkan';}},400)});
+
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});ensurePipeline();acqWL();if(silentAudio&&silentAudio.paused)silentAudio.play().catch(()=>{});if(ringSt.active&&alarmLoop&&alarmLoop.paused)alarmLoop.play().catch(()=>{});}else{if(silentAudio)silentAudio.play().catch(()=>{});if(ringSt.active&&alarmLoop)alarmLoop.play().catch(()=>{});}});
+
+  startW(); DOM.cdDisplay.textContent=fmt(parseInt(DOM.cdInput.value)||0);
+})();
+</script>
+</body>
+</html>
