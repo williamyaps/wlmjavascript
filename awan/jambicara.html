@@ -2,126 +2,204 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jam Bicara V7 - Fixed Jam Jalan + Auto Guard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Jam Bicara V8 - MS Date Weather + Custom Teks</title>
 <style>
-:root{--bg:linear-gradient(135deg,#0b0c10 0%,#1a1c24 100%);--glass:rgba(20,22,28,.93);--bd:rgba(255,255,255,.12);--accent:#00e5ff;--glow:rgba(0,229,255,.4);--text:#e0e0e0;--dim:#8b92a5;--btn:#252830;--red:#ff3b30}
+:root{--bg1:#070a12;--bg2:#12182a;--glass:rgba(18,22,38,.94);--bd:rgba(110,180,255,.18);--accent:#00e5ff;--accent2:#7c4dff;--glow:rgba(0,229,255,.45);--text:#e6eefc;--dim:#8ea0c0;--btn:#1e253a;--red:#ff3b5c;--green:#00e676}
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif}
-body{background:var(--bg);color:var(--text);display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:16px}
-.box{width:460px;max-width:100%;background:var(--glass);backdrop-filter:blur(20px);border-radius:24px;padding:18px;border:1px solid var(--bd);box-shadow:0 20px 50px rgba(0,0,0,.8);text-align:center}
-h1{font-size:1.2rem;color:var(--accent)} .sub{font-size:.74rem;color:var(--dim);margin:2px 0 10px}
-.badges{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
-.badge{font-size:.68rem;padding:5px 9px;border-radius:20px;border:1px solid var(--bd);background:rgba(0,0,0,.3)}
-.badge.on{background:rgba(0,200,83,.14);border-color:rgba(0,200,83,.4);color:#a5d6a7;box-shadow:0 0 10px rgba(0,200,83,.25)}
-.badge.warn{background:rgba(255,234,0,.1);border-color:rgba(255,234,0,.3);color:#ffea00}
-.controls{display:flex;gap:7px;margin-bottom:10px} .controls select{flex:1;background:var(--btn);color:var(--text);border:1px solid var(--bd);padding:7px;border-radius:8px;font-size:.82rem;outline:none}
-.clock{perspective:900px;height:108px;display:flex;justify-content:center;align-items:center;margin-bottom:2px}
-.clock-inner{position:relative;width:320px;height:90px}
-.digit{position:absolute;width:50px;height:78px;top:6px;margin-left:-25px}
-.digit .face{position:absolute;inset:0;background:rgba(0,0,0,.58);border:1px solid rgba(255,255,255,.14);border-radius:10px;display:flex;justify-content:center;align-items:center;font-size:2.25rem;font-weight:900;font-family:'Courier New',monospace;color:#fff;text-shadow:0 0 10px var(--glow)}
-.d-h1{left:40px}.d-h2{left:104px}.d-col{left:168px;width:36px}.d-m1{left:220px}.d-m2{left:284px}
-#digital{font-size:.88rem;color:var(--accent);font-family:'Courier New',monospace;letter-spacing:1px;margin-bottom:10px;font-weight:700}
-.guardBox{width:100%;padding:10px 12px;border-radius:11px;border:1px dashed var(--accent);background:rgba(0,229,255,.08);margin-bottom:11px;transition:.3s}
-.guardBox.active{border-style:solid;background:rgba(0,200,83,.12);border-color:#00c853}
-.guardBox .gTitle{font-size:.82rem;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px}
-.guardBox .gSub{font-size:.68rem;color:var(--dim);margin-top:3px;line-height:1.3}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:1px solid var(--bd);padding-top:11px;text-align:left}
-.card{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.06);padding:10px;border-radius:12px;display:flex;flex-direction:column;gap:5px}
-.card label{font-size:.64rem;color:var(--dim);text-transform:uppercase;letter-spacing:1px;font-weight:700}
-.card input{background:var(--btn);border:1px solid var(--bd);color:#fff;padding:7px;border-radius:7px;text-align:center;outline:none}
-.card button{border:none;padding:8px;border-radius:7px;font-weight:800;cursor:pointer;font-size:.8rem}
-.btn-a{background:var(--accent);color:#000} .btn-r{background:var(--red);color:#fff}
-.count{font-size:1.55rem;font-weight:900;font-family:'Courier New',monospace;color:var(--accent);text-align:center}
-.preset{display:flex;gap:4px;flex-wrap:wrap;justify-content:center} .preset button{font-size:.66rem;padding:3px 7px;background:#2e313d;color:#ccc;border:1px solid var(--bd);border-radius:12px;cursor:pointer}
-#status{font-size:.73rem;margin-top:10px;background:rgba(0,0,0,.32);padding:8px;border-radius:8px;color:#aaa;min-height:22px;text-align:left;line-height:1.35}
-#superOverlay{position:fixed;inset:0;background:rgba(90,0,0,.96);display:none;flex-direction:column;justify-content:center;align-items:center;z-index:9999;padding:20px}
-#superOverlay.on{display:flex;animation:bgP .6s infinite alternate} @keyframes bgP{from{background:rgba(120,0,0,.96)}to{background:rgba(20,0,0,.99)}}
-.rT{font-size:2.2rem;font-weight:900;color:#fff;text-shadow:0 0 18px #ff1744;animation:shake .28s infinite;text-align:center} .rS{color:#ffb3b3;margin:10px 0 20px;text-align:center}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px) scale(1.03)}75%{transform:translateX(7px) scale(1.03)}}
-#btnStop{width:92%;max-width:380px;padding:20px;font-size:1.5rem;font-weight:900;background:linear-gradient(180deg,#ff3b30,#b71c1c);color:#fff;border:4px solid #fff;border-radius:18px;box-shadow:0 0 35px rgba(255,23,68,.9);cursor:pointer}
+body{background:radial-gradient(1200px 600px at 20% -10%, #1a2a5a 0%, transparent 60%), radial-gradient(900px 500px at 100% 0%, #2a1a5a 0%, transparent 55%), linear-gradient(180deg,var(--bg1),var(--bg2));color:var(--text);display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:12px;overflow-x:hidden}
+.box{width:480px;max-width:100%;background:linear-gradient(180deg,rgba(28,34,62,.96),rgba(14,18,32,.98));backdrop-filter:blur(18px);border-radius:22px;padding:14px 14px 18px;border:1px solid var(--bd);box-shadow:0 20px 60px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.08);text-align:center;position:relative}
+h1{font-size:1.22rem;letter-spacing:.3px;color:#fff;text-shadow:0 0 12px var(--glow)} .sub{font-size:.71rem;color:var(--dim);margin:2px 0 8px}
+.badges{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-bottom:8px}
+.badge{font-size:.62rem;padding:4px 8px;border-radius:20px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.28);display:inline-flex;align-items:center;gap:4px}
+.badge.on{background:rgba(0,230,118,.14);border-color:rgba(0,230,118,.38);color:#a7f0c3;box-shadow:0 0 10px rgba(0,230,118,.18)} .badge.warn{background:rgba(255,234,0,.11);border-color:rgba(255,234,0,.32);color:#ffe76a}
+.controls{display:flex;gap:6px;margin-bottom:8px} .controls select{flex:1;background:linear-gradient(180deg,#242d4a,#1a2238);color:var(--text);border:1px solid rgba(120,160,255,.22);padding:7px 8px;border-radius:10px;font-size:.8rem;outline:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+/* ===== JAM 3D SUPER SHADOW ===== */
+.clock-wrap{perspective:1200px;display:flex;flex-direction:column;align-items:center;gap:4px;margin:6px 0 2px}
+.clock{perspective:1200px;height:88px;display:flex;justify-content:center;align-items:center;transform-style:preserve-3d}
+.clock-inner{position:relative;width:360px;max-width:100%;height:84px;transform-style:preserve-3d;display:flex;justify-content:center;align-items:center;gap:6px}
+.digit{position:relative;width:56px;height:76px;transform-style:preserve-3d;transition:transform .18s}
+.digit .face{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,#0f1428 0%, #0a0e1e 55%, #070a16 100%);
+  border:1px solid rgba(120,180,255,.22);
+  border-radius:12px;
+  display:flex;justify-content:center;align-items:center;
+  font-size:2.35rem;font-weight:950;font-family:'Courier New',monospace;color:#eaffff;
+  text-shadow:0 0 8px rgba(0,229,255,.9), 0 0 22px rgba(0,229,255,.35);
+  box-shadow:
+    0 14px 28px rgba(0,0,0,.9),
+    0 2px 6px rgba(0,0,0,.8),
+    0 0 0 1px rgba(255,255,255,.06) inset,
+    0 10px 20px rgba(0,229,255,.12),
+    inset 0 2px 0 rgba(255,255,255,.18),
+    inset 0 -8px 18px rgba(0,0,0,.75);
+  transform:translateZ(18px);
+}
+.digit::after{
+  content:'';position:absolute;inset:0;border-radius:12px;
+  background:linear-gradient(180deg,rgba(255,255,255,.18),transparent 38%, transparent 78%, rgba(0,0,0,.55));
+  pointer-events:none;transform:translateZ(19px);
+}
+.digit .shadow3d{
+  position:absolute;left:6px;right:6px;bottom:-10px;height:18px;
+  background:radial-gradient(ellipse at center, rgba(0,0,0,.85) 0%, rgba(0,0,0,0) 70%);
+  filter:blur(4px);transform:translateZ(-12px) rotateX(78deg);opacity:.9;
+}
+.colon{width:18px;font-size:2.2rem;font-weight:900;color:var(--accent);text-shadow:0 0 14px var(--glow);animation:blink 1s steps(2) infinite}
+@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:.25}}
+/* mili detik */
+#msBox{
+  margin-top:2px;
+  width:110px;height:46px;
+  display:flex;justify-content:center;align-items:center;
+  background:linear-gradient(180deg,#10152a,#0a0f22);
+  border:1px solid rgba(100,180,255,.28);
+  border-radius:10px;
+  font-family:'Courier New',monospace;font-weight:950;font-size:1.55rem;letter-spacing:1px;
+  box-shadow:0 8px 18px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.12), 0 0 18px rgba(124,77,255,.18);
+  transform:translateZ(12px);
+}
+#dateDisplay{
+  margin-top:6px;
+  font-size:.88rem;font-weight:700;letter-spacing:.2px;
+  color:#aee8ff;
+  text-shadow:0 0 10px rgba(0,229,255,.35);
+  background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.18);
+  display:inline-block;padding:5px 12px;border-radius:20px;
+}
+#digitalSec{font-size:.72rem;color:var(--dim);margin-top:2px;letter-spacing:.5px}
+.guardBox{width:100%;padding:9px 10px;border-radius:12px;border:1px dashed var(--accent);background:rgba(0,229,255,.08);margin:8px 0 10px;transition:.25s;text-align:left}
+.guardBox.active{border-style:solid;background:rgba(0,230,118,.11);border-color:#00e676}
+.guardBox .gTitle{font-size:.8rem;font-weight:850;display:flex;align-items:center;gap:6px;justify-content:center}
+.guardBox .gSub{font-size:.66rem;color:var(--dim);margin-top:3px;line-height:1.35;text-align:center}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;border-top:1px solid rgba(255,255,255,.08);padding-top:10px;text-align:left}
+.card{background:linear-gradient(180deg,rgba(18,24,44,.85),rgba(10,14,28,.9));border:1px solid rgba(120,160,255,.14);padding:9px;border-radius:13px;display:flex;flex-direction:column;gap:5px;box-shadow:0 8px 20px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06)}
+.card label{font-size:.62rem;color:#9fb2d8;text-transform:uppercase;letter-spacing:.8px;font-weight:800}
+.card input[type="time"], .card input[type="number"], .card input[type="text"]{background:#161d34;border:1px solid rgba(120,160,255,.2);color:#fff;padding:7px 8px;border-radius:8px;text-align:center;outline:none;font-size:.84rem;width:100%}
+.card input[type="text"]{text-align:left;font-size:.78rem}
+.card button{border:none;padding:8px;border-radius:9px;font-weight:900;cursor:pointer;font-size:.82rem;transition:.18s}
+.btn-a{background:linear-gradient(180deg,#00e5ff,#00b8d4);color:#002027;box-shadow:0 6px 14px rgba(0,229,255,.28)} .btn-r{background:linear-gradient(180deg,#ff5a7a,#d9304a);color:#fff}
+.count{font-size:1.45rem;font-weight:950;font-family:'Courier New',monospace;color:var(--accent);text-align:center;text-shadow:0 0 12px var(--glow)}
+.preset{display:flex;gap:4px;flex-wrap:wrap;justify-content:center} .preset button{font-size:.64rem;padding:3px 7px;background:#222a45;color:#aab8d8;border:1px solid rgba(120,160,255,.18);border-radius:12px;cursor:pointer}
+#status{font-size:.7rem;margin-top:9px;background:rgba(0,0,0,.32);padding:7px 8px;border-radius:9px;color:#a9b8d8;min-height:22px;text-align:left;line-height:1.35;border:1px solid rgba(255,255,255,.06)}
+#superOverlay{position:fixed;inset:0;background:rgba(90,0,0,.97);display:none;flex-direction:column;justify-content:center;align-items:center;z-index:9999;padding:18px}
+#superOverlay.on{display:flex;animation:bgP .55s infinite alternate} @keyframes bgP{from{background:rgba(120,0,0,.97)}to{background:rgba(18,0,0,.99)}}
+.rT{font-size:2.15rem;font-weight:950;color:#fff;text-shadow:0 0 18px #ff1744;animation:shake .26s infinite;text-align:center} .rS{color:#ffb3b3;margin:10px 0 18px;text-align:center;font-size:.9rem;line-height:1.4}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px) scale(1.03)}75%{transform:translateX(6px) scale(1.03)}}
+#btnStop{width:92%;max-width:360px;padding:18px;font-size:1.4rem;font-weight:950;background:linear-gradient(180deg,#ff425a,#b71c2e);color:#fff;border:3px solid #fff;border-radius:16px;box-shadow:0 0 32px rgba(255,23,68,.9);cursor:pointer}
+/* WEATHER */
+.weather-section{margin-top:12px;text-align:left;border-top:1px solid rgba(255,255,255,.08);padding-top:12px}
+.weather-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.weather-head h3{font-size:.88rem;color:#8ee8ff;display:flex;align-items:center;gap:6px}
+.weather-head button{font-size:.7rem;padding:5px 9px;border-radius:8px;border:1px solid rgba(120,180,255,.25);background:#1a2442;color:#a9c4ff;cursor:pointer}
+.current-card{background:linear-gradient(180deg,rgba(0,150,255,.18),rgba(0,60,120,.22));border:1px solid rgba(80,160,255,.28);border-radius:14px;padding:10px 12px;display:grid;grid-template-columns:1fr auto;gap:8px;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.current-main .temp{font-size:2rem;font-weight:950;color:#fff;text-shadow:0 0 14px rgba(80,180,255,.6)} .current-main .cond{font-size:.82rem;color:#b8d8ff}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.68rem;color:#a8bddf;margin-top:6px}
+.kv div{background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.06);padding:5px 6px;border-radius:8px}
+.kv b{color:#e6f0ff;font-weight:800}
+.hourly{margin-top:10px;display:flex;flex-direction:column;gap:6px;max-height:560px;overflow:auto;padding-right:2px}
+.hour-row{background:linear-gradient(180deg,#141c35,#0e1428);border:1px solid rgba(120,160,255,.14);border-radius:12px;padding:8px 9px;display:grid;grid-template-columns:54px 1fr auto;align-items:center;gap:8px;cursor:pointer;transition:.15s}
+.hour-row:hover{border-color:rgba(0,229,255,.32);transform:translateY(-1px)}
+.hour-time{font-weight:800;font-size:.78rem;color:#9fe7ff}
+.hour-meta{font-size:.7rem;color:#a9bddf;line-height:1.25}
+.hour-temp{font-weight:900;font-size:1rem;color:#fff;text-align:right}
+.hour-detail{display:none;grid-column:1/-1;margin-top:6px;padding-top:8px;border-top:1px dashed rgba(120,160,255,.18);grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:.66rem;color:#9fb6d8}
+.hour-row.open .hour-detail{display:grid}
+.hour-detail div{background:rgba(0,0,0,.24);padding:5px 6px;border-radius:8px;border:1px solid rgba(255,255,255,.05)} .hour-detail b{color:#d6e6ff}
+.small{font-size:.62rem;color:var(--dim)}
 </style>
 </head>
 <body>
 <div id="superOverlay">
   <div class="rT" id="rTitle">⏰ BANGUN BRO!!!</div>
-  <div class="rS" id="rSub">Bunyi TERUS tahan pindah app!<br>Tekan STOP!</div>
+  <div class="rS" id="rSub">Alarm bunyi TERUS sampai STOP!<br>Tahan pindah app!</div>
   <button id="btnStop">⛔ STOP ALARM ⛔</button>
 </div>
 
 <div class="box">
-  <h1>⏰ Jam Bicara V7</h1>
-  <p class="sub">19 Bahasa • Jam Jalan • Auto Anti-Stop • Teknik Playermini</p>
+  <h1>⏰ Jam Bicara V8</h1>
+  <p class="sub">19 Bahasa • Mili Detik Live • Custom Teks • Weather Per Jam • Anti-Stop</p>
   <div class="badges">
     <span class="badge on" id="clockBadge">🕐 Jam: Jalan</span>
-    <span class="badge" id="guardBadge">🛡️ Guard: Menunggu tap...</span>
+    <span class="badge on" id="guardBadge">🛡️ Guard: ON ✅</span>
     <span class="badge warn">🌐 19 Bahasa</span>
   </div>
 
   <div class="controls">
     <select id="langSelect">
-      <option value="id-ID">🇮🇩 Indonesia</option>
-      <option value="jv-ID">🌿 Jawa</option>
-      <option value="su-ID">🌿 Sunda</option>
-      <option value="zh-HK">🇭🇰 Kanton</option>
-      <option value="hokkien">🏮 Hokkien</option>
-      <option value="nan-TW">🏮 Hokkien Taiwan</option>
-      <option value="zh-CN">🇨🇳 Mandarin</option>
-      <option value="ja-JP">🇯🇵 Jepang</option>
-      <option value="ko-KR">🇰🇷 Korea</option>
-      <option value="en-US">🇺🇸 English US</option>
-      <option value="en-GB">🇬🇧 English UK</option>
-      <option value="fr-FR">🇫🇷 Prancis</option>
-      <option value="it-IT">🇮🇹 Italia</option>
-      <option value="es-ES">🇪🇸 Spanyol</option>
-      <option value="de-DE">🇩🇪 Jerman</option>
-      <option value="pt-BR">🇧🇷 Portugis</option>
-      <option value="ru-RU">🇷🇺 Rusia</option>
-      <option value="ar-SA">🇸🇦 Arab</option>
-      <option value="hi-IN">🇮🇳 Hindi</option>
+      <option value="id-ID">🇮🇩 Indonesia</option><option value="jv-ID">🌿 Jawa</option><option value="su-ID">🌿 Sunda</option>
+      <option value="zh-HK">🇭🇰 Kanton</option><option value="hokkien">🏮 Hokkien</option><option value="nan-TW">🏮 Hokkien TW</option>
+      <option value="zh-CN">🇨🇳 Mandarin</option><option value="ja-JP">🇯🇵 Jepang</option><option value="ko-KR">🇰🇷 Korea</option>
+      <option value="en-US">🇺🇸 English US</option><option value="en-GB">🇬🇧 English UK</option><option value="fr-FR">🇫🇷 Prancis</option>
+      <option value="it-IT">🇮🇹 Italia</option><option value="es-ES">🇪🇸 Spanyol</option><option value="de-DE">🇩🇪 Jerman</option>
+      <option value="pt-BR">🇧🇷 Portugis</option><option value="ru-RU">🇷🇺 Rusia</option><option value="ar-SA">🇸🇦 Arab</option><option value="hi-IN">🇮🇳 Hindi</option>
     </select>
     <select id="intervalSelect">
-      <option value="0">🔇 Jam Diam</option>
-      <option value="1">🔔 Tiap 1 menit</option>
-      <option value="5">🔔 Tiap 5 menit</option>
-      <option value="10">🔔 Tiap 10 menit</option>
-      <option value="15">🔔 Tiap 15 menit</option>
-      <option value="30">🔔 Tiap 30 menit</option>
-      <option value="60" selected>🔔 Tiap 1 jam</option>
+      <option value="0">🔇 Jam Diam</option><option value="1">🔔 Tiap 1 menit</option><option value="5">🔔 Tiap 5 menit</option>
+      <option value="10">🔔 Tiap 10 menit</option><option value="15">🔔 Tiap 15 menit</option><option value="30">🔔 Tiap 30 menit</option><option value="60" selected>🔔 Tiap 1 jam</option>
     </select>
   </div>
 
-  <div class="clock"><div class="clock-inner">
-    <div class="digit d-h1" id="h1"><div class="face">0</div></div>
-    <div class="digit d-h2" id="h2"><div class="face">0</div></div>
-    <div class="digit d-col"><div class="face" style="background:transparent;border:none;color:var(--accent);font-size:1.7rem">:</div></div>
-    <div class="digit d-m1" id="m1"><div class="face">0</div></div>
-    <div class="digit d-m2" id="m2"><div class="face">0</div></div>
-  </div></div>
-  <div id="digital">00:00:00</div>
+  <div class="clock-wrap">
+    <div class="clock"><div class="clock-inner" id="clockInner">
+      <div class="digit" id="h1"><div class="face">0</div><div class="shadow3d"></div></div>
+      <div class="digit" id="h2"><div class="face">0</div><div class="shadow3d"></div></div>
+      <div class="colon">:</div>
+      <div class="digit" id="m1"><div class="face">0</div><div class="shadow3d"></div></div>
+      <div class="digit" id="m2"><div class="face">0</div><div class="shadow3d"></div></div>
+    </div></div>
+    <div id="msBox">000</div>
+    <div id="dateDisplay">Memuat tanggal...</div>
+    <div id="digitalSec">00:00:00</div>
+  </div>
 
-  <div class="guardBox" id="guardBox">
-    <div class="gTitle" id="gTitle">👆 Tap dimana saja untuk aktifkan Anti-Stop</div>
-    <div class="gSub" id="gSub">Sekali tap, jam langsung pakai teknik playermini: Silent WAV 1 detik + 1 Audio Session. Habis itu pindah app tetap bunyi, gak perlu tekan apa-apa lagi.</div>
+  <div class="guardBox active" id="guardBox">
+    <div class="gTitle">✅ Anti-Stop AKTIF - Siap pindah app!</div>
+    <div class="gSub">Teknik playermini: Silent WAV 1 detik loop + 1 Audio Session. Jam, alarm & timer tetap bunyi walau pindah app.</div>
   </div>
 
   <div class="grid">
     <div class="card">
       <label>⏰ Alarm Tidur (Loop)</label>
       <input type="time" id="alarmTime" value="05:00">
+      <input type="text" id="alarmText" placeholder="Teks alarm: Bangun bro, sholat!" value="Bangun bro! Waktunya bangun, jangan tidur lagi!">
       <button class="btn-a" id="setAlarm">Set Alarm</button>
       <button class="btn-r" id="clearAlarm" style="display:none">Batal Alarm</button>
-      <div style="font-size:.6rem;color:var(--dim)">Loop terus sampai STOP</div>
+      <div class="small">Loop terus sampai STOP • Suara pakai teks di atas</div>
     </div>
     <div class="card">
       <label>🍳 Timer Anti Gosong</label>
-      <input type="number" id="cdInput" value="600" min="1">
-      <div class="count" id="cdDisplay">10:00</div>
+      <input type="number" id="cdInput" value="180" min="1">
+      <input type="text" id="timerText" placeholder="Teks timer: Angkat gorengan!" value="Waktu habis! Angkat masakan, jangan sampai gosong!">
+      <div class="count" id="cdDisplay">03:00</div>
       <div class="preset"><button data-s="180">3m</button><button data-s="300">5m</button><button data-s="600">10m</button><button data-s="900">15m</button><button data-s="1800">30m</button></div>
       <button class="btn-a" id="startCd">▶ Mulai</button>
       <button class="btn-r" id="stopCd" style="display:none">■ Stop</button>
     </div>
   </div>
-  <div id="status">✅ Jam jalan normal. Tap layar sekali biar Guard ON otomatis.</div>
+
+  <div id="status">✅ V8 siap. Mili detik live, tanggal today, custom teks alarm/timer, weather per jam. Tap layar sekali untuk Guard.</div>
+
+  <div class="weather-section" id="weatherSection">
+    <div class="weather-head">
+      <h3>🌦️ Prakiraan Per Jam • <span id="locName">Mendeteksi lokasi...</span></h3>
+      <button id="btnLoc">📍 Izin Lokasi</button>
+    </div>
+    <div class="current-card" id="currentCard">
+      <div class="current-main">
+        <div class="temp" id="curTemp">--°</div>
+        <div class="cond" id="curCond">Memuat cuaca...</div>
+        <div class="kv" id="curKv"></div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:2rem" id="curIcon">⛅</div>
+        <div class="small" id="curTime">--:--</div>
+      </div>
+    </div>
+    <div class="hourly" id="hourlyList"></div>
+    <div class="small" style="margin-top:6px">Sumber: Open-Meteo (gratis, tanpa API key) • Mirip MSN • Tap jam untuk lihat detail lengkap</div>
+  </div>
 </div>
 
 <script>
@@ -149,11 +227,10 @@ h1{font-size:1.2rem;color:var(--accent)} .sub{font-size:.74rem;color:var(--dim);
   };
   const getTL = l=>{if(['hokkien','nan-TW'].includes(l))return 'zh-TW'; if(['jv-ID','su-ID'].includes(l))return 'id-ID'; return l;};
   const buildText=(lang,h,m)=>{const db=TIME_TEXTS[lang]||TIME_TEXTS['id-ID'];const hs=db.h?db.h(h):h;const ms=db.m?db.m(m):m;if(m===0)return (db.prefix||'')+hs+(db.exact||'');if(lang.startsWith('en'))return `${db.prefix}${hs}:${ms}`;return `${db.prefix}${hs} ${ms}${db.min||' menit'}`;};
-
   const $=id=>document.getElementById(id);
-  const DOM={lang:$('langSelect'),interval:$('intervalSelect'),digital:$('digital'),h1:$('h1'),h2:$('h2'),m1:$('m1'),m2:$('m2'),status:$('status'),alarmTime:$('alarmTime'),setAlarm:$('setAlarm'),clearAlarm:$('clearAlarm'),cdInput:$('cdInput'),cdDisplay:$('cdDisplay'),startCd:$('startCd'),stopCd:$('stopCd'),overlay:$('superOverlay'),rTitle:$('rTitle'),rSub:$('rSub'),btnStop:$('btnStop'),guardBox:$('guardBox'),gTitle:$('gTitle'),gSub:$('gSub'),guardBadge:$('guardBadge')};
+  const DOM={lang:$('langSelect'),interval:$('intervalSelect'),msBox:$('msBox'),dateDisplay:$('dateDisplay'),digitalSec:$('digitalSec'),h1:$('h1'),h2:$('h2'),m1:$('m1'),m2:$('m2'),status:$('status'),alarmTime:$('alarmTime'),alarmText:$('alarmText'),setAlarm:$('setAlarm'),clearAlarm:$('clearAlarm'),cdInput:$('cdInput'),timerText:$('timerText'),cdDisplay:$('cdDisplay'),startCd:$('startCd'),stopCd:$('stopCd'),overlay:$('superOverlay'),rTitle:$('rTitle'),rSub:$('rSub'),btnStop:$('btnStop'),guardBadge:$('guardBadge'),locName:$('locName'),btnLoc:$('btnLoc'),curTemp:$('curTemp'),curCond:$('curCond'),curIcon:$('curIcon'),curTime:$('curTime'),curKv:$('curKv'),hourlyList:$('hourlyList')};
 
-  // ==== AUDIO ENGINE - TEKNIK PLAYERMINI ASLI ====
+  // ==== AUDIO ENGINE - TEKNIK PLAYERMINI ASLI (TETAP) ====
   let audioCtx=null, silentAudio=null, silentConnected=false, talkNode=null, alarmLoop=null, alarmLoopConnected=false, wakeLock=null;
   function makeSilent(){const a=document.createElement('audio');(function(){try{const sr=8000,n=sr,buf=new ArrayBuffer(44+n),v=new DataView(buf);const s2=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};s2(0,'RIFF');v.setUint32(4,36+n,true);s2(8,'WAVE');s2(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr,true);v.setUint16(32,1,true);v.setUint16(34,8,true);s2(36,'data');v.setUint32(40,n,true);new Uint8Array(buf,44).fill(0x80);a.src=URL.createObjectURL(new Blob([buf],{type:'audio/wav'}));}catch(e){a.src='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';}})();a.loop=true;a.volume=0.001;a.setAttribute('playsinline','');return a;}
   function makeSiren(){const sr=22050,dur=2.3,len=Math.floor(sr*dur),out=new Int16Array(len);for(let i=0;i<len;i++){const t=i/sr,f=820+380*Math.sin(t*2.6),ph=2*Math.PI*f*t,sq=Math.sin(ph)>0?1:-1,env=(Math.floor(t*3.2)%2===0)?1:0.16;out[i]=Math.floor(sq*env*30000);}const buf=new ArrayBuffer(44+len*2),v=new DataView(buf),w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};w(0,'RIFF');v.setUint32(4,36+len*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,len*2,true);let o=44;for(let i=0;i<len;i++){v.setInt16(o,out[i],true);o+=2;}return URL.createObjectURL(new Blob([buf],{type:'audio/wav'}));}
@@ -162,56 +239,158 @@ h1{font-size:1.2rem;color:var(--accent)} .sub{font-size:.74rem;color:var(--dim);
   async function acqWL(){if(!('wakeLock' in navigator))return;try{if(wakeLock&&!wakeLock.released)return;wakeLock=await navigator.wakeLock.request('screen');wakeLock.addEventListener('release',()=>{if(talkInterval>0||alarmActive||countdownActive||ringSt.active)setTimeout(acqWL,900);});}catch(e){}}
   function speakGoogle(text,lang){const ctx=initAudio();if(ctx&&ctx.state==='suspended')ctx.resume().catch(()=>{});ensurePipeline();if(!talkNode)talkNode=new Audio();else{try{talkNode.pause();talkNode.currentTime=0;}catch(e){}}const tl=getTL(lang).split('-')[0];const url='https://translate.google.com/translate_tts?ie=UTF-8&tl='+encodeURIComponent(tl)+'&client=tw-ob&q='+encodeURIComponent(text);talkNode.volume=1;talkNode.src=url;talkNode.play().catch(()=>{});}
 
-  // ==== JAM JALAN - FIX UTAMA: SELALU UPDATE, TIDAK TERGANTUNG WORKER ====
-  function updClock(h,m,s){DOM.digital.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;DOM.h1.querySelector('.face').textContent=Math.floor(h/10);DOM.h2.querySelector('.face').textContent=h%10;DOM.m1.querySelector('.face').textContent=Math.floor(m/10);DOM.m2.querySelector('.face').textContent=m%10;}
-  setInterval(()=>{const n=new Date();updClock(n.getHours(),n.getMinutes(),n.getSeconds());},1000);
-  (function(){const n=new Date();updClock(n.getHours(),n.getMinutes(),n.getSeconds());})();
+  // ==== JAM + MILI DETIK LIVE + TANGGAL ====
+  let lastH=-1,lastM=-1;
+  function updateDate(){
+    const now=new Date();
+    try{
+      const fmt=new Intl.DateTimeFormat('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+      DOM.dateDisplay.textContent=fmt.format(now);
+    }catch(e){
+      const days=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+      const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+      DOM.dateDisplay.textContent=`${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+    }
+  }
+  updateDate();
+  setInterval(updateDate,60000);
 
-  // ==== WORKER (HANYA UNTUK JAM BICARA + ALARM + COUNTDOWN, TIDAK URUS DISPLAY JAM) ====
-  let talkInterval=parseInt(DOM.interval.value)||0, alarmActive=false, alarmH=0,alarmM=0, countdownActive=false, cdRem=0, talkWorker=null;
+  function tick(){
+    const now=new Date();
+    const h=now.getHours(), m=now.getMinutes(), s=now.getSeconds(), ms=now.getMilliseconds();
+    if(h!==lastH || m!==lastM){
+      $('h1').querySelector('.face').textContent=Math.floor(h/10);
+      $('h2').querySelector('.face').textContent=h%10;
+      $('m1').querySelector('.face').textContent=Math.floor(m/10);
+      $('m2').querySelector('.face').textContent=m%10;
+      lastH=h;lastM=m;
+    }
+    DOM.digitalSec.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    // mili detik live dengan warna gonta-ganti bright
+    const msStr=String(ms).padStart(3,'0');
+    DOM.msBox.textContent=msStr;
+    const hue = (now.getTime()/18)%360; // ganti tiap ~18ms
+    DOM.msBox.style.color=`hsl(${hue},100%,62%)`;
+    DOM.msBox.style.borderColor=`hsl(${hue},100%,55%)`;
+    DOM.msBox.style.boxShadow=`0 8px 18px rgba(0,0,0,.7), 0 0 18px hsla(${hue},100%,60%,.55), inset 0 1px 0 rgba(255,255,255,.18)`;
+    DOM.msBox.style.textShadow=`0 0 10px hsla(${hue},100%,60%,.9), 0 0 22px hsla(${hue},100%,60%,.45)`;
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  // ==== WORKER (TETAP ANTI-STOP, TIDAK CEK hidden) ====
+  let talkInterval=parseInt(DOM.interval.value)||0, alarmActive=false, alarmH=0,alarmM=0, countdownActive=false, talkWorker=null;
   const WORKER_SRC=`var iMin=0,lastMin=-1,aH=-1,aM=-1,aOn=false,cSec=0,cOn=false;setInterval(function(){var d=new Date(),h=d.getHours(),m=d.getMinutes(),s=d.getSeconds(),tot=h*60+m;if(iMin!==0&&tot!==lastMin&&tot%iMin===0){lastMin=tot;postMessage({t:'SPEAK'})}if(aOn&&h===aH&&m===aM&&s<=2){postMessage({t:'ALARM'})}if(cOn){cSec--;postMessage({t:'CD_TICK',sec:cSec});if(cSec<=0){cOn=false;postMessage({t:'CD_DONE'})}}},1000);onmessage=function(e){var x=e.data||{};if(x.cmd==='TALK'){iMin=x.v;lastMin=-1}if(x.cmd==='ALARM'){aH=x.h;aM=x.m;aOn=x.on}if(x.cmd==='CD'){cSec=x.sec;cOn=x.on}if(x.cmd==='CDSTOP'){cOn=false}};`;
   function startW(){if(talkWorker)try{talkWorker.terminate()}catch(e){}try{const b=new Blob([WORKER_SRC],{type:'text/javascript'}),u=URL.createObjectURL(b);talkWorker=new Worker(u);URL.revokeObjectURL(u);talkWorker.onmessage=e=>{const d=e.data||{};if(d.t==='SPEAK'){const now=new Date();const txt=buildText(DOM.lang.value,now.getHours(),now.getMinutes());speakGoogle(txt,DOM.lang.value);DOM.status.textContent='🗣️ '+txt;}if(d.t==='ALARM'){if(!ringSt.active)startRing('alarm')}if(d.t==='CD_TICK'){DOM.cdDisplay.textContent=fmt(Math.max(0,d.sec))}if(d.t==='CD_DONE'){startRing('countdown')}};talkWorker.postMessage({cmd:'TALK',v:talkInterval});}catch(e){}}
   function fmt(s){s=Math.max(0,s);const mm=Math.floor(s/60),ss=s%60;return String(mm).padStart(2,'0')+':'+String(ss).padStart(2,'0')}
 
-  // ==== RING ====
+  // ==== RING DENGAN CUSTOM TEKS ====
   let ringSt={active:false,type:'',sInt:null,vInt:null,nInt:null};
   function showN(t,b){if(!('Notification'in window)||Notification.permission!=='granted')return;try{new Notification(t,{body:b,requireInteraction:true})}catch(e){}}
-  function startRing(type){if(ringSt.active)return;ringSt.active=true;ringSt.type=type;initAudio();if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});ensurePipeline();if(silentAudio)silentAudio.play().catch(()=>{});DOM.overlay.classList.add('on');if(type==='alarm'){DOM.rTitle.textContent='⏰ BANGUN BRO!!!';DOM.rSub.innerHTML='Alarm tidur! Tahan pindah app!<br>Tekan STOP!';}else{DOM.rTitle.textContent='🍳 MATANG BRO!!!';DOM.rSub.innerHTML='Timer habis! Matikan kompor!<br>Jangan gosong!';}document.body.style.overflow='hidden';if(alarmLoop){try{alarmLoop.currentTime=0;alarmLoop.volume=1;alarmLoop.play().catch(()=>{});}catch(e){}}const first=type==='alarm'?'Bangun! Bangun! Waktunya bangun! Tekan stop!':'Waktu habis! Matikan kompor! Masakan matang!';speakGoogle(first,DOM.lang.value);showN(type==='alarm'?'⏰ BANGUN':'🍳 MATANG',first);if(navigator.vibrate)navigator.vibrate([700,200,700]);ringSt.sInt=setInterval(()=>{if(alarmLoop&&alarmLoop.paused)alarmLoop.play().catch(()=>{});if(navigator.vibrate)navigator.vibrate([400,100,400]);},1100);let vc=0;ringSt.vInt=setInterval(()=>{vc++;const msgs=type==='alarm'?[`Bangun bro jam ${new Date().getHours()}!`,'Alarm masih bunyi!','Tekan stop bro!']:['Cek masakan!','Matikan kompor!','Jangan gosong!'];speakGoogle(msgs[vc%msgs.length],DOM.lang.value);},2800);ringSt.nInt=setInterval(()=>{showN('🚨 ALARM MASIH BUNYI','Buka app & tekan STOP');},3800);acqWL();}
+  function startRing(type){
+    if(ringSt.active)return;ringSt.active=true;ringSt.type=type;initAudio();if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});ensurePipeline();if(silentAudio)silentAudio.play().catch(()=>{});DOM.overlay.classList.add('on');
+    const customAlarm = DOM.alarmText.value.trim() || 'Bangun bro! Waktunya bangun!';
+    const customTimer = DOM.timerText.value.trim() || 'Waktu habis! Angkat masakan!';
+    const first = type==='alarm'? customAlarm : customTimer;
+    if(type==='alarm'){DOM.rTitle.textContent='⏰ BANGUN BRO!!!';DOM.rSub.innerHTML=(customAlarm+'<br>Loop sampai STOP!').slice(0,120);}else{DOM.rTitle.textContent='🍳 MATANG BRO!!!';DOM.rSub.innerHTML=(customTimer+'<br>Jangan sampai gosong!').slice(0,120);}
+    document.body.style.overflow='hidden';
+    if(alarmLoop){try{alarmLoop.currentTime=0;alarmLoop.volume=1;alarmLoop.play().catch(()=>{});}catch(e){}}
+    speakGoogle(first,DOM.lang.value);showN(type==='alarm'?'⏰ ALARM':'🍳 TIMER',first);if(navigator.vibrate)navigator.vibrate([700,200,700]);
+    ringSt.sInt=setInterval(()=>{if(alarmLoop&&alarmLoop.paused)alarmLoop.play().catch(()=>{});if(navigator.vibrate)navigator.vibrate([400,100,400]);},1100);
+    let vc=0;ringSt.vInt=setInterval(()=>{vc++;const arr=type==='alarm'?[customAlarm,'Alarm masih bunyi! Tekan STOP!']:[customTimer,'Cek masakan sekarang!'];speakGoogle(arr[vc%arr.length],DOM.lang.value);},3000);
+    ringSt.nInt=setInterval(()=>{showN('🚨 MASIH BUNYI','Buka app & tekan STOP');},3800);acqWL();
+  }
   function stopRing(){const was=ringSt.active;ringSt.active=false;clearInterval(ringSt.sInt);clearInterval(ringSt.vInt);clearInterval(ringSt.nInt);ringSt.sInt=ringSt.vInt=ringSt.nInt=null;DOM.overlay.classList.remove('on');document.body.style.overflow='';try{window.speechSynthesis.cancel()}catch(e){}if(alarmLoop)try{alarmLoop.pause();alarmLoop.currentTime=0}catch(e){}if(navigator.vibrate)navigator.vibrate(0);if(was){if(ringSt.type==='alarm'){alarmActive=false;DOM.clearAlarm.style.display='none';DOM.setAlarm.style.display='block';if(talkWorker)talkWorker.postMessage({cmd:'ALARM',on:false});}else{countdownActive=false;DOM.stopCd.style.display='none';DOM.startCd.style.display='block';if(talkWorker)talkWorker.postMessage({cmd:'CDSTOP'});}}DOM.status.textContent='✅ Dihentikan. Guard tetap ON.';ringSt.type='';}
 
-  // ==== UI ====
+  // ==== UI EVENTS ====
   DOM.interval.addEventListener('change',()=>{talkInterval=parseInt(DOM.interval.value)||0;if(talkWorker)talkWorker.postMessage({cmd:'TALK',v:talkInterval});if(talkInterval>0){initAudio();if(silentAudio)silentAudio.play().catch(()=>{});ensurePipeline();acqWL();}});
-  DOM.setAlarm.addEventListener('click',()=>{const v=DOM.alarmTime.value;if(!v){DOM.status.textContent='❌ Pilih jam!';return;}const [hh,mm]=v.split(':').map(Number);alarmH=hh;alarmM=mm;alarmActive=true;DOM.setAlarm.style.display='none';DOM.clearAlarm.style.display='block';initAudio();if(silentAudio)silentAudio.play().catch(()=>{});ensurePipeline();if(!talkWorker)startW();talkWorker.postMessage({cmd:'ALARM',h:hh,m:mm,on:true});acqWL();DOM.status.textContent=`⏰ Alarm ${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')} aktif - tahan background!`;speakGoogle(`Alarm jam ${hh} ${mm} aktif`,DOM.lang.value);});
+  DOM.setAlarm.addEventListener('click',()=>{const v=DOM.alarmTime.value;if(!v){DOM.status.textContent='❌ Pilih jam!';return;}const [hh,mm]=v.split(':').map(Number);alarmH=hh;alarmM=mm;alarmActive=true;DOM.setAlarm.style.display='none';DOM.clearAlarm.style.display='block';initAudio();if(silentAudio)silentAudio.play().catch(()=>{});ensurePipeline();if(!talkWorker)startW();talkWorker.postMessage({cmd:'ALARM',h:hh,m:mm,on:true});acqWL();DOM.status.textContent=`⏰ Alarm ${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')} aktif • Teks: ${DOM.alarmText.value.slice(0,30)}`;speakGoogle(`Alarm disetel jam ${hh} ${mm}`,DOM.lang.value);});
   DOM.clearAlarm.addEventListener('click',()=>{alarmActive=false;if(talkWorker)talkWorker.postMessage({cmd:'ALARM',on:false});DOM.clearAlarm.style.display='none';DOM.setAlarm.style.display='block';DOM.status.textContent='⏰ Alarm batal';stopRing();});
-  DOM.startCd.addEventListener('click',()=>{let v=parseInt(DOM.cdInput.value);if(isNaN(v)||v<1){DOM.status.textContent='❌ Isi detik!';return;}cdRem=v;countdownActive=true;DOM.cdDisplay.textContent=fmt(v);DOM.startCd.style.display='none';DOM.stopCd.style.display='block';initAudio();if(silentAudio)silentAudio.play().catch(()=>{});ensurePipeline();if(!talkWorker)startW();talkWorker.postMessage({cmd:'CD',sec:v,on:true});acqWL();DOM.status.textContent=`🍳 Timer ${fmt(v)} mulai!`;});
+  DOM.startCd.addEventListener('click',()=>{let v=parseInt(DOM.cdInput.value);if(isNaN(v)||v<1){DOM.status.textContent='❌ Isi detik!';return;}countdownActive=true;DOM.cdDisplay.textContent=fmt(v);DOM.startCd.style.display='none';DOM.stopCd.style.display='block';initAudio();if(silentAudio)silentAudio.play().catch(()=>{});ensurePipeline();if(!talkWorker)startW();talkWorker.postMessage({cmd:'CD',sec:v,on:true});acqWL();DOM.status.textContent=`🍳 Timer ${fmt(v)} mulai! Teks: ${DOM.timerText.value.slice(0,30)}`;});
   DOM.stopCd.addEventListener('click',()=>{countdownActive=false;if(talkWorker)talkWorker.postMessage({cmd:'CDSTOP'});DOM.stopCd.style.display='none';DOM.startCd.style.display='block';DOM.status.textContent='⏳ Timer stop';stopRing();});
   document.querySelectorAll('.preset button').forEach(b=>b.addEventListener('click',()=>{const s=parseInt(b.dataset.s);DOM.cdInput.value=s;DOM.cdDisplay.textContent=fmt(s);}));
   DOM.cdInput.addEventListener('input',()=>{const v=parseInt(DOM.cdInput.value)||0;DOM.cdDisplay.textContent=fmt(v);});
   DOM.btnStop.addEventListener('click',stopRing);
 
-  // ==== AUTO GUARD - USER GAK PERLU BINGUNG TEKAN APA ====
-  let guardOn=false;
-  async function activateGuardAuto(){
-    if(guardOn) return; guardOn=true;
-    initAudio();const ctx=audioCtx;if(ctx&&ctx.state==='suspended')try{await ctx.resume()}catch(e){}
-    if(silentAudio)try{await silentAudio.play()}catch(e){}
-    ensurePipeline();await acqWL();
-    if(!talkWorker)startW();
-    if('Notification' in window && Notification.permission==='default'){try{await Notification.requestPermission()}catch(e){}}
-    DOM.guardBadge.textContent='🛡️ Guard: ON ✅ 1 Session';DOM.guardBadge.className='badge on';
-    DOM.guardBox.classList.add('active');DOM.gTitle.textContent='✅ Anti-Stop AKTIF - Siap pindah app!';
-    DOM.gSub.textContent='Teknik playermini aktif: Silent WAV 1 detik loop + 1 Audio Session. Sekarang jam, alarm & timer tetap bunyi walau pindah app. Gak perlu tekan apa-apa lagi.';
-    DOM.status.textContent='✅ Guard ON otomatis! Jam jalan, 19 bahasa siap, tahan background.';
-    try{if('mediaSession' in navigator){navigator.mediaSession.metadata=new MediaMetadata({title:'Jam Bicara Anti-Stop',artist:'19 Bahasa',album:'Playermini'});navigator.mediaSession.setActionHandler('stop',()=>stopRing());}}catch(e){}
+  // ==== WEATHER PER JAM MIRIP MSN ====
+  const weatherCodes={0:'Cerah',1:'Sebagian cerah',2:'Sebagian berawan',3:'Mendung',45:'Berkabut',48:'Kabut es',51:'Gerimis ringan',53:'Gerimis',55:'Gerimis lebat',61:'Hujan ringan',63:'Hujan',65:'Hujan lebat',71:'Salju ringan',73:'Salju',75:'Salju lebat',80:'Hujan rintik',81:'Hujan sedang',82:'Hujan deras',95:'Badai petir',96:'Badai petir es'};
+  const weatherIcons={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',51:'🌦️',61:'🌧️',63:'🌧️',65:'⛈️',80:'🌧️',95:'⛈️'};
+  function iconFor(code,isDay){return weatherIcons[code]|| (isDay?'⛅':'🌙');}
+  async function reverseGeocode(lat,lon){
+    try{
+      const r=await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=id`);
+      const j=await r.json(); return j.city||j.locality||j.principalSubdivision||`${lat.toFixed(2)}, ${lon.toFixed(2)}`;
+    }catch(e){return `${lat.toFixed(2)}, ${lon.toFixed(2)}`;}
   }
-  // Trigger di interaksi pertama apapun
+  async function fetchWeather(lat,lon){
+    try{
+      DOM.locName.textContent=`${lat.toFixed(3)}, ${lon.toFixed(3)} • Memuat...`;
+      const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,pressure_msl,dew_point_2m,visibility,uv_index,cloud_cover&hourly=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation_probability,weather_code,wind_speed_10m,uv_index,visibility,dew_point_2m,pressure_msl,wind_gusts_10m,cloud_cover&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto`;
+      const res=await fetch(url); const data=await res.json();
+      const name=await reverseGeocode(lat,lon); DOM.locName.textContent=name;
+      renderWeather(data);
+    }catch(e){DOM.locName.textContent='Gagal memuat cuaca'; DOM.curCond.textContent='Cek koneksi internet';}
+  }
+  function renderWeather(d){
+    const cur=d.current; const hourly=d.hourly; const daily=d.daily;
+    DOM.curTemp.textContent=`${Math.round(cur.temperature_2m)}°`; 
+    DOM.curCond.textContent=weatherCodes[cur.weather_code]||'Cuaca';
+    DOM.curIcon.textContent=iconFor(cur.weather_code,cur.is_day);
+    DOM.curTime.textContent=new Date(cur.time).toLocaleString('id-ID',{hour:'2-digit',minute:'2-digit'});
+    DOM.curKv.innerHTML=`
+      <div>Terasa <b>${Math.round(cur.apparent_temperature)}°</b></div>
+      <div>Kelembapan <b>${cur.relative_humidity_2m}%</b></div>
+      <div>Angin <b>${cur.wind_speed_10m} km/j</b></div>
+      <div>Embusan <b>${cur.wind_gusts_10m} km/j</b></div>
+      <div>Titik Embun <b>${Math.round(cur.dew_point_2m)}°</b></div>
+      <div>Tekanan <b>${Math.round(cur.pressure_msl)} mb</b></div>
+      <div>Jarak Pandang <b>${(cur.visibility/1000).toFixed(1)} km</b></div>
+      <div>UV Index <b>${cur.uv_index}</b></div>
+    `;
+    // hourly list 24 jam ke depan
+    const now=new Date(); const startIdx=hourly.time.findIndex(t=>new Date(t)>=now); const slice=24;
+    DOM.hourlyList.innerHTML='';
+    for(let i=startIdx;i<Math.min(startIdx+slice,hourly.time.length);i++){
+      const t=new Date(hourly.time[i]);
+      const row=document.createElement('div'); row.className='hour-row';
+      row.innerHTML=`
+        <div class="hour-time">${t.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}<div class="small">${t.toLocaleDateString('id-ID',{weekday:'short'})}</div></div>
+        <div class="hour-meta">
+          <div>${iconFor(hourly.weather_code[i],1)} ${weatherCodes[hourly.weather_code[i]]||''} • ${Math.round(hourly.temperature_2m[i])}°</div>
+          <div>💧 ${hourly.precipitation_probability[i]}% • ☀️ UV ${hourly.uv_index[i]} • 💨 ${Math.round(hourly.wind_speed_10m[i])} km/j</div>
+        </div>
+        <div class="hour-temp">${Math.round(hourly.temperature_2m[i])}°</div>
+        <div class="hour-detail">
+          <div>Terasa Seperti<br><b>${Math.round(hourly.apparent_temperature[i])}°</b></div>
+          <div>Kelembapan<br><b>${hourly.relative_humidity_2m[i]}%</b></div>
+          <div>Jarak Pandang<br><b>${(hourly.visibility[i]/1000).toFixed(1)} km</b></div>
+          <div>Titik Embun<br><b>${Math.round(hourly.dew_point_2m[i])}°</b></div>
+          <div>Tekanan<br><b>${Math.round(hourly.pressure_msl[i])} mb</b></div>
+          <div>Embusan Angin<br><b>${Math.round(hourly.wind_gusts_10m[i])} km/j</b></div>
+          <div>Hamparan Awan<br><b>${hourly.cloud_cover[i]}%</b></div>
+          <div>UV Index<br><b>${hourly.uv_index[i]}</b></div>
+          <div>Presipitasi<br><b>${hourly.precipitation_probability[i]}%</b></div>
+        </div>
+      `;
+      row.addEventListener('click',()=>row.classList.toggle('open'));
+      DOM.hourlyList.appendChild(row);
+    }
+  }
+  async function requestLocation(){
+    DOM.locName.textContent='Meminta izin lokasi...';
+    if(!navigator.geolocation){fetchWeather(-6.2088,106.8456);return;}
+    navigator.geolocation.getCurrentPosition(pos=>{fetchWeather(pos.coords.latitude,pos.coords.longitude);},err=>{DOM.locName.textContent='Izin ditolak, pakai Jakarta';fetchWeather(-6.2088,106.8456);},{enableHighAccuracy:true,timeout:8000});
+  }
+  DOM.btnLoc.addEventListener('click',requestLocation);
+  // auto request
+  requestLocation();
+
+  // ==== AUTO GUARD ====
+  let guardOn=false;
+  async function activateGuardAuto(){if(guardOn)return;guardOn=true;initAudio();const ctx=audioCtx;if(ctx&&ctx.state==='suspended')try{await ctx.resume()}catch(e){}if(silentAudio)try{await silentAudio.play()}catch(e){}ensurePipeline();await acqWL();if(!talkWorker)startW();if('Notification' in window && Notification.permission==='default'){try{await Notification.requestPermission()}catch(e){}}DOM.guardBadge.textContent='🛡️ Guard: ON ✅';DOM.guardBadge.className='badge on';}
   ['click','touchend','keydown'].forEach(ev=>{document.addEventListener(ev,function h(){activateGuardAuto();document.removeEventListener(ev,h);},{once:true});});
-  // Juga auto coba pas load (kadang browser allow)
-  window.addEventListener('load',()=>{setTimeout(()=>{if(!guardOn){DOM.gTitle.textContent='👆 Tap layar sekali untuk aktifkan';}},400)});
-
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});ensurePipeline();acqWL();if(silentAudio&&silentAudio.paused)silentAudio.play().catch(()=>{});if(ringSt.active&&alarmLoop&&alarmLoop.paused)alarmLoop.play().catch(()=>{});}else{if(silentAudio)silentAudio.play().catch(()=>{});if(ringSt.active&&alarmLoop)alarmLoop.play().catch(()=>{});}});
-
-  startW(); DOM.cdDisplay.textContent=fmt(parseInt(DOM.cdInput.value)||0);
+  startW();
 })();
 </script>
 </body>
