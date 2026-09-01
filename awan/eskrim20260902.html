@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Es Krim Cinta Untukmu 🍦💕</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600;700&display=swap');
+
+        :root {
+            --pink: #ffb6c1;
+            --pink-light: #ffe4e9;
+            --pink-dark: #ff8fa3;
+            --cream: #fff8f0;
+            --brown: #8b5e3c;
+            --mint: #a8e6cf;
+            --lavender: #d4a5e8;
+            --sky: #a8d8ea;
+            --sunny: #ffeaa7;
+            --strawberry: #ff6b81;
+            --choco: #6b3f2a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(160deg, #fff5f7 0%, #ffe8ee 25%, #fce4ec 50%, #fff0f5 75%, #ffe4e1 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Quicksand', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+            cursor: default;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Floating decorative elements */
+        .floating-emoji {
+            position: fixed;
+            font-size: 2rem;
+            pointer-events: none;
+            animation: floatAround 15s infinite ease-in-out;
+            z-index: 1;
+            opacity: 0.6;
+        }
+
+        @keyframes floatAround {
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            25% {
+                transform: translateY(-30px) rotate(10deg);
+            }
+            50% {
+                transform: translateY(-10px) rotate(-5deg);
+            }
+            75% {
+                transform: translateY(-40px) rotate(8deg);
+            }
+        }
+
+        .main-container {
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        /* Title Section */
+        .title-section {
+            margin-bottom: 10px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .title-emoji {
+            font-size: 3rem;
+            display: inline-block;
+            animation: wiggle 2s infinite ease-in-out;
+        }
+
+        @keyframes wiggle {
+            0%,
+            100% {
+                transform: rotate(-5deg);
+            }
+            50% {
+                transform: rotate(5deg);
+            }
+        }
+
+        .main-title {
+            font-family: 'Pacifico', cursive;
+            font-size: 2.5rem;
+            color: var(--strawberry);
+            text-shadow: 2px 2px 0 rgba(255, 182, 193, 0.5), 4px 4px 8px rgba(255, 143, 163, 0.3);
+            margin: 8px 0;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #e0758a;
+            font-weight: 600;
+            letter-spacing: 1px;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 8px 18px;
+            border-radius: 20px;
+            display: inline-block;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 182, 193, 0.4);
+        }
+
+        /* Ice Cream Container */
+        .icecream-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            animation: bounceIn 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            margin: 15px 0;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3) translateY(50px);
+            }
+            50% {
+                transform: scale(1.1) translateY(-10px);
+            }
+            70% {
+                transform: scale(0.95) translateY(5px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .icecream-wrapper:hover {
+            transform: scale(1.05) rotate(-2deg);
+        }
+
+        .icecream-wrapper:active {
+            transform: scale(0.92) rotate(2deg);
+        }
+
+        .icecream-emoji-main {
+            font-size: 8rem;
+            display: block;
+            filter: drop-shadow(0 10px 30px rgba(255, 107, 129, 0.4));
+            transition: all 0.3s;
+            animation: gentleBounce 2s infinite ease-in-out;
+        }
+
+        @keyframes gentleBounce {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-12px);
+            }
+        }
+
+        .icecream-wrapper:hover .icecream-emoji-main {
+            filter: drop-shadow(0 15px 40px rgba(255, 107, 129, 0.6));
+            animation: excitedBounce 0.6s infinite ease-in-out;
+        }
+
+        @keyframes excitedBounce {
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+            }
+            25% {
+                transform: translateY(-15px) scale(1.05) rotate(-5deg);
+            }
+            75% {
+                transform: translateY(-15px) scale(1.05) rotate(5deg);
+            }
+        }
+
+        /* Glow ring */
+        .glow-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 182, 193, 0.5) 0%, rgba(255, 182, 193, 0.15) 40%, transparent 70%);
+            pointer-events: none;
+            animation: pulseRing 2.5s infinite ease-in-out;
+            z-index: -1;
+        }
+
+        @keyframes pulseRing {
+            0%,
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.8;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.4);
+                opacity: 0.4;
+            }
+        }
+
+        /* Click hint */
+        .click-hint {
+            font-size: 0.95rem;
+            color: #e0758a;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 6px 16px;
+            border-radius: 18px;
+            display: inline-block;
+            margin-top: 5px;
+            animation: hintBlink 2s infinite ease-in-out;
+            backdrop-filter: blur(4px);
+            border: 1px dashed var(--pink-dark);
+        }
+
+        @keyframes hintBlink {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.05);
+            }
+        }
+
+        /* Message box */
+        .message-box {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 20px 24px;
+            margin-top: 15px;
+            border: 2px solid rgba(255, 182, 193, 0.5);
+            box-shadow: 0 8px 32px rgba(255, 143, 163, 0.2);
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message-text {
+            font-size: 1.2rem;
+            color: #d4607a;
+            font-weight: 700;
+            line-height: 1.6;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+
+        .message-text .big-heart {
+            font-size: 1.8rem;
+            display: inline-block;
+            animation: heartBeat 1.2s infinite;
+        }
+
+        @keyframes heartBeat {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            25% {
+                transform: scale(1.3);
+            }
+            40% {
+                transform: scale(1);
+            }
+            60% {
+                transform: scale(1.2);
+            }
+            80% {
+                transform: scale(1);
+            }
+        }
+
+        /* Heart burst container */
+        .heart-burst-container {
+            position: fixed;
+            pointer-events: none;
+            z-index: 100;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .burst-heart {
+            position: absolute;
+            font-size: 1.5rem;
+            animation: heartFly 1.5s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes heartFly {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(0.5) rotate(0deg);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(var(--fly-x), var(--fly-y)) scale(1.2) rotate(180deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(calc(var(--fly-x) * 2), calc(var(--fly-y) * 2)) scale(0.3) rotate(360deg);
+            }
+        }
+
+        /* Sparkle burst */
+        .sparkle {
+            position: absolute;
+            font-size: 1.2rem;
+            animation: sparkleFly 1.2s ease-out forwards;
+            pointer-events: none;
+            z-index: 99;
+        }
+
+        @keyframes sparkleFly {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(0.3) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--sparkle-x), var(--sparkle-y)) scale(1.5) rotate(360deg);
+            }
+        }
+
+        /* Falling sprinkles */
+        .sprinkle-fall {
+            position: fixed;
+            pointer-events: none;
+            z-index: 5;
+            font-size: 1.2rem;
+            animation: sprinkleDrop linear forwards;
+        }
+
+        @keyframes sprinkleDrop {
+            0% {
+                opacity: 1;
+                transform: translateY(-20px) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+
+        /* Particle text on click */
+        .click-particle {
+            position: fixed;
+            pointer-events: none;
+            font-weight: 700;
+            font-size: 1rem;
+            z-index: 101;
+            animation: particleRise 1s ease-out forwards;
+        }
+
+        @keyframes particleRise {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(0.8);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--p-x, 20px), var(--p-y, -60px)) scale(1.3);
+            }
+        }
+
+        /* Counter badge */
+        .counter-badge {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 10px 18px;
+            border: 2px solid var(--pink);
+            box-shadow: 0 4px 16px rgba(255, 143, 163, 0.3);
+            z-index: 50;
+            font-weight: 700;
+            color: var(--strawberry);
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .counter-badge span {
+            font-size: 1.3rem;
+            display: inline-block;
+            margin: 0 2px;
+        }
+
+        /* Sweet messages list */
+        .sweet-words {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            animation: fadeInUp 0.8s ease-out 0.5s both;
+        }
+
+        .sweet-word-tag {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            padding: 5px 14px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #e0758a;
+            border: 1px solid rgba(255, 182, 193, 0.4);
+            cursor: default;
+            transition: all 0.3s;
+            backdrop-filter: blur(4px);
+        }
+
+        .sweet-word-tag:hover {
+            background: var(--pink);
+            color: white;
+            transform: scale(1.05);
+            border-color: var(--pink-dark);
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .main-title {
+                font-size: 1.8rem;
+            }
+            .icecream-emoji-main {
+                font-size: 5.5rem;
+            }
+            .message-text {
+                font-size: 1rem;
+            }
+            .glow-ring {
+                width: 100px;
+                height: 100px;
+            }
+            .title-emoji {
+                font-size: 2.2rem;
+            }
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            .counter-badge {
+                bottom: 10px;
+                right: 10px;
+                padding: 8px 14px;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Shake animation for click feedback */
+        .shake-animation {
+            animation: shakeShake 0.5s ease-in-out;
+        }
+
+        @keyframes shakeShake {
+            0%,
+            100% {
+                transform: rotate(0deg) scale(1);
+            }
+            10% {
+                transform: rotate(-8deg) scale(0.95);
+            }
+            20% {
+                transform: rotate(8deg) scale(1.05);
+            }
+            30% {
+                transform: rotate(-6deg) scale(0.98);
+            }
+            40% {
+                transform: rotate(6deg) scale(1.03);
+            }
+            50% {
+                transform: rotate(-4deg) scale(1);
+            }
+            60% {
+                transform: rotate(4deg) scale(1.02);
+            }
+            70% {
+                transform: rotate(-2deg) scale(1);
+            }
+            80% {
+                transform: rotate(2deg) scale(1.01);
+            }
+            90% {
+                transform: rotate(-1deg) scale(1);
+            }
+        }
+
+        /* Rainbow border animation for message box */
+        .rainbow-glow {
+            animation: rainbowBorder 2s infinite;
+        }
+
+        @keyframes rainbowBorder {
+            0% {
+                border-color: #ffb6c1;
+                box-shadow: 0 8px 32px rgba(255, 182, 193, 0.4);
+            }
+            20% {
+                border-color: #ffd1a8;
+                box-shadow: 0 8px 32px rgba(255, 209, 168, 0.5);
+            }
+            40% {
+                border-color: #ffeaa7;
+                box-shadow: 0 8px 32px rgba(255, 234, 167, 0.5);
+            }
+            60% {
+                border-color: #a8e6cf;
+                box-shadow: 0 8px 32px rgba(168, 230, 207, 0.5);
+            }
+            80% {
+                border-color: #a8d8ea;
+                box-shadow: 0 8px 32px rgba(168, 216, 234, 0.5);
+            }
+            100% {
+                border-color: #ffb6c1;
+                box-shadow: 0 8px 32px rgba(255, 182, 193, 0.4);
+            }
+        }
+
+        /* Sprinkle trail effect on mouse move over ice cream */
+        .cursor-sprinkle {
+            position: fixed;
+            pointer-events: none;
+            font-size: 1rem;
+            z-index: 90;
+            animation: cursorSprinkleFade 0.7s ease-out forwards;
+        }
+
+        @keyframes cursorSprinkleFade {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(40px) scale(0.5);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating background emojis -->
+    <div class="floating-emoji" style="top:5%;left:5%;animation-delay:0s;font-size:2.5rem;">🌸</div>
+    <div class="floating-emoji" style="top:15%;right:8%;animation-delay:2s;font-size:2rem;">💖</div>
+    <div class="floating-emoji" style="bottom:20%;left:3%;animation-delay:4s;font-size:2.2rem;">✨</div>
+    <div class="floating-emoji" style="bottom:10%;right:5%;animation-delay:6s;font-size:2.8rem;">🍨</div>
+    <div class="floating-emoji" style="top:40%;left:2%;animation-delay:8s;font-size:1.8rem;">💕</div>
+    <div class="floating-emoji" style="top:30%;right:3%;animation-delay:10s;font-size:2rem;">🍓</div>
+    <div class="floating-emoji" style="bottom:35%;right:10%;animation-delay:12s;font-size:1.6rem;">🌟</div>
+    <div class="floating-emoji" style="top:8%;left:30%;animation-delay:14s;font-size:1.5rem;">🌈</div>
+
+    <!-- Heart burst container -->
+    <div class="heart-burst-container" id="heartBurstContainer"></div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="title-section">
+            <span class="title-emoji">🍦</span>
+            <h1 class="main-title">Es Krim Cinta</h1>
+            <div class="subtitle">🎀 Untuk Kekasihku Tersayang 🎀</div>
+        </div>
+
+        <!-- Ice Cream Clickable -->
+        <div class="icecream-wrapper" id="icecreamWrapper" title="Klik aku sayang! 💕">
+            <div class="glow-ring"></div>
+            <span class="icecream-emoji-main" id="icecreamEmoji">🍨</span>
+        </div>
+
+        <div class="click-hint" id="clickHint">👆 Klik es krimnya ya sayang~ 💋</div>
+
+        <!-- Message Box -->
+        <div class="message-box" id="messageBox">
+            <p class="message-text" id="messageText">
+                Kamu manis seperti es krim <span class="big-heart">💖</span><br>
+                Aku sayang kamu selamanya~
+            </p>
+        </div>
+
+        <!-- Sweet words tags -->
+        <div class="sweet-words">
+            <span class="sweet-word-tag">🍓 Manis</span>
+            <span class="sweet-word-tag">💕 Sayang</span>
+            <span class="sweet-word-tag">🌸 Cantik</span>
+            <span class="sweet-word-tag">✨ Spesial</span>
+            <span class="sweet-word-tag">🍦 Lucu</span>
+            <span class="sweet-word-tag">💖 Cinta</span>
+            <span class="sweet-word-tag">🌈 Terbaik</span>
+            <span class="sweet-word-tag">🎀 Imut</span>
+        </div>
+    </div>
+
+    <!-- Click Counter -->
+    <div class="counter-badge" id="counterBadge">
+        <span>💖</span> Klik: <span id="clickCount">0</span> <span>🍨</span>
+    </div>
+
+    <script>
+        (function() {
+            // DOM Elements
+            const icecreamWrapper = document.getElementById('icecreamWrapper');
+            const icecreamEmoji = document.getElementById('icecreamEmoji');
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            const clickCountSpan = document.getElementById('clickCount');
+            const clickHint = document.getElementById('clickHint');
+            const heartBurstContainer = document.getElementById('heartBurstContainer');
+
+            // State
+            let clickCount = 0;
+            let isAnimating = false;
+            const iceCreamEmojis = ['🍨', '🍦', '🍧', '🍮', '🧁', '🍰', '🎂', '🍩', '🍪', '🍫', '🍓', '🍒', '🍑', '🍉', '🍇', '🍌', '🍎', '🥝', '🍊', '🍋'];
+            const sweetMessages = [
+                'Kamu manis seperti es krim <span class="big-heart">💖</span><br>Aku sayang kamu selamanya~',
+                'Setiap gigitan es krim ini<br>mengingatkanku pada senyummu <span class="big-heart">😍💕</span>',
+                'Kamu lebih manis dari es krim apa pun di dunia ini! <span class="big-heart">🍦💖</span>',
+                'Aku ingin memelukmu erat-erat<br>seperti cone memeluk es krimnya <span class="big-heart">🤗💕</span>',
+                'Cintaku padamu meleleh setiap saat<br>seperti es krim di musim panas <span class="big-heart">☀️💓</span>',
+                'Kamu adalah topping terindah<br>dalam hidupku <span class="big-heart">🍒✨</span>',
+                'Seandainya aku bisa menjadi es krim<br>agar kamu menikmatiku setiap hari <span class="big-heart">😋💕</span>',
+                'Manisnya dirimu tak tertandingi<br>oleh gula mana pun <span class="big-heart">🍬💖</span>',
+                'Bersamamu seperti rasa es krim favorit<br>selalu membuatku bahagia <span class="big-heart">🥰🍦</span>',
+                'Aku mencintaimu lebih dari aku mencintai es krim<br>dan itu sangat besar! <span class="big-heart">💝🎀</span>',
+                'Hatiku meleleh setiap kali melihatmu<br>seperti es krim di bawah sinar matahari <span class="big-heart">☀️💗</span>',
+                'Kamu adalah rasa manis dalam hari-hariku <span class="big-heart">🌈💕</span><br>Terima kasih sudah ada untukku',
+                'Es krim ini terlalu dingin<br>tapi kamu selalu hangat di hatiku <span class="big-heart">🔥💖</span>',
+                'Scoop demi scoop kebahagiaan<br>bersamamu selamanya <span class="big-heart">🍨✨</span>',
+                'Aku rela antre panjang<br>demi mendapatkan cintamu <span class="big-heart">💕🎀</span>',
+                'Kamu itu seperti es krim vanilla<br>klasik, manis, dan selalu kurindukan <span class="big-heart">🍦💛</span>',
+            ];
+            const particleWords = ['Sayang! 💕', 'Cinta! 💖', 'Manis! 🍓', 'Cantik! 🌸', 'Sayang banget! 💝', 'Cium! 💋',
+                'Peluk! 🤗', 'Kamu! ✨', 'Aku cinta kamu! 💓', 'Manisnya! 😍', 'Sweet! 🍬', 'Love! 💗'
+            ];
+            const sprinkleEmojis = ['✨', '🌟', '💫', '⭐', '🌸', '💮', '🩷', '🧁', '🍓', '🍒', '🫐', '🍬', '🍭'];
+
+            // Click handler
+            icecreamWrapper.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Increment click counter
+                clickCount++;
+                clickCountSpan.textContent = clickCount;
+
+                // Shake animation
+                icecreamWrapper.classList.remove('shake-animation');
+                void icecreamWrapper.offsetWidth; // force reflow
+                icecreamWrapper.classList.add('shake-animation');
+
+                // Change ice cream emoji
+                const newEmoji = iceCreamEmojis[Math.floor(Math.random() * iceCreamEmojis.length)];
+                icecreamEmoji.textContent = newEmoji;
+
+                // Change message
+                const newMessage = sweetMessages[Math.floor(Math.random() * sweetMessages.length)];
+                messageText.innerHTML = newMessage;
+
+                // Rainbow glow on message box
+                messageBox.classList.add('rainbow-glow');
+                setTimeout(() => {
+                    messageBox.classList.remove('rainbow-glow');
+                }, 2000);
+
+                // Get click position for effects
+                const rect = icecreamWrapper.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+
+                // Heart burst
+                spawnHeartBurst(centerX, centerY);
+
+                // Sparkles
+                spawnSparkles(centerX, centerY);
+
+                // Click particles (floating words)
+                spawnClickParticles(centerX, centerY);
+
+                // Sprinkles fall
+                spawnSprinkles();
+
+                // Update hint text
+                if (clickCount === 1) {
+                    clickHint.textContent = '🎉 Yay! Sekali lagi sayang! 💕';
+                } else if (clickCount === 5) {
+                    clickHint.textContent = '😍 Kamu makin manis! Klik terus! 💖';
+                } else if (clickCount === 10) {
+                    clickHint.textContent = '🌟 Wow! Kamu hebat! Aku makin cinta! 💝';
+                } else if (clickCount === 20) {
+                    clickHint.textContent = '🏆 Juara hatiku! Teruskan! 💘';
+                } else if (clickCount === 50) {
+                    clickHint.textContent = '💍 Mau nikah? Hehehe... 💕';
+                } else if (clickCount === 100) {
+                    clickHint.textContent = '👑 Kamu ratu/raja es krim! Aku cinta kamu! 💖';
+                } else if (clickCount > 0 && clickCount % 10 === 0) {
+                    clickHint.textContent = '✨ ' + clickCount + ' klik! Kamu luar biasa! 💕';
+                } else if (clickCount > 0 && clickCount % 3 === 0) {
+                    clickHint.textContent = '💋 Ciuman untukmu sayang~ Muah! 💕';
+                }
+            });
+
+            // Mouse move over ice cream - sprinkle trail
+            let lastSprinkleTime = 0;
+            icecreamWrapper.addEventListener('mousemove', function(e) {
+                const now = Date.now();
+                if (now - lastSprinkleTime > 150) {
+                    lastSprinkleTime = now;
+                    const sprinkle = document.createElement('span');
+                    sprinkle.className = 'cursor-sprinkle';
+                    sprinkle.textContent = sprinkleEmojis[Math.floor(Math.random() * sprinkleEmojis.length)];
+                    sprinkle.style.left = (e.clientX + (Math.random() * 30 - 15)) + 'px';
+                    sprinkle.style.top = (e.clientY + (Math.random() * 20 - 10)) + 'px';
+                    sprinkle.style.position = 'fixed';
+                    document.body.appendChild(sprinkle);
+                    setTimeout(() => {
+                        if (sprinkle.parentNode) sprinkle.parentNode.removeChild(sprinkle);
+                    }, 700);
+                }
+            });
+
+            // Heart burst function
+            function spawnHeartBurst(x, y) {
+                const heartEmojis = ['💖', '💕', '💗', '💓', '❤️', '🩷', '💘', '💝', '💞', '💟', '❣️', '💛', '🧡',
+                    '💚', '💙', '💜'
+                ];
+                const count = 8 + Math.floor(Math.random() * 6); // 8-13 hearts
+
+                for (let i = 0; i < count; i++) {
+                    const heart = document.createElement('span');
+                    heart.className = 'burst-heart';
+                    heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+
+                    const angle = (Math.PI * 2 / count) * i + Math.random() * 0.8;
+                    const distance = 60 + Math.random() * 80;
+                    const flyX = Math.cos(angle) * distance;
+                    const flyY = Math.sin(angle) * distance - 30;
+
+                    heart.style.left = (x + (Math.random() * 30 - 15)) + 'px';
+                    heart.style.top = (y + (Math.random() * 20 - 10)) + 'px';
+                    heart.style.setProperty('--fly-x', flyX + 'px');
+                    heart.style.setProperty('--fly-y', flyY + 'px');
+                    heart.style.fontSize = (1.2 + Math.random() * 1.5) + 'rem';
+                    heart.style.animationDuration = (0.8 + Math.random() * 0.8) + 's';
+
+                    heartBurstContainer.appendChild(heart);
+                    setTimeout(() => {
+                        if (heart.parentNode) heart.parentNode.removeChild(heart);
+                    }, 1600);
+                }
+            }
+
+            // Sparkles function
+            function spawnSparkles(x, y) {
+                const sparkleEmojis = ['✨', '🌟', '💫', '⭐', '🌸', '💮', '🩷'];
+                const count = 6 + Math.floor(Math.random() * 5);
+
+                for (let i = 0; i < count; i++) {
+                    const sparkle = document.createElement('span');
+                    sparkle.className = 'sparkle';
+                    sparkle.textContent = sparkleEmojis[Math.floor(Math.random() * sparkleEmojis.length)];
+
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = 40 + Math.random() * 70;
+                    const sparkleX = Math.cos(angle) * distance;
+                    const sparkleY = Math.sin(angle) * distance;
+
+                    sparkle.style.left = (x + (Math.random() * 20 - 10)) + 'px';
+                    sparkle.style.top = (y + (Math.random() * 15 - 7)) + 'px';
+                    sparkle.style.setProperty('--sparkle-x', sparkleX + 'px');
+                    sparkle.style.setProperty('--sparkle-y', sparkleY + 'px');
+                    sparkle.style.fontSize = (0.9 + Math.random() * 1.2) + 'rem';
+                    sparkle.style.animationDuration = (0.7 + Math.random() * 0.6) + 's';
+
+                    heartBurstContainer.appendChild(sparkle);
+                    setTimeout(() => {
+                        if (sparkle.parentNode) sparkle.parentNode.removeChild(sparkle);
+                    }, 1300);
+                }
+            }
+
+            // Click particles (floating words)
+            function spawnClickParticles(x, y) {
+                const count = 3 + Math.floor(Math.random() * 3);
+                for (let i = 0; i < count; i++) {
+                    const particle = document.createElement('span');
+                    particle.className = 'click-particle';
+                    const word = particleWords[Math.floor(Math.random() * particleWords.length)];
+                    particle.textContent = word;
+
+                    const pX = (Math.random() * 80 - 40);
+                    const pY = -(40 + Math.random() * 80);
+
+                    particle.style.left = (x + (Math.random() * 40 - 20)) + 'px';
+                    particle.style.top = (y + (Math.random() * 20 - 10)) + 'px';
+                    particle.style.setProperty('--p-x', pX + 'px');
+                    particle.style.setProperty('--p-y', pY + 'px');
+                    particle.style.color = ['#ff6b81', '#ff8fa3', '#ffb6c1', '#e0758a', '#d4607a', '#ff4757'][Math
+                        .floor(Math.random() * 6)];
+                    particle.style.fontSize = (0.8 + Math.random() * 0.6) + 'rem';
+                    particle.style.animationDuration = (0.7 + Math.random() * 0.5) + 's';
+
+                    heartBurstContainer.appendChild(particle);
+                    setTimeout(() => {
+                        if (particle.parentNode) particle.parentNode.removeChild(particle);
+                    }, 1200);
+                }
+            }
+
+            // Sprinkles falling from top
+            function spawnSprinkles() {
+                const count = 8 + Math.floor(Math.random() * 8);
+                for (let i = 0; i < count; i++) {
+                    const sprinkle = document.createElement('span');
+                    sprinkle.className = 'sprinkle-fall';
+                    sprinkle.textContent = sprinkleEmojis[Math.floor(Math.random() * sprinkleEmojis.length)];
+                    sprinkle.style.left = (Math.random() * 100) + '%';
+                    sprinkle.style.top = '-20px';
+                    sprinkle.style.fontSize = (0.8 + Math.random() * 1.2) + 'rem';
+                    sprinkle.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+                    sprinkle.style.animationDelay = (Math.random() * 0.5) + 's';
+                    document.body.appendChild(sprinkle);
+                    setTimeout(() => {
+                        if (sprinkle.parentNode) sprinkle.parentNode.removeChild(sprinkle);
+                    }, 3500);
+                }
+            }
+
+            // Touch support for mobile
+            icecreamWrapper.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const clickEvent = new MouseEvent('click', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY,
+                });
+                icecreamWrapper.dispatchEvent(clickEvent);
+            }, { passive: false });
+
+            // Keyboard support
+            icecreamWrapper.setAttribute('tabindex', '0');
+            icecreamWrapper.setAttribute('role', 'button');
+            icecreamWrapper.setAttribute('aria-label', 'Klik untuk kejutan manis');
+            icecreamWrapper.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    icecreamWrapper.click();
+                }
+            });
+
+            // Initial sprinkle drop on load
+            window.addEventListener('load', function() {
+                setTimeout(() => {
+                    spawnSprinkles();
+                    setTimeout(spawnSprinkles, 800);
+                }, 500);
+            });
+
+            // Slight random sparkle on load
+            setTimeout(() => {
+                const rect = icecreamWrapper.getBoundingClientRect();
+                spawnSparkles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+            }, 1200);
+
+            // Heart burst periodically (subtle)
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    const rect = icecreamWrapper.getBoundingClientRect();
+                    const x = rect.left + rect.width / 2 + (Math.random() * 60 - 30);
+                    const y = rect.top + rect.height / 2 + (Math.random() * 40 - 20);
+                    spawnHeartBurst(x, y);
+                }
+            }, 4000);
+        })();
+    </script>
+</body>
+</html>
