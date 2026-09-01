@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jam Bicara Bro 🗣️ (Anti-Sleep Version)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0d1117;
+            --card: #161b22;
+            --text: #f0f6fc;
+            --accent: #238636;
+            --accent-hover: #2ea043;
+            --danger: #da3633;
+            --danger-hover: #f85149;
+            --border: #30363d;
+            --glow: #58a6ff;
+            --mono: 'Courier New', monospace;
+            --sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: var(--bg); color: var(--text); font-family: var(--sans);
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100dvh; padding: 16px; margin: 0; user-select: none;
+        }
+        .container {
+            background: var(--card); border: 1px solid var(--border); border-radius: 24px;
+            padding: 24px 20px; width: 100%; max-width: 420px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5); display: flex; flex-direction: column;
+            gap: 20px; text-align: center;
+        }
+        h1 { font-size: 1.6rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .clock {
+            font-family: var(--mono); font-size: 3.2rem; font-weight: 700; letter-spacing: 2px;
+            background: #0a0e14; border: 2px solid var(--border); border-radius: 18px;
+            padding: 18px 10px; text-shadow: 0 0 12px rgba(88, 166, 255, 0.6); color: #e6edf3;
+        }
+        .status {
+            font-size: 1rem; font-weight: 600; padding: 8px 12px; border-radius: 30px;
+            display: inline-block; margin: 0 auto;
+        }
+        .status.running { background: rgba(35, 134, 54, 0.2); color: #3fb950; border: 1px solid rgba(35, 134, 54, 0.5); }
+        .status.stopped { background: rgba(218, 54, 51, 0.15); color: #f85149; border: 1px solid rgba(218, 54, 51, 0.4); }
+        .controls { display: flex; flex-direction: column; gap: 16px; }
+        .select-group { display: flex; flex-direction: column; gap: 6px; text-align: left; }
+        .select-group label { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; color: #8b949e; }
+        select {
+            background: #0a0e14; color: var(--text); border: 2px solid var(--border);
+            border-radius: 12px; padding: 14px 16px; font-size: 1rem; width: 100%; outline: none;
+        }
+        .btn-group { display: flex; gap: 12px; margin-top: 4px; }
+        .btn {
+            flex: 1; border: none; border-radius: 16px; padding: 16px 10px;
+            font-size: 1.2rem; font-weight: 700; cursor: pointer; color: white; text-transform: uppercase;
+        }
+        .btn-start { background: var(--accent); }
+        .btn-start:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-stop { background: var(--danger); }
+        .btn-stop:disabled { opacity: 0.5; cursor: not-allowed; }
+        .info { font-size: 0.8rem; color: #8b949e; line-height: 1.5; border-top: 1px solid var(--border); padding-top: 14px; }
+        .info span { color: #e6edf3; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗣️ Jam Bicara Bro</h1>
+        <div class="clock" id="clock">--:--:--.---</div>
+        <div id="status" class="status stopped">⏹️ Stopped</div>
+
+        <div class="controls">
+            <div class="select-group">
+                <label for="interval">⏱️ Interval Ngomong</label>
+                <select id="interval">
+                    <option value="60000" selected>1 Menit (Default)</option>
+                    <option value="300000">5 Menit</option>
+                    <option value="900000">15 Menit</option>
+                    <option value="1800000">30 Menit</option>
+                    <option value="3600000">1 Jam</option>
+                </select>
+            </div>
+            <div class="select-group">
+                <label for="lang">🌐 Bahasa</label>
+                <select id="lang">
+                    <option value="id" selected>🇮🇩 Indonesia (Default)</option>
+                    <option value="en">🇬🇧 English</option>
+                    <option value="zh">🇨🇳 Mandarin</option>
+                </select>
+            </div>
+            <div class="btn-group">
+                <button id="btnStart" class="btn btn-start">▶️ Start</button>
+                <button id="btnStop" class="btn btn-stop" disabled>⏹️ Stop</button>
+            </div>
+        </div>
+
+        <div class="info">
+            💡 Untuk Android: Matikan fitur <span>Penghemat Baterai / Battery Optimization</span> untuk Chrome agar tidak di-kill saat layar mati.
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            let running = false;
+            let intervalId = null;
+            let audioCtx = null;
+            let silentOscillator = null;
+            let wakeLock = null;
+            let clockTimer = null;
+
+            const clockEl = document.getElementById('clock');
+            const statusEl = document.getElementById('status');
+            const intervalSelect = document.getElementById('interval');
+            const langSelect = document.getElementById('lang');
+            const btnStart = document.getElementById('btnStart');
+            const btnStop = document.getElementById('btnStop');
+
+            function updateClock() {
+                const now = new Date();
+                const h = String(now.getHours()).padStart(2, '0');
+                const m = String(now.getMinutes()).padStart(2, '0');
+                const s = String(now.getSeconds()).padStart(2, '0');
+                const ms = String(now.getMilliseconds()).padStart(3, '0');
+                clockEl.textContent = `${h}:${m}:${s}.${ms}`;
+            }
+
+            // Anti-Freeze via Continuous Web Audio Oscillator (Volume 0)
+            function startKeepAliveAudio() {
+                try {
+                    if (!audioCtx) {
+                        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    }
+                    if (audioCtx.state === 'suspended') {
+                        audioCtx.resume();
+                    }
+                    silentOscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    gainNode.gain.value = 0.001; // Menggunakan sinyal sangat amat kecil agar WebAudio tetap aktif secara native
+                    silentOscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    silentOscillator.start();
+                } catch (e) { console.warn('Audio KeepAlive fail', e); }
+            }
+
+            function stopKeepAliveAudio() {
+                try {
+                    if (silentOscillator) {
+                        silentOscillator.stop();
+                        silentOscillator.disconnect();
+                        silentOscillator = null;
+                    }
+                    if (audioCtx) {
+                        audioCtx.close();
+                        audioCtx = null;
+                    }
+                } catch (e) { console.warn('Audio Stop fail', e); }
+            }
+
+            // Request WakeLock jika didukung browser
+            async function requestWakeLock() {
+                if ('wakeLock' in navigator) {
+                    try { wakeLock = await navigator.wakeLock.request('screen'); } 
+                    catch (err) { console.warn('Wake Lock error:', err); }
+                }
+            }
+
+            function getTimeText(date, lang) {
+                const h = date.getHours();
+                const m = date.getMinutes();
+                if (lang === 'id') return m === 0 ? `Sekarang pukul ${h} tepat` : `Sekarang pukul ${h} lewat ${m} menit`;
+                if (lang === 'en') {
+                    const ampm = h >= 12 ? 'PM' : 'AM';
+                    const h12 = h % 12 || 12;
+                    return m === 0 ? `It's ${h12} o'clock ${ampm}` : `It's ${h12} ${m} ${ampm}`;
+                }
+                if (lang === 'zh') {
+                    const period = h >= 12 ? '下午' : '上午';
+                    const h12 = h % 12 || 12;
+                    return m === 0 ? `现在是${period}${h12}点整` : `现在是${period}${h12}点${m}分`;
+                }
+                return '';
+            }
+
+            function speakTime() {
+                if (!('speechSynthesis' in window)) return;
+                const now = new Date();
+                const text = getTimeText(now, langSelect.value);
+
+                if (speechSynthesis.speaking) speechSynthesis.cancel();
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.volume = 1;
+                utterance.rate = 1;
+                speechSynthesis.speak(utterance);
+            }
+
+            function start() {
+                if (running) return;
+                running = true;
+                statusEl.textContent = '🔊 Running...';
+                statusEl.className = 'status running';
+                btnStart.disabled = true;
+                btnStop.disabled = false;
+
+                startKeepAliveAudio();
+                requestWakeLock();
+                speakTime();
+
+                const ms = parseInt(intervalSelect.value, 10);
+                intervalId = setInterval(speakTime, ms);
+
+                // Menggunakan Web Locks API jika tersedia untuk mencegah freeze background
+                if ('locks' in navigator) {
+                    navigator.locks.request('jam_bicara_lock', async () => {
+                        await new Promise(() => {}); // Tetap menahan lock selama aplikasi berjalan
+                    });
+                }
+            }
+
+            function stop() {
+                if (!running) return;
+                running = false;
+                statusEl.textContent = '⏹️ Stopped';
+                statusEl.className = 'status stopped';
+                btnStart.disabled = false;
+                btnStop.disabled = true;
+
+                if (intervalId) clearInterval(intervalId);
+                stopKeepAliveAudio();
+                if (wakeLock) { wakeLock.release(); wakeLock = null; }
+                if (speechSynthesis.speaking) speechSynthesis.cancel();
+            }
+
+            btnStart.addEventListener('click', start);
+            btnStop.addEventListener('click', stop);
+            clockTimer = setInterval(updateClock, 10);
+        })();
+    </script>
+</body>
+</html>
