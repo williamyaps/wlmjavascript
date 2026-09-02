@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jam Bicara Bro 🗣️ (Web Worker)</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background:#0d1117; color:#f0f6fc; font-family:'Segoe UI', sans-serif;
+            display:flex; align-items:center; justify-content:center; min-height:100dvh;
+            padding:16px; user-select:none; -webkit-tap-highlight-color:transparent;
+        }
+        .container {
+            background:#161b22; border:1px solid #30363d; border-radius:24px;
+            padding:24px 20px; width:100%; max-width:420px; text-align:center;
+            box-shadow:0 12px 40px rgba(0,0,0,0.5); display:flex; flex-direction:column; gap:20px;
+        }
+        h1 { font-size:1.5rem; }
+        .clock {
+            font-family:'Courier New', monospace; font-size:3rem; font-weight:700;
+            background:#0a0e14; border:2px solid #30363d; border-radius:18px;
+            padding:18px 10px; text-shadow:0 0 12px #58a6ff;
+        }
+        .status {
+            display:inline-block; padding:8px 16px; border-radius:30px; font-weight:600;
+            background:rgba(218,54,51,0.15); color:#f85149; border:1px solid rgba(218,54,51,0.4);
+        }
+        .status.running { background:rgba(35,134,54,0.2); color:#3fb950; border-color:rgba(35,134,54,0.5); }
+        select {
+            width:100%; padding:14px; background:#0a0e14; color:white; border:2px solid #30363d;
+            border-radius:12px; font-size:1rem; outline:none;
+        }
+        .btn-group { display:flex; gap:12px; }
+        button {
+            flex:1; padding:16px; border:none; border-radius:16px; font-size:1.1rem;
+            font-weight:700; color:white; cursor:pointer; text-transform:uppercase;
+        }
+        #btnStart { background:#238636; }
+        #btnStop { background:#da3633; }
+        button:disabled { opacity:0.5; cursor:not-allowed; }
+        .info { font-size:0.8rem; color:#8b949e; border-top:1px solid #30363d; padding-top:14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗣️ Jam Bicara Bro</h1>
+        <div class="clock" id="clock">--:--:--.---</div>
+        <div id="status" class="status">⏹️ Stopped</div>
+
+        <select id="interval">
+            <option value="60000">1 Menit (Default)</option>
+            <option value="300000">5 Menit</option>
+            <option value="900000">15 Menit</option>
+            <option value="1800000">30 Menit</option>
+            <option value="3600000">1 Jam</option>
+        </select>
+        <select id="lang">
+            <option value="id">🇮🇩 Indonesia</option>
+            <option value="en">🇬🇧 English</option>
+            <option value="zh">🇨🇳 Mandarin</option>
+        </select>
+
+        <div class="btn-group">
+            <button id="btnStart">▶️ Start</button>
+            <button id="btnStop" disabled>⏹️ Stop</button>
+        </div>
+
+        <div class="info">
+            💡 <b>Wajib</b>: Matikan <u>Penghemat Baterai</u> untuk browser ini.<br>
+            Timer jalan di Web Worker, anti throttle.
+        </div>
+    </div>
+
+    <!-- Silent audio element -->
+    <audio id="silentAudio" loop preload="auto" style="display:none">
+        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav">
+    </audio>
+
+    <script>
+        (function() {
+            // State
+            let running = false;
+            let worker = null;
+            let wakeLock = null;
+            let clockTimer = null;
+            let audioCtx = null;
+
+            // DOM
+            const clockEl = document.getElementById('clock');
+            const statusEl = document.getElementById('status');
+            const intervalSelect = document.getElementById('interval');
+            const langSelect = document.getElementById('lang');
+            const btnStart = document.getElementById('btnStart');
+            const btnStop = document.getElementById('btnStop');
+            const silentAudio = document.getElementById('silentAudio');
+
+            // Update jam (milidetik)
+            function updateClock() {
+                const now = new Date();
+                const h = String(now.getHours()).padStart(2,'0');
+                const m = String(now.getMinutes()).padStart(2,'0');
+                const s = String(now.getSeconds()).padStart(2,'0');
+                const ms = String(now.getMilliseconds()).padStart(3,'0');
+                clockEl.textContent = `${h}:${m}:${s}.${ms}`;
+            }
+
+            // Pastikan silent audio diputar
+            function ensureSilentAudio() {
+                if (silentAudio.paused) {
+                    silentAudio.play().catch(e => console.warn('Silent audio play error:', e));
+                }
+            }
+
+            // Wake Lock
+            async function requestWakeLock() {
+                if ('wakeLock' in navigator) {
+                    try { wakeLock = await navigator.wakeLock.request('screen'); } 
+                    catch(e) { console.warn('Wake Lock error:', e); }
+                }
+            }
+
+            // Web Locks
+            function requestWebLock() {
+                if ('locks' in navigator) {
+                    navigator.locks.request('jam_bicara_lock', async () => {
+                        await new Promise(() => {}); // tahan terus
+                    });
+                }
+            }
+
+            // Fallback beep jika speech gagal total
+            function playBeep() {
+                try {
+                    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = 880;
+                    gain.gain.value = 0.9;
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    setTimeout(() => osc.stop(), 300);
+                } catch(e) {}
+            }
+
+            // Ucapkan waktu
+            function speakTime() {
+                if (!('speechSynthesis' in window)) {
+                    playBeep();
+                    return;
+                }
+
+                const now = new Date();
+                const lang = langSelect.value;
+                let text = '';
+                const h = now.getHours();
+                const m = now.getMinutes();
+                if (lang === 'id') text = m === 0 ? `Sekarang pukul ${h} tepat` : `Sekarang pukul ${h} lewat ${m} menit`;
+                else if (lang === 'en') {
+                    const ampm = h >= 12 ? 'PM' : 'AM';
+                    const h12 = h % 12 || 12;
+                    text = m === 0 ? `It's ${h12} o'clock ${ampm}` : `It's ${h12} ${m} ${ampm}`;
+                } else if (lang === 'zh') {
+                    const period = h >= 12 ? '下午' : '上午';
+                    const h12 = h % 12 || 12;
+                    text = m === 0 ? `现在是${period}${h12}点整` : `现在是${period}${h12}点${m}分`;
+                }
+
+                // Batalkan ucapan sebelumnya
+                if (speechSynthesis.speaking) speechSynthesis.cancel();
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = lang === 'id' ? 'id-ID' : lang === 'en' ? 'en-US' : 'zh-CN';
+                utterance.volume = 1;
+                utterance.rate = 1;
+                utterance.pitch = 1;
+
+                // Coba pilih voice yang cocok
+                const voices = speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    const prefix = lang === 'id' ? 'id' : lang === 'en' ? 'en' : 'zh';
+                    const voice = voices.find(v => v.lang.replace('_','-').startsWith(prefix));
+                    if (voice) utterance.voice = voice;
+                }
+
+                // Fallback beep jika speech gagal
+                utterance.onerror = () => playBeep();
+                speechSynthesis.speak(utterance);
+            }
+
+            // Buat Web Worker untuk timer
+            function createWorker(intervalMs) {
+                // Worker code as Blob
+                const workerCode = `
+                    let intervalId = null;
+                    self.onmessage = function(e) {
+                        if (e.data.command === 'start') {
+                            if (intervalId) clearInterval(intervalId);
+                            const ms = e.data.interval;
+                            intervalId = setInterval(() => {
+                                self.postMessage({ type: 'tick' });
+                            }, ms);
+                        } else if (e.data.command === 'stop') {
+                            if (intervalId) clearInterval(intervalId);
+                            intervalId = null;
+                        } else if (e.data.command === 'update') {
+                            if (intervalId) clearInterval(intervalId);
+                            const ms = e.data.interval;
+                            intervalId = setInterval(() => {
+                                self.postMessage({ type: 'tick' });
+                            }, ms);
+                        }
+                    };
+                `;
+                const blob = new Blob([workerCode], { type: 'application/javascript' });
+                const workerUrl = URL.createObjectURL(blob);
+                const worker = new Worker(workerUrl);
+                
+                worker.onmessage = function(e) {
+                    if (e.data.type === 'tick') {
+                        speakTime();
+                    }
+                };
+                return worker;
+            }
+
+            // Start
+            function start() {
+                if (running) return;
+                running = true;
+                statusEl.textContent = '🔊 Running...';
+                statusEl.className = 'status running';
+                btnStart.disabled = true;
+                btnStop.disabled = false;
+
+                ensureSilentAudio();
+                requestWakeLock();
+                requestWebLock();
+
+                // Buat worker dan kirim interval
+                const ms = parseInt(intervalSelect.value, 10);
+                if (worker) worker.terminate();
+                worker = createWorker(ms);
+                worker.postMessage({ command: 'start', interval: ms });
+
+                // Ucapkan langsung sekarang
+                speakTime();
+            }
+
+            // Stop
+            function stop() {
+                if (!running) return;
+                running = false;
+                statusEl.textContent = '⏹️ Stopped';
+                statusEl.className = 'status';
+                btnStart.disabled = false;
+                btnStop.disabled = true;
+
+                if (worker) {
+                    worker.postMessage({ command: 'stop' });
+                    worker.terminate();
+                    worker = null;
+                }
+                if (wakeLock) { wakeLock.release(); wakeLock = null; }
+                if (speechSynthesis.speaking) speechSynthesis.cancel();
+                silentAudio.pause();
+            }
+
+            // Event listeners
+            btnStart.addEventListener('click', () => {
+                if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+                start();
+            });
+            btnStop.addEventListener('click', stop);
+
+            intervalSelect.addEventListener('change', () => {
+                if (running) {
+                    const ms = parseInt(intervalSelect.value, 10);
+                    if (worker) {
+                        worker.postMessage({ command: 'update', interval: ms });
+                    }
+                }
+            });
+
+            langSelect.addEventListener('change', () => {
+                if (running) speakTime();
+            });
+
+            // Visibility change: pastikan silent audio tetap main
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && running) {
+                    ensureSilentAudio();
+                    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+                }
+            });
+
+            // Cleanup saat tab ditutup
+            window.addEventListener('beforeunload', () => {
+                stop();
+                clearInterval(clockTimer);
+            });
+
+            // Mulai jam
+            updateClock();
+            clockTimer = setInterval(updateClock, 10);
+        })();
+    </script>
+</body>
+</html>
