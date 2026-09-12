@@ -1,0 +1,183 @@
+from IPython.display import display, HTML
+
+# KODE REKAYASA ANTARMUKA MURNI (HTML5 + MATHQUILL ENG-V2)
+kalkulator_html = """
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Muat Library MathQuill Resmi & JQuery Aman -->
+    <link rel="stylesheet" href="https://cloudflare.com" />
+    <script src="https://googleapis.com"></script>
+    <script src="https://cloudflare.com"></script>
+    <!-- Muat Library untuk Gambar Canvas Ke PNG -->
+    <script src="https://cloudflare.com"></script>
+
+    <style>
+        body { background-color: #020617; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; padding: 10px; }
+        .main-box { background: #0f172a; padding: 20px; border-radius: 16px; border: 1px solid #1e293b; width: 100%; max-width: 440px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); box-sizing: border-box; }
+        .main-title { color: #a855f7; font-weight: 800; text-align: center; margin-bottom: 15px; letter-spacing: 1px; font-size: 16px; }
+        
+        /* AREA KETIK RUMUS VISUAL */
+        .math-field-container { background: #020617; color: #f8fafc; padding: 15px; border: 2px solid #334155; border-radius: 8px; min-height: 45px; font-size: 24px; margin-bottom: 10px; display: flex; align-items: center; }
+        .mq-editable-field { border: none !important; box-shadow: none !important; width: 100%; color: white !important; }
+        .mq-cursor { border-left: 2px solid #a855f7 !important; }
+        
+        /* AREA HASIL REALTIME */
+        .output-box { background: #1e1b4b; color: #38bdf8; font-size: 20px; font-weight: bold; padding: 12px; border-radius: 8px; text-align: right; margin-bottom: 15px; min-height: 25px; word-wrap: break-word; }
+        
+        /* SISTEM TAB UI */
+        .tab-header { display: flex; background: #1e293b; border-radius: 8px 8px 0 0; overflow: hidden; }
+        .tab-btn { flex: 1; padding: 10px 5px; background: none; border: none; color: #94a3b8; font-weight: bold; font-size: 11px; cursor: pointer; text-align: center; text-transform: uppercase; }
+        .tab-btn.active { background: #a855f7; color: white; }
+        .tab-content { background: #1e293b; padding: 15px; border-radius: 0 0 8px 8px; display: none; }
+        .tab-content.active { display: block; }
+        
+        /* SAKLAR TOMBOL KEYBOARD */
+        .grid-layout { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+        .grid-layout-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        .btn { background: #334155; color: white; border: none; padding: 12px 0; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.1s; text-align: center; }
+        .btn:active { opacity: 0.8; }
+        .btn-op { background: #475569; color: #a855f7; }
+        .btn-act { background: #6b21a8; color: white; }
+        .btn-del { background: #b91c1c; color: white; }
+        
+        /* PANEL HISTORI */
+        .history-list { max-height: 120px; overflow-y: auto; background: #020617; border-radius: 6px; padding: 8px; font-family: monospace; font-size: 11px; color: #cbd5e1; margin-bottom: 10px; }
+        .history-item { border-bottom: 1px solid #1e293b; padding: 4px 0; }
+        .btn-exp { width: 100%; padding: 10px; margin-top: 5px; font-weight: bold; border-radius: 6px; border: none; cursor: pointer; color: white; }
+        
+        /* AREA KARTU GRAFIK / GAMBAR HASIL */
+        #capture-area { background: #0f172a; padding: 10px; border-radius: 8px; margin-top: 15px; border: 1px dashed #334155; text-align: center; color: white; }
+        .result-card { background: #020617; border: 1px solid #a855f7; padding: 15px; border-radius: 6px; color: #38bdf8; font-size: 18px; font-weight: bold; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+<div class="main-box">
+    <div class="main-title">⚡ AI MATH SOLVER SUITE (PRO VISUAL)</div>
+    
+    <!-- Wadah Input Visual MathQuill -->
+    <div class="math-field-container">
+        <span id="editable-math"></span>
+    </div>
+    
+    <!-- Monitor Output Hasil -->
+    <div class="output-box" id="result-display">0</div>
+    
+    <!-- Navigasi 4 Tab -->
+    <div class="tab-header">
+        <button class="tab-btn active" onclick="bukaTab(event, 'tab-algebra')">Algebra</button>
+        <button class="tab-btn" onclick="bukaTab(event, 'tab-trig')">Trigonometri</button>
+        <button class="tab-btn" onclick="bukaTab(event, 'tab-calc')">Kalkulus</button>
+        <button class="tab-btn" onclick="bukaTab(event, 'tab-history')">Riwayat</button>
+    </div>
+    
+    <!-- ISI TAB 1: ALGEBRA -->
+    <div id="tab-algebra" class="tab-content active">
+        <div class="grid-layout">
+            <button class="btn" onclick="inputTombol('7')">7</button>
+            <button class="btn" onclick="inputTombol('8')">8</button>
+            <button class="btn" onclick="inputTombol('9')">9</button>
+            <button class="btn btn-op" onclick="inputCmd('/')">÷</button>
+            <button class="btn btn-del" onclick="inputBackspace()">⌫</button>
+            
+            <button class="btn" onclick="inputTombol('4')">4</button>
+            <button class="btn" onclick="inputTombol('5')">5</button>
+            <button class="btn" onclick="inputTombol('6')">6</button>
+            <button class="btn btn-op" onclick="inputTombol('*')">×</button>
+            <button class="btn btn-del" onclick="inputClear()">AC</button>
+            
+            <button class="btn" onclick="inputTombol('1')">1</button>
+            <button class="btn" onclick="inputTombol('2')">2</button>
+            <button class="btn" onclick="inputTombol('3')">3</button>
+            <button class="btn btn-op" onclick="inputTombol('-')">-</button>
+            <button class="btn btn-act" style="grid-row: span 2; height: 100%;" onclick="hitungSelesai()">=</button>
+            
+            <button class="btn" onclick="inputTombol('0')">0</button>
+            <button class="btn" onclick="inputTombol('.')">.</button>
+            <button class="btn btn-op" onclick="inputTombol('x')">x</button>
+            <button class="btn btn-op" onclick="inputTombol('+')">+</button>
+        </div>
+    </div>
+    
+    <!-- ISI TAB 2: TRIGONOMETRI -->
+    <div id="tab-trig" class="tab-content">
+        <div class="grid-layout-3">
+            <button class="btn btn-op" onclick="inputTulis('sin(')">sin</button>
+            <button class="btn btn-op" onclick="inputTulis('cos(')">cos</button>
+            <button class="btn btn-op" onclick="inputTulis('tan(')">tan</button>
+            <button class="btn" onclick="inputTombol('(')">(</button>
+            <button class="btn" onclick="inputTombol(')')">)</button>
+            <button class="btn btn-op" onclick="inputTulis('\\\\pi')">π</button>
+        </div>
+    </div>
+    
+    <!-- ISI TAB 3: KALKULUS & EXTRA -->
+    <div id="tab-calc" class="tab-content">
+        <div class="grid-layout-3">
+            <button class="btn btn-op" onclick="inputTulis('log(')">log</button>
+            <button class="btn btn-op" onclick="inputTulis('ln(')">ln</button>
+            <button class="btn btn-op" onclick="inputTombol('e')">e</button>
+            <button class="btn btn-op" onclick="inputCmd('\\\\sqrt')">√</button>
+            <button class="btn btn-op" onclick="inputCmd('^')">^</button>
+        </div>
+    </div>
+    
+    <!-- ISI TAB 4: RIWAYAT & EKSPOR LOKAL -->
+    <div id="tab-history" class="tab-content">
+        <b style="color: white; font-size: 12px; display:block; margin-bottom:5px;">Riwayat Kalkulasi:</b>
+        <div class="history-list" id="log-list">Belum ada riwayat.</div>
+        <button class="btn-exp" style="background:#6b21a8;" onclick="eksporCSV()">Unduh Riwayat (.CSV)</button>
+        <button class="btn-exp" style="background:#475569;" onclick="eksporPNG()">Save As Gambar (.PNG)</button>
+    </div>
+    
+    <!-- AREA KARTU UNTUK DICAPTURE JADI GAMBAR -->
+    <div id="capture-area">
+        <div style="font-size:10px; color:#64748b; margin-bottom:5px; font-family:monospace;">PREVIEW EKSPOR GAMBAR</div>
+        <div class="result-card" id="card-render">INPUT KOSONG</div>
+    </div>
+</div>
+
+<script>
+    // Inisialisasi MathQuill Engine
+    var MQ = MathQuill.getInterface(2);
+    var mathFieldSpan = document.getElementById('editable-math');
+    var riwayatDatabase = [];
+    
+    var mathField = MQ.MathField(mathFieldSpan, {
+        spaceBehavesLikeTab: true,
+        handlers: {
+            edit: function() {
+                prosesKalkulasiRealtime();
+            }
+        }
+    });
+
+    // Kontrol Navigasi Tab UI
+    function bukaTab(evt, tabId) {
+        $('.tab-content').removeClass('active');
+        $('.tab-btn').removeClass('active');
+        $('#' + tabId).addClass('active');
+        $(evt.currentTarget).addClass('active');
+    }
+
+    // Fungsi Pengendali Input Keyboard Virtual
+    function inputTombol(str) { mathField.write(str); mathField.focus(); }
+    function inputTulis(str) { mathField.write(str); mathField.focus(); }
+    function inputCmd(str) { mathField.cmd(str); mathField.focus(); }
+    function inputBackspace() { mathField.keystroke('Backspace'); mathField.focus(); }
+    function inputClear() { mathField.latex(''); $('#result-display').text('0'); $('#card-render').text('INPUT KOSONG'); }
+
+    // Parser Logika Matematika dari MathQuill Text ke JavaScript Evaluator
+    function prosesKalkulasiRealtime() {
+        var rawText = mathField.text();
+        if(!rawText.strip) rawText = rawText.trim();
+        if(rawText === "") {
+            $('#result-display').text('0');
+            return;
+        }
+        
+        // Terjemahkan format bacaan MathQuill ke kode matematika JS standar
+        var formula = rawText.replace(/[^a-zA-Z0-9+\-*/().^]/g, function(match) {
+            if(match === '·') return '*';
+          return match;});formula = formula.replace(/sin(/g, 'Math.sin(').replace(/cos(/g, 'Math.cos(').replace(/tan(/g, 'Math.tan(').replace(/log(/g, 'Math.log10(').replace(/ln(/g, 'Math.log(').replace(/π/g, 'Math.PI').replace(/e/g, 'Math.E');// Pemrosesan Pangkat Luar (A^B -> Math.pow(A,B))while(formula.includes('^')) {formula = formula.replace(/([a-zA-Z0-9.()]+)^([a-zA-Z0-9.()]+)/g, "Math.pow($1,$2)");}// Abaikan kalkulasi otomatis dulu jika ada variabel fungsi kurva 'x'if(rawText.includes('x')) {$('#result-display').text("Format Fungsi f(x)");$('#card-render').text(rawText);return;}try {var hasil = eval(formula);if(!isNaN(hasil)) {if (Number.isInteger(hasil)) {$('#result-display').text(hasil);} else {$('#result-display').text(Number(hasil.toFixed(6)));}$('#card-render').text(rawText + " = " + $('#result-display').text());}} catch(e) {// Biarkan user menyelesaikan ketikan rumusnya dulu$('#result-display').text("Mengetik...");}}// Fungsi Menyimpan Data Riwayat Saat Tombol '=' Ditekanfunction hitungSelesai() {var rumus = mathField.text();var hasil = $('#result-display').text();if(!rumus || hasil === "Mengetik..." || hasil === "0") return;// Catat Waktu Lokal HP/Laptop secara akuratvar dt = new Date();var waktuStr = dt.getFullYear() + '-' +String(dt.getMonth()+1).padStart(2,'0') + '-' +String(dt.getDate()).padStart(2,'0') + ' ' +String(dt.getHours()).padStart(2,'0') + ':' +String(dt.getMinutes()).padStart(2,'0') + ':' +String(dt.getSeconds()).padStart(2,'0');riwayatDatabase.push({ waktu: waktuStr, rumus: rumus, hasil: hasil });// Perbarui Tampilan List Riwayat UIvar htmlList = "";for(var i = riwayatDatabase.length - 1; i >= 0; i--) {htmlList += "[" + riwayatDatabase[i].waktu + "] " +riwayatDatabase[i].rumus + " = " + riwayatDatabase[i].hasil + "";}$('#log-list').html(htmlList);}// Fungsi Ekspor Riwayat ke Format File CSV Langsung Unduh Ke Storage Perangkatfunction eksporCSV() {if(riwayatDatabase.length === 0) { alert("Belum ada riwayat kalukasi!"); return; }var csvContent = "Tanggal & Jam,Rumus Matematika,Hasil\n";riwayatDatabase.forEach(function(row) {csvContent += '"' + row.waktu + '","' + row.rumus + '","' + row.hasil + '"\n';});var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });var link = document.createElement("a");link.href = URL.createObjectURL(blob);link.setAttribute("download", "riwayat_kalkulator_ai.csv");document.body.appendChild(link);link.click();document.body.removeChild(link);}// Fungsi Konversi Area Preview Menjadi File Gambar PNG Tanpa Rusak/Copotfunction eksporPNG() {var targetArea = document.getElementById('capture-area');html2canvas(targetArea, { backgroundColor: '#0f172a' }).then(function(canvas) {var link = document.createElement('a');link.download = 'hasil_render_math_ai.png';link.href = canvas.toDataURL('image/png');document.body.appendChild(link);link.click();document.body.removeChild(link);});}
